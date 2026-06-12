@@ -8,1038 +8,245 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
 <meta name="theme-color" content="#1a0a0a" />
 <style>
-/* ============================================================
-   RESET & BASE
-   ============================================================ */
 * { margin: 0; padding: 0; box-sizing: border-box; }
 
 body {
   font-family: "PingFang SC", "Microsoft YaHei", sans-serif;
-  min-height: 100vh;
-  min-height: 100dvh;
+  min-height: 100vh; min-height: 100dvh;
   background: #1a0a0a;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  overflow-x: hidden;
-  position: relative;
+  display: flex; align-items: center; justify-content: center;
+  overflow-x: hidden; position: relative;
   transition: background 1.5s ease;
-  user-select: none;
-  -webkit-user-select: none;
-  -webkit-tap-highlight-color: transparent;
-  -webkit-touch-callout: none;
+  user-select: none; -webkit-user-select: none;
+  -webkit-tap-highlight-color: transparent; -webkit-touch-callout: none;
   opacity: 0;
 }
 body.ready { opacity: 1; }
 
-/* Dynamic background hue shift */
 body::before {
-  content: '';
-  position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+  content: ''; position: fixed; top:0;left:0;right:0;bottom:0;
   background: radial-gradient(ellipse at 30% 30%, rgba(255,107,107,0.06) 0%, transparent 50%),
               radial-gradient(ellipse at 70% 70%, rgba(255,154,243,0.06) 0%, transparent 50%),
               radial-gradient(ellipse at 50% 50%, rgba(254,202,87,0.04) 0%, transparent 50%);
   pointer-events: none; z-index: 0;
   animation: bgShift 12s ease-in-out infinite;
 }
-@keyframes bgShift {
-  0%,100% { opacity: 0.7; }
-  33% { opacity: 1; }
-  66% { opacity: 0.5; }
-}
+@keyframes bgShift { 0%,100%{opacity:0.7;} 33%{opacity:1;} 66%{opacity:0.5;} }
 
-/* ============================================================
-   STARFIELD
-   ============================================================ */
-.starfield { position: fixed; top: 0; left: 0; right: 0; bottom: 0; pointer-events: none; z-index: 0; }
-.star {
-  position: absolute;
-  background: #fff;
-  border-radius: 50%;
-  animation: twinkle var(--dur) ease-in-out infinite;
-  animation-delay: var(--delay);
-  opacity: 0;
-}
-@keyframes twinkle {
-  0%,100% { opacity: 0.15; }
-  50% { opacity: 0.7; }
-}
+.starfield { position: fixed; top:0;left:0;right:0;bottom:0; pointer-events:none; z-index:0; }
+.star { position:absolute; background:#fff; border-radius:50%; animation: twinkle var(--dur) ease-in-out infinite; animation-delay:var(--delay); opacity:0; }
+@keyframes twinkle { 0%,100%{opacity:0.15;} 50%{opacity:0.7;} }
 
-/* ============================================================
-   SPLASH SCREEN
-   ============================================================ */
-.splash {
-  position: fixed;
-  top: 0; left: 0; right: 0; bottom: 0;
-  background: #0a0a0f;
-  z-index: 10000;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  transition: opacity 0.4s ease, visibility 0.4s ease;
-  will-change: opacity;
-}
-.splash.hide { opacity: 0; visibility: hidden; pointer-events: none; }
-.splash .s-radio { font-size: 80px; animation: splashBounce 0.6s ease infinite; filter: drop-shadow(0 0 30px rgba(255,107,107,0.5)); }
-.splash .s-title { font-size: 32px; font-weight: 900; color: #ff9ff3; margin-top: 12px; letter-spacing: 6px; text-shadow: 0 0 20px rgba(255,154,243,0.4); }
-.splash .s-freq { font-size: 22px; font-weight: 700; color: #feca57; margin: 4px 0 20px; letter-spacing: 4px; }
-.splash .s-bar-wrap { width: 180px; height: 4px; background: rgba(255,255,255,0.08); border-radius: 2px; overflow: hidden; margin-bottom: 16px; }
-.splash .s-bar { height: 100%; width: 0%; background: linear-gradient(90deg, #ff6b6b, #ff9ff3); border-radius: 2px; transition: width 0.3s ease; will-change: width; }
-.splash .s-msg { font-size: 13px; color: #718096; letter-spacing: 2px; }
-@keyframes splashBounce { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
+/* splash */
+.splash { position:fixed; top:0;left:0;right:0;bottom:0; background:#0a0a0f; z-index:10000; display:flex; flex-direction:column; align-items:center; justify-content:center; transition: opacity 0.4s ease, visibility 0.4s ease; will-change:opacity; }
+.splash.hide { opacity:0; visibility:hidden; pointer-events:none; }
+.splash .s-radio { font-size:80px; animation:splashBounce 0.6s ease infinite; filter:drop-shadow(0 0 30px rgba(255,107,107,0.5)); }
+.splash .s-title { font-size:32px; font-weight:900; color:#ff9ff3; margin-top:12px; letter-spacing:6px; text-shadow:0 0 20px rgba(255,154,243,0.4); }
+.splash .s-freq { font-size:22px; font-weight:700; color:#feca57; margin:4px 0 20px; letter-spacing:4px; }
+.splash .s-bar-wrap { width:180px; height:4px; background:rgba(255,255,255,0.08); border-radius:2px; overflow:hidden; margin-bottom:16px; }
+.splash .s-bar { height:100%; width:0%; background:linear-gradient(90deg, #ff6b6b, #ff9ff3); border-radius:2px; transition:width 0.3s ease; will-change:width; }
+.splash .s-msg { font-size:13px; color:#718096; letter-spacing:2px; }
+@keyframes splashBounce { 0%,100%{transform:translateY(0);} 50%{transform:translateY(-10px);} }
 
-/* ============================================================
-   ANIMATIONS — base
-   ============================================================ */
-@keyframes floatUp {
-  0%   { transform: translateY(0) scale(0.5); opacity: 1; }
-  100% { transform: translateY(-60vh) scale(1.6); opacity: 0; }
-}
-@keyframes shake {
-  0%,100% { transform: translateX(0); }
-  10%,30%,50%,70%,90% { transform: translateX(-8px); }
-  20%,40%,60%,80% { transform: translateX(8px); }
-}
-@keyframes superShake {
-  0%,100% { transform: translate(0,0) rotate(0); }
-  20%  { transform: translate(-12px,4px) rotate(-3deg); }
-  40%  { transform: translate(10px,-2px) rotate(3deg); }
-  60%  { transform: translate(-4px,-6px) rotate(-2deg); }
-  80%  { transform: translate(8px,6px) rotate(4deg); }
-}
-@keyframes bounce {
-  0%,100% { transform: translateY(0); }
-  30%  { transform: translateY(-18px); }
-  50%  { transform: translateY(0); }
-  70%  { transform: translateY(-8px); }
-}
-@keyframes wiggle {
-  0%,100% { transform: rotate(0deg); }
-  25% { transform: rotate(-6deg); }
-  75% { transform: rotate(6deg); }
-}
-@keyframes rainbow {
-  0%   { color: #ff6b6b; }
-  16%  { color: #feca57; }
-  33%  { color: #48dbfb; }
-  50%  { color: #ff9ff3; }
-  66%  { color: #54a0ff; }
-  83%  { color: #5f27cd; }
-  100% { color: #ff6b6b; }
-}
-@keyframes pulse {
-  0%,100% { box-shadow: 0 0 0 0 rgba(255,107,107,0.6); }
-  50%     { box-shadow: 0 0 0 24px rgba(255,107,107,0); }
-}
-@keyframes pulseGlow {
-  0%,100% { box-shadow: 0 0 20px rgba(255,154,243,0.3), 0 0 60px rgba(255,107,107,0.15); }
-  50%     { box-shadow: 0 0 40px rgba(255,154,243,0.6), 0 0 100px rgba(255,107,107,0.3); }
-}
-@keyframes slideUp {
-  from { transform: translateY(15px); opacity: 0; }
-  to   { transform: translateY(0); opacity: 1; }
-}
-@keyframes fadeIn {
-  from { opacity: 0; }
-  to   { opacity: 1; }
-}
-@keyframes popIn {
-  from { transform: scale(0.3); opacity: 0; }
-  to   { transform: scale(1); opacity: 1; }
-}
-@keyframes popBounce {
-  0%   { transform: scale(0); }
-  50%  { transform: scale(1.15); }
-  100% { transform: scale(1); }
-}
-@keyframes confettiFall {
-  0%   { transform: translateY(-120px) rotate(0deg) scale(0.5); opacity: 1; }
-  100% { transform: translateY(110vh) rotate(720deg) scale(1.2); opacity: 0; }
-}
-@keyframes progressBar {
-  from { width: 0%; }
-  to   { width: 100%; }
-}
-@keyframes shimmer {
-  0% { background-position: 200% 0; }
-  100% { background-position: 0 0; }
-}
-@keyframes blink {
-  0%,100% { border-color: transparent; }
-  50% { border-color: #ff6b6b; }
-}
-@keyframes spin {
-  from { transform: rotate(0deg); }
-  to   { transform: rotate(360deg); }
-}
-@keyframes mascotBob {
-  0%,100% { transform: translateY(0) rotate(-2deg); }
-  25%  { transform: translateY(-6px) rotate(0deg); }
-  50%  { transform: translateY(0) rotate(2deg); }
-  75%  { transform: translateY(-3px) rotate(0deg); }
-}
-@keyframes mascotDance {
-  0%,100% { transform: translateY(0) rotate(-5deg) scale(1); }
-  25%  { transform: translateY(-12px) rotate(0deg) scale(1.1); }
-  50%  { transform: translateY(0) rotate(5deg) scale(1); }
-  75%  { transform: translateY(-6px) rotate(0deg) scale(1.05); }
-}
-@keyframes mascotLaugh {
-  0%   { transform: scale(1); }
-  25%  { transform: scale(1.3) rotate(10deg); }
-  50%  { transform: scale(0.9) rotate(-10deg); }
-  75%  { transform: scale(1.2) rotate(5deg); }
-  100% { transform: scale(1) rotate(0); }
-}
-@keyframes mascotAngry {
-  0%,100% { transform: translateX(0); }
-  25% { transform: translateX(-6px) rotate(-4deg); }
-  75% { transform: translateX(6px) rotate(4deg); }
-}
-@keyframes visualizerBar {
-  0%,100% { transform: scaleY(0.3); }
-  50%  { transform: scaleY(1); }
-}
-@keyframes spotlightScan {
-  0%,100% { opacity: 0.1; transform: translateX(-50%) rotate(-5deg); }
-  50%  { opacity: 0.25; transform: translateX(-50%) rotate(5deg); }
-}
-@keyframes neonFlicker {
-  0%,100% { opacity: 1; }
-  92%  { opacity: 1; }
-  93%  { opacity: 0.3; }
-  94%  { opacity: 1; }
-  96%  { opacity: 0.6; }
-  97%  { opacity: 1; }
-}
-@keyframes marqueeScroll {
-  from { transform: translateX(100%); }
-  to   { transform: translateX(-100%); }
-}
-@keyframes toastSlide {
-  from { transform: translateY(-60px); opacity: 0; }
-  to   { transform: translateY(0); opacity: 1; }
-}
-@keyframes pulseRing {
-  0%   { transform: translate(-50%,-50%) scale(0); opacity: 0.8; }
-  100% { transform: translate(-50%,-50%) scale(2.5); opacity: 0; }
-}
-@keyframes particleBurst {
-  0%   { transform: translate(0,0) scale(1); opacity: 1; }
-  100% { transform: translate(var(--dx), var(--dy)) scale(0); opacity: 0; }
-}
-@keyframes trailFade {
-  0%   { opacity: 0.9; transform: scale(1); }
-  100% { opacity: 0; transform: scale(0.2); }
-}
-@keyframes pigMarch {
-  0%   { transform: translateX(-120px); }
-  100% { transform: translateX(calc(100vw + 120px)); }
-}
-@keyframes sparkFlash {
-  0%,100% { opacity: 0; }
-  50% { opacity: 0.7; }
-}
-@keyframes meteorFall {
-  0%   { transform: translate(0, -100px) rotate(30deg); opacity: 1; }
-  100% { transform: translate(300px, 110vh) rotate(30deg); opacity: 0; }
-}
+/* animations */
+@keyframes floatUp { 0%{transform:translateY(0) scale(0.5); opacity:1;} 100%{transform:translateY(-60vh) scale(1.6); opacity:0;} }
+@keyframes shake { 0%,100%{transform:translateX(0);} 10%,30%,50%,70%,90%{transform:translateX(-8px);} 20%,40%,60%,80%{transform:translateX(8px);} }
+@keyframes superShake { 0%,100%{transform:translate(0,0) rotate(0);} 20%{transform:translate(-12px,4px) rotate(-3deg);} 40%{transform:translate(10px,-2px) rotate(3deg);} 60%{transform:translate(-4px,-6px) rotate(-2deg);} 80%{transform:translate(8px,6px) rotate(4deg);} }
+@keyframes bounce { 0%,100%{transform:translateY(0);} 30%{transform:translateY(-18px);} 50%{transform:translateY(0);} 70%{transform:translateY(-8px);} }
+@keyframes wiggle { 0%,100%{transform:rotate(0deg);} 25%{transform:rotate(-6deg);} 75%{transform:rotate(6deg);} }
+@keyframes rainbow { 0%{color:#ff6b6b;} 16%{color:#feca57;} 33%{color:#48dbfb;} 50%{color:#ff9ff3;} 66%{color:#54a0ff;} 83%{color:#5f27cd;} 100%{color:#ff6b6b;} }
+@keyframes pulse { 0%,100%{box-shadow:0 0 0 0 rgba(255,107,107,0.6);} 50%{box-shadow:0 0 0 24px rgba(255,107,107,0);} }
+@keyframes pulseGlow { 0%,100%{box-shadow:0 0 20px rgba(255,154,243,0.3),0 0 60px rgba(255,107,107,0.15);} 50%{box-shadow:0 0 40px rgba(255,154,243,0.6),0 0 100px rgba(255,107,107,0.3);} }
+@keyframes slideUp { from{transform:translateY(15px);opacity:0;} to{transform:translateY(0);opacity:1;} }
+@keyframes fadeIn { from{opacity:0;} to{opacity:1;} }
+@keyframes popIn { from{transform:scale(0.3);opacity:0;} to{transform:scale(1);opacity:1;} }
+@keyframes popBounce { 0%{transform:scale(0);} 50%{transform:scale(1.15);} 100%{transform:scale(1);} }
+@keyframes confettiFall { 0%{transform:translateY(-120px) rotate(0deg) scale(0.5);opacity:1;} 100%{transform:translateY(110vh) rotate(720deg) scale(1.2);opacity:0;} }
+@keyframes progressBar { from{width:0%;} to{width:100%;} }
+@keyframes shimmer { 0%{background-position:200% 0;} 100%{background-position:0 0;} }
+@keyframes blink { 0%,100%{border-color:transparent;} 50%{border-color:#ff6b6b;} }
+@keyframes spin { from{transform:rotate(0deg);} to{transform:rotate(360deg);} }
+@keyframes mascotBob { 0%,100%{transform:translateY(0) rotate(-2deg);} 25%{transform:translateY(-6px) rotate(0deg);} 50%{transform:translateY(0) rotate(2deg);} 75%{transform:translateY(-3px) rotate(0deg);} }
+@keyframes mascotDance { 0%,100%{transform:translateY(0) rotate(-5deg) scale(1);} 25%{transform:translateY(-12px) rotate(0deg) scale(1.1);} 50%{transform:translateY(0) rotate(5deg) scale(1);} 75%{transform:translateY(-6px) rotate(0deg) scale(1.05);} }
+@keyframes mascotLaugh { 0%{transform:scale(1);} 25%{transform:scale(1.3) rotate(10deg);} 50%{transform:scale(0.9) rotate(-10deg);} 75%{transform:scale(1.2) rotate(5deg);} 100%{transform:scale(1) rotate(0);} }
+@keyframes mascotAngry { 0%,100%{transform:translateX(0);} 25%{transform:translateX(-6px) rotate(-4deg);} 75%{transform:translateX(6px) rotate(4deg);} }
+@keyframes visualizerBar { 0%,100%{transform:scaleY(0.3);} 50%{transform:scaleY(1);} }
+@keyframes spotlightScan { 0%,100%{opacity:0.1;transform:translateX(-50%) rotate(-5deg);} 50%{opacity:0.25;transform:translateX(-50%) rotate(5deg);} }
+@keyframes neonFlicker { 0%,100%{opacity:1;} 92%{opacity:1;} 93%{opacity:0.3;} 94%{opacity:1;} 96%{opacity:0.6;} 97%{opacity:1;} }
+@keyframes marqueeScroll { from{transform:translateX(100%);} to{transform:translateX(-100%);} }
+@keyframes toastSlide { from{transform:translateY(-60px);opacity:0;} to{transform:translateY(0);opacity:1;} }
+@keyframes pulseRing { 0%{transform:translate(-50%,-50%) scale(0);opacity:0.8;} 100%{transform:translate(-50%,-50%) scale(2.5);opacity:0;} }
+@keyframes particleBurst { 0%{transform:translate(0,0) scale(1);opacity:1;} 100%{transform:translate(var(--dx),var(--dy)) scale(0);opacity:0;} }
+@keyframes trailFade { 0%{opacity:0.9;transform:scale(1);} 100%{opacity:0;transform:scale(0.2);} }
+@keyframes pigMarch { 0%{transform:translateX(-120px);} 100%{transform:translateX(calc(100vw + 120px));} }
+@keyframes sparkFlash { 0%,100%{opacity:0;} 50%{opacity:0.7;} }
+@keyframes meteorFall { 0%{transform:translate(0,-100px) rotate(30deg);opacity:1;} 100%{transform:translate(300px,110vh) rotate(30deg);opacity:0;} }
 
-/* ============================================================
-   AMBIENT BACKGROUND
-   ============================================================ */
-.ambient-bg {
-  position: fixed;
-  top: 0; left: 0; right: 0; bottom: 0;
-  pointer-events: none;
-  z-index: 0;
-  background:
-    radial-gradient(ellipse at 30% 20%, rgba(255,107,107,0.1) 0%, transparent 60%),
-    radial-gradient(ellipse at 70% 60%, rgba(255,154,243,0.08) 0%, transparent 60%),
-    radial-gradient(ellipse at 50% 80%, rgba(254,202,87,0.06) 0%, transparent 50%);
-}
-.spotlight {
-  position: fixed;
-  top: -100px;
-  left: 50%;
-  width: 600px;
-  height: 400px;
-  background: radial-gradient(ellipse, rgba(255,154,243,0.12) 0%, transparent 70%);
-  transform: translateX(-50%);
-  pointer-events: none;
-  z-index: 0;
-  animation: spotlightScan 4s ease-in-out infinite;
-  will-change: opacity, transform;
-}
+.ambient-bg { position:fixed; top:0;left:0;right:0;bottom:0; pointer-events:none; z-index:0;
+  background: radial-gradient(ellipse at 30% 20%, rgba(255,107,107,0.1) 0%, transparent 60%),
+              radial-gradient(ellipse at 70% 60%, rgba(255,154,243,0.08) 0%, transparent 60%),
+              radial-gradient(ellipse at 50% 80%, rgba(254,202,87,0.06) 0%, transparent 50%); }
+.spotlight { position:fixed; top:-100px; left:50%; width:600px; height:400px; background:radial-gradient(ellipse, rgba(255,154,243,0.12) 0%, transparent 70%); transform:translateX(-50%); pointer-events:none; z-index:0; animation:spotlightScan 4s ease-in-out infinite; will-change:opacity,transform; }
 
-/* ============================================================
-   FLOATING PIGS
-   ============================================================ */
-.floating-pig {
-  position: absolute;
-  pointer-events: none;
-  z-index: 1;
-  animation: floatUp 5s ease-in forwards;
-  will-change: transform, opacity;
-}
+.floating-pig { position:absolute; pointer-events:none; z-index:1; animation:floatUp 5s ease-in forwards; will-change:transform,opacity; }
+.cursor-trail { position:fixed; pointer-events:none; z-index:9998; font-size:14px; animation:trailFade 0.6s ease-out forwards; will-change:transform,opacity; }
+.rainbow-trail { position:absolute; pointer-events:none; z-index:5; border-radius:50%; animation:trailFade 0.5s ease-out forwards; will-change:transform,opacity; }
+.pulse-ring { position:absolute; pointer-events:none; z-index:4; border-radius:50%; border:2px solid rgba(255,107,107,0.6); width:60px;height:60px; animation:pulseRing 0.7s ease-out forwards; }
+.burst-particle { position:fixed; pointer-events:none; z-index:9997; font-size:20px; animation:particleBurst 1s ease-out forwards; will-change:transform,opacity; }
+.pig-parade { position:fixed; pointer-events:none; z-index:1; white-space:nowrap; font-size:36px; animation:pigMarch var(--speed) linear forwards; top:var(--top); }
 
-/* ============================================================
-   CURSOR TRAIL
-   ============================================================ */
-.cursor-trail {
-  position: fixed;
-  pointer-events: none;
-  z-index: 9998;
-  font-size: 14px;
-  animation: trailFade 0.6s ease-out forwards;
-  will-change: transform, opacity;
-}
+body.screen-shake { animation:superShake 0.4s ease-out; }
+body.screen-shake-light { animation:shake 0.3s ease-out; }
 
-/* ============================================================
-   BUTTON RAINBOW TRAIL
-   ============================================================ */
-.rainbow-trail {
-  position: absolute;
-  pointer-events: none;
-  z-index: 5;
-  border-radius: 50%;
-  animation: trailFade 0.5s ease-out forwards;
-  will-change: transform, opacity;
-}
+.btn-spark { position:absolute; pointer-events:none; z-index:3; width:3px;height:3px; background:#feca57; border-radius:50%; box-shadow:0 0 6px 2px #feca57; animation:sparkFlash 0.3s ease-out forwards; }
+.meteor { position:fixed; pointer-events:none; z-index:0; width:2px; height:80px; background:linear-gradient(to bottom, #fff, transparent); border-radius:1px; animation:meteorFall 1.2s linear forwards; opacity:0.6; }
 
-/* ============================================================
-   PULSE RING
-   ============================================================ */
-.pulse-ring {
-  position: absolute;
-  pointer-events: none;
-  z-index: 4;
-  border-radius: 50%;
-  border: 2px solid rgba(255,107,107,0.6);
-  width: 60px; height: 60px;
-  animation: pulseRing 0.7s ease-out forwards;
-}
+/* title */
+.funny-title { position:relative; z-index:2; text-align:center; cursor:pointer; }
+.funny-title h1 { font-size:72px; animation:rainbow 3s linear infinite, neonFlicker 5s linear infinite; text-shadow:0 0 20px rgba(255,107,107,0.5),0 0 60px rgba(255,154,243,0.3),3px 3px 0 rgba(255,255,255,0.1); transition:font-size 0.3s; will-change:transform; }
+.funny-title .sub { font-size:18px; color:#ff9ff3; margin-top:8px; animation:wiggle 0.8s ease infinite; letter-spacing:3px; text-shadow:0 0 10px rgba(255,154,243,0.4); }
+.funny-title .easter-hint { font-size:10px; color:rgba(255,255,255,0.15); margin-top:4px; opacity:0; transition:opacity 0.5s; }
+.funny-title:hover .easter-hint { opacity:1; }
 
-/* ============================================================
-   PARTICLE BURST
-   ============================================================ */
-.burst-particle {
-  position: fixed;
-  pointer-events: none;
-  z-index: 9997;
-  font-size: 20px;
-  animation: particleBurst 1s ease-out forwards;
-  will-change: transform, opacity;
-}
+/* mascot */
+.mascot-container { position:fixed; bottom:100px; right:30px; z-index:1500; pointer-events:none; transition:all 0.3s; }
+.mascot { font-size:64px; animation:mascotBob 2s ease-in-out infinite; transition:all 0.3s; cursor:pointer; pointer-events:auto; filter:drop-shadow(0 0 12px rgba(255,107,107,0.5)); will-change:transform; }
+.mascot.dancing { animation:mascotDance 0.4s ease-in-out infinite; }
+.mascot.laughing { animation:mascotLaugh 0.5s ease; }
+.mascot.angry { animation:mascotAngry 0.25s ease infinite; }
+.mascot.surprised { font-size:80px; }
+.mascot .mascot-bubble { position:absolute; top:-55px; left:50%; transform:translateX(-50%); background:rgba(0,0,0,0.85); color:#ff9ff3; padding:6px 14px; border-radius:14px; font-size:12px; font-weight:600; white-space:nowrap; opacity:0; transition:opacity 0.2s; border:1px solid rgba(255,154,243,0.3); pointer-events:none; }
+.mascot:hover .mascot-bubble { opacity:1; }
 
-/* ============================================================
-   PIG PARADE
-   ============================================================ */
-.pig-parade {
-  position: fixed;
-  pointer-events: none;
-  z-index: 1;
-  white-space: nowrap;
-  font-size: 36px;
-  animation: pigMarch var(--speed) linear forwards;
-  top: var(--top);
-}
+/* visualizer */
+.visualizer-container { position:fixed; bottom:80px; left:50%; transform:translateX(-50%); z-index:400; display:flex; gap:3px; align-items:flex-end; height:50px; pointer-events:none; opacity:0; transition:opacity 0.5s; }
+.visualizer-container.active { opacity:1; }
+.visualizer-bar { width:6px; background:linear-gradient(180deg, #ff6b6b, #ff9ff3, #feca57); border-radius:3px; transition:height 0.08s ease; min-height:4px; box-shadow:0 0 8px rgba(255,107,107,0.4); will-change:height; }
 
-/* ============================================================
-   SCREEN SHAKE
-   ============================================================ */
-body.screen-shake { animation: superShake 0.4s ease-out; }
-body.screen-shake-light { animation: shake 0.3s ease-out; }
+/* music toggle */
+.music-toggle { position:fixed; top:16px; right:16px; z-index:2000; background:rgba(0,0,0,0.7); border:1px solid rgba(255,154,243,0.3); border-radius:20px; padding:8px 16px; font-size:13px; cursor:pointer; font-weight:600; color:#ff9ff3; transition:all 0.2s; backdrop-filter:blur(10px); -webkit-backdrop-filter:blur(10px); font-family:inherit; }
+.music-toggle:hover { background:rgba(255,107,107,0.2); border-color:#ff6b6b; }
+.music-toggle.on { animation:pulseGlow 2s ease infinite; }
 
-/* ============================================================
-   BUTTON SPARK
-   ============================================================ */
-.btn-spark {
-  position: absolute;
-  pointer-events: none;
-  z-index: 3;
-  width: 3px; height: 3px;
-  background: #feca57;
-  border-radius: 50%;
-  box-shadow: 0 0 6px 2px #feca57;
-  animation: sparkFlash 0.3s ease-out forwards;
-}
+.achievement-btn { position:fixed; top:16px; right:130px; z-index:2001; background:rgba(0,0,0,0.7); border:1px solid rgba(255,154,243,0.3); border-radius:50%; width:37px;height:37px; font-size:16px; cursor:pointer; display:flex; align-items:center; justify-content:center; transition:all 0.2s; color:#ff9ff3; backdrop-filter:blur(10px); -webkit-backdrop-filter:blur(10px); font-family:inherit; }
+.achievement-btn:hover { border-color:#feca57; transform:scale(1.1); }
+.achievement-btn.has-new { animation:pulse 1.5s ease infinite; border-color:#feca57; }
 
-/* ============================================================
-   METEOR
-   ============================================================ */
-.meteor {
-  position: fixed;
-  pointer-events: none;
-  z-index: 0;
-  width: 2px;
-  height: 80px;
-  background: linear-gradient(to bottom, #fff, transparent);
-  border-radius: 1px;
-  animation: meteorFall 1.2s linear forwards;
-  opacity: 0.6;
-}
+/* toast */
+.toast-container { position:fixed; top:0; left:50%; transform:translateX(-50%); z-index:9000; display:flex; flex-direction:column; gap:6px; padding:10px; pointer-events:none; }
+.toast { background:rgba(0,0,0,0.9); border:1px solid rgba(255,154,243,0.3); color:#ff9ff3; border-radius:24px; padding:10px 22px; font-weight:600; font-size:14px; text-align:center; animation:toastSlide 0.35s ease-out; pointer-events:auto; backdrop-filter:blur(10px); -webkit-backdrop-filter:blur(10px); box-shadow:0 8px 24px rgba(0,0,0,0.3); white-space:nowrap; }
 
-/* ============================================================
-   TITLE
-   ============================================================ */
-.funny-title {
-  position: relative;
-  z-index: 2;
-  text-align: center;
-  cursor: pointer;
-}
-.funny-title h1 {
-  font-size: 72px;
-  animation: rainbow 3s linear infinite, neonFlicker 5s linear infinite;
-  text-shadow: 0 0 20px rgba(255,107,107,0.5), 0 0 60px rgba(255,154,243,0.3), 3px 3px 0 rgba(255,255,255,0.1);
-  transition: font-size 0.3s;
-  will-change: transform;
-}
-.funny-title .sub {
-  font-size: 18px;
-  color: #ff9ff3;
-  margin-top: 8px;
-  animation: wiggle 0.8s ease infinite;
-  letter-spacing: 3px;
-  text-shadow: 0 0 10px rgba(255,154,243,0.4);
-}
-.funny-title .easter-hint {
-  font-size: 10px;
-  color: rgba(255,255,255,0.15);
-  margin-top: 4px;
-  opacity: 0;
-  transition: opacity 0.5s;
-}
-.funny-title:hover .easter-hint { opacity: 1; }
+/* achievement panel */
+.ach-panel-overlay { position:fixed; top:0;left:0;right:0;bottom:0; background:rgba(0,0,0,0.7); z-index:4000; display:flex; align-items:center; justify-content:center; animation:fadeIn 0.2s ease; backdrop-filter:blur(4px); -webkit-backdrop-filter:blur(4px); }
+.ach-panel { background:#1a1a2e; border-radius:16px; padding:24px; max-width:420px; width:90%; max-height:70vh; overflow-y:auto; box-shadow:0 20px 60px rgba(0,0,0,0.5),0 0 30px rgba(254,202,87,0.1); animation:popIn 0.3s cubic-bezier(0.175,0.885,0.32,1.275); border:1px solid rgba(254,202,87,0.2); color:#e2e8f0; }
+.ach-panel h3 { font-size:18px; margin-bottom:4px; color:#feca57; }
+.ach-panel .panel-subtitle { font-size:11px; color:#718096; margin-bottom:14px; }
+.ach-item { display:flex; align-items:center; gap:12px; padding:10px 12px; border-radius:10px; margin-bottom:6px; border:1px solid rgba(255,255,255,0.06); transition:all 0.2s; }
+.ach-item.unlocked { border-color:rgba(254,202,87,0.15); background:rgba(254,202,87,0.05); }
+.ach-item.locked { opacity:0.45; filter:grayscale(1); }
+.ach-item .ach-icon { font-size:28px; flex-shrink:0; }
+.ach-item .ach-info { flex:1; }
+.ach-item .ach-name { font-weight:700; font-size:14px; color:#e2e8f0; }
+.ach-item .ach-desc { font-size:11px; color:#718096; margin-top:2px; }
+.ach-item.locked .ach-name { color:#555; }
+.ach-progress { font-size:11px; color:#feca57; margin-top:2px; }
 
-/* ============================================================
-   MASCOT
-   ============================================================ */
-.mascot-container {
-  position: fixed;
-  bottom: 100px;
-  right: 30px;
-  z-index: 1500;
-  pointer-events: none;
-  transition: all 0.3s;
-}
-.mascot {
-  font-size: 64px;
-  animation: mascotBob 2s ease-in-out infinite;
-  transition: all 0.3s;
-  cursor: pointer;
-  pointer-events: auto;
-  filter: drop-shadow(0 0 12px rgba(255,107,107,0.5));
-  will-change: transform;
-}
-.mascot.dancing { animation: mascotDance 0.4s ease-in-out infinite; }
-.mascot.laughing { animation: mascotLaugh 0.5s ease; }
-.mascot.angry { animation: mascotAngry 0.25s ease infinite; }
-.mascot.surprised { font-size: 80px; }
-.mascot .mascot-bubble {
-  position: absolute;
-  top: -55px;
-  left: 50%;
-  transform: translateX(-50%);
-  background: rgba(0,0,0,0.85);
-  color: #ff9ff3;
-  padding: 6px 14px;
-  border-radius: 14px;
-  font-size: 12px;
-  font-weight: 600;
-  white-space: nowrap;
-  opacity: 0;
-  transition: opacity 0.2s;
-  border: 1px solid rgba(255,154,243,0.3);
-  pointer-events: none;
-}
-.mascot:hover .mascot-bubble { opacity: 1; }
+/* marquee */
+.marquee { position:fixed; top:0; left:0; right:0; z-index:3000; background:linear-gradient(90deg, #ff6b6b, #ff9ff3); color:#fff; font-size:13px; font-weight:700; padding:5px 0; overflow:hidden; white-space:nowrap; display:none; letter-spacing:2px; }
+.marquee span { display:inline-block; animation:marqueeScroll 12s linear infinite; }
+.marquee.show { display:block; }
 
-/* ============================================================
-   AUDIO VISUALIZER
-   ============================================================ */
-.visualizer-container {
-  position: fixed;
-  bottom: 80px;
-  left: 50%;
-  transform: translateX(-50%);
-  z-index: 400;
-  display: flex;
-  gap: 3px;
-  align-items: flex-end;
-  height: 50px;
-  pointer-events: none;
-  opacity: 0;
-  transition: opacity 0.5s;
-}
-.visualizer-container.active { opacity: 1; }
-.visualizer-bar {
-  width: 6px;
-  background: linear-gradient(180deg, #ff6b6b, #ff9ff3, #feca57);
-  border-radius: 3px;
-  transition: height 0.08s ease;
-  min-height: 4px;
-  box-shadow: 0 0 8px rgba(255,107,107,0.4);
-  will-change: height;
-}
+/* overlay & modal */
+.overlay { position:fixed; top:0;left:0;right:0;bottom:0; background:rgba(0,0,0,0.7); display:flex; align-items:center; justify-content:center; z-index:2000; animation:fadeIn 0.3s ease; backdrop-filter:blur(3px); -webkit-backdrop-filter:blur(3px); }
+.modal { background:linear-gradient(145deg, #1a1a2e 0%, #16213e 100%); border-radius:20px; padding:40px 30px 30px; text-align:center; max-width:440px; width:90%; box-shadow:0 20px 60px rgba(0,0,0,0.5),0 0 40px rgba(255,107,107,0.1); animation:popBounce 0.5s cubic-bezier(0.175,0.885,0.32,1.275); position:relative; border:1px solid rgba(255,154,243,0.2); color:#e2e8f0; transition:border-color 0.3s,box-shadow 0.3s; will-change:transform; }
+.modal.dramatic { border-color:#ff6b6b; box-shadow:0 20px 80px rgba(255,107,107,0.3),0 0 80px rgba(255,154,243,0.2); }
+.modal .pig-icon { font-size:80px; animation:bounce 0.6s ease infinite; filter:drop-shadow(0 0 20px rgba(255,107,107,0.5)); will-change:transform; }
+.modal .question { font-size:22px; font-weight:700; color:#ff9ff3; margin:15px 0 25px; line-height:1.6; text-shadow:0 0 10px rgba(255,154,243,0.3); }
+.modal .buttons { display:flex; gap:16px; justify-content:center; flex-wrap:wrap; position:relative; min-height:50px; }
 
-/* ============================================================
-   MUSIC TOGGLE
-   ============================================================ */
-.music-toggle {
-  position: fixed;
-  top: 16px;
-  right: 16px;
-  z-index: 2000;
-  background: rgba(0,0,0,0.7);
-  border: 1px solid rgba(255,154,243,0.3);
-  border-radius: 20px;
-  padding: 8px 16px;
-  font-size: 13px;
-  cursor: pointer;
-  font-weight: 600;
-  color: #ff9ff3;
-  transition: all 0.2s;
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
-  font-family: inherit;
-}
-.music-toggle:hover { background: rgba(255,107,107,0.2); border-color: #ff6b6b; }
-.music-toggle.on { animation: pulseGlow 2s ease infinite; }
+/* buttons */
+.btn { padding:14px 32px; border:none; border-radius:50px; font-size:18px; font-weight:700; cursor:pointer; transition:all 0.15s ease; min-width:100px; position:relative; user-select:none; -webkit-user-select:none; outline:none; letter-spacing:1px; touch-action:manipulation; -webkit-tap-highlight-color:transparent; font-family:inherit; }
+.btn-know { background:linear-gradient(135deg, #ff6b6b, #ee5a5a); color:#fff; animation:pulse 2s ease infinite; box-shadow:0 4px 20px rgba(255,107,107,0.4); }
+.btn-know:hover { background:linear-gradient(135deg, #ff5252, #e04848); transform:scale(1.08); }
+.btn-know:active { transform:scale(0.95); }
+.btn-dunno { background:linear-gradient(135deg, #feca57, #ff9f43); color:#1a0a0a; transition:all 0.06s ease; box-shadow:0 4px 16px rgba(254,202,87,0.3); }
+.btn-dunno:hover { box-shadow:0 6px 24px rgba(254,202,87,0.5); }
+.btn-dunno.shrinking { font-size:15px; padding:10px 24px; }
+.btn-dunno.tiny { font-size:12px; padding:6px 16px; opacity:0.7; }
+.btn-dunno.micro { font-size:10px; padding:4px 10px; opacity:0.5; }
+.btn-back { background:rgba(255,255,255,0.08); color:#a0aec0; font-size:14px; padding:10px 24px; margin-top:12px; border:1px solid rgba(255,255,255,0.1); }
+.btn-back:hover { background:rgba(255,255,255,0.15); transform:scale(1.05); color:#fff; }
+.btn-later { background:rgba(255,255,255,0.05); color:#a0aec0; border:1px solid rgba(255,255,255,0.1); }
+.btn-later:hover { background:rgba(255,255,255,0.1); }
+.btn-cert { background:linear-gradient(135deg, #ff9ff3, #f368e0); color:#fff; font-size:16px; padding:12px 28px; margin-top:10px; animation:pulse 2s ease infinite; box-shadow:0 4px 20px rgba(255,154,243,0.4); }
+.btn-cert:hover { transform:scale(1.08); }
+.btn-share { background:linear-gradient(135deg, #48dbfb, #0abde3); color:#fff; font-size:14px; padding:10px 24px; margin-top:8px; box-shadow:0 4px 16px rgba(72,219,251,0.3); }
+.btn-share:hover { transform:scale(1.06); }
 
-.achievement-btn {
-  position: fixed;
-  top: 16px;
-  right: 130px;
-  z-index: 2001;
-  background: rgba(0,0,0,0.7);
-  border: 1px solid rgba(255,154,243,0.3);
-  border-radius: 50%;
-  width: 37px; height: 37px;
-  font-size: 16px;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: all 0.2s;
-  color: #ff9ff3;
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
-  font-family: inherit;
-}
-.achievement-btn:hover { border-color: #feca57; transform: scale(1.1); }
-.achievement-btn.has-new { animation: pulse 1.5s ease infinite; border-color: #feca57; }
+.escape-badge { position:absolute; top:-10px; right:-10px; background:#ff6b6b; color:#fff; border-radius:50%; width:30px;height:30px; font-size:13px; font-weight:800; display:flex; align-items:center; justify-content:center; animation:bounce 0.6s ease infinite; box-shadow:0 2px 12px rgba(255,107,107,0.5); pointer-events:none; z-index:5; }
 
-/* ============================================================
-   TOAST
-   ============================================================ */
-.toast-container {
-  position: fixed;
-  top: 0; left: 50%;
-  transform: translateX(-50%);
-  z-index: 9000;
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-  padding: 10px;
-  pointer-events: none;
-}
-.toast {
-  background: rgba(0,0,0,0.9);
-  border: 1px solid rgba(255,154,243,0.3);
-  color: #ff9ff3;
-  border-radius: 24px;
-  padding: 10px 22px;
-  font-weight: 600;
-  font-size: 14px;
-  text-align: center;
-  animation: toastSlide 0.35s ease-out;
-  pointer-events: auto;
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
-  box-shadow: 0 8px 24px rgba(0,0,0,0.3);
-  white-space: nowrap;
-}
+/* result & certificate */
+.result-text { font-size:26px; font-weight:700; color:#ff9ff3; margin:15px 0; animation:wiggle 0.5s ease infinite; text-shadow:0 0 10px rgba(255,154,243,0.3); }
+.roast-text { font-size:15px; color:#a0aec0; margin-top:8px; font-style:italic; animation:slideUp 0.5s ease; }
+.pig-name { font-size:22px; font-weight:900; margin:10px 0; color:#feca57; animation:popIn 0.4s cubic-bezier(0.175,0.885,0.32,1.275); text-shadow:0 0 10px rgba(254,202,87,0.3); letter-spacing:2px; }
+.cert-rank-display { font-size:14px; color:#718096; margin-bottom:6px; }
 
-/* ============================================================
-   ACHIEVEMENT PANEL
-   ============================================================ */
-.ach-panel-overlay {
-  position: fixed;
-  top: 0; left: 0; right: 0; bottom: 0;
-  background: rgba(0,0,0,0.7);
-  z-index: 4000;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  animation: fadeIn 0.2s ease;
-  backdrop-filter: blur(4px);
-  -webkit-backdrop-filter: blur(4px);
-}
-.ach-panel {
-  background: #1a1a2e;
-  border-radius: 16px;
-  padding: 24px;
-  max-width: 420px;
-  width: 90%;
-  max-height: 70vh;
-  overflow-y: auto;
-  box-shadow: 0 20px 60px rgba(0,0,0,0.5), 0 0 30px rgba(254,202,87,0.1);
-  animation: popIn 0.3s cubic-bezier(0.175,0.885,0.32,1.275);
-  border: 1px solid rgba(254,202,87,0.2);
-  color: #e2e8f0;
-}
-.ach-panel h3 { font-size: 18px; margin-bottom: 4px; color: #feca57; }
-.ach-panel .panel-subtitle { font-size: 11px; color: #718096; margin-bottom: 14px; }
-.ach-item {
-  display: flex; align-items: center; gap: 12px;
-  padding: 10px 12px; border-radius: 10px;
-  margin-bottom: 6px;
-  border: 1px solid rgba(255,255,255,0.06);
-  transition: all 0.2s;
-}
-.ach-item.unlocked { border-color: rgba(254,202,87,0.15); background: rgba(254,202,87,0.05); }
-.ach-item.locked { opacity: 0.45; filter: grayscale(1); }
-.ach-item .ach-icon { font-size: 28px; flex-shrink: 0; }
-.ach-item .ach-info { flex: 1; }
-.ach-item .ach-name { font-weight: 700; font-size: 14px; color: #e2e8f0; }
-.ach-item .ach-desc { font-size: 11px; color: #718096; margin-top: 2px; }
-.ach-item.locked .ach-name { color: #555; }
-.ach-progress { font-size: 11px; color: #feca57; margin-top: 2px; }
+.certificate { background:linear-gradient(135deg, #1a1a2e, #2d1b3e); border:2px solid #feca57; border-radius:8px; padding:25px 20px 20px; margin:15px 0; position:relative; box-shadow:inset 0 0 30px rgba(254,202,87,0.05),0 0 20px rgba(254,202,87,0.1); }
+.certificate .cert-seal { position:absolute; top:-25px; right:-15px; font-size:64px; animation:spin 10s linear infinite; opacity:0.8; filter:drop-shadow(0 0 8px rgba(255,107,107,0.5)); will-change:transform; }
+.certificate .cert-title { font-size:22px; font-weight:900; color:#feca57; letter-spacing:4px; margin-bottom:10px; }
+.certificate .cert-body { font-size:14px; color:#e2e8f0; line-height:2; }
+.certificate .cert-no { font-size:11px; color:#718096; margin-top:10px; font-family:'Courier New', monospace; }
+.certificate .cert-badge { display:inline-block; font-size:60px; animation:bounce 0.8s ease infinite; filter:drop-shadow(0 0 10px rgba(255,107,107,0.4)); will-change:transform; }
 
-/* ============================================================
-   SCREAM-O-METER
-   ============================================================ */
-.scream-section {
-  margin-top: 12px;
-  text-align: center;
-}
-.scream-btn {
-  display: inline-block;
-  padding: 12px 24px;
-  border-radius: 30px;
-  background: rgba(255,107,107,0.1);
-  border: 2px solid rgba(255,107,107,0.3);
-  color: #ff9ff3;
-  font-size: 14px;
-  font-weight: 700;
-  cursor: pointer;
-  transition: all 0.15s;
-  letter-spacing: 1px;
-  -webkit-user-select: none;
-  user-select: none;
-  touch-action: manipulation;
-  font-family: inherit;
-}
-.scream-btn:active, .scream-btn.active { background: rgba(255,107,107,0.25); border-color: #ff6b6b; transform: scale(0.97); }
-.scream-meter-wrap {
-  height: 8px;
-  background: rgba(255,255,255,0.06);
-  border-radius: 4px;
-  margin-top: 8px;
-  overflow: hidden;
-  transition: height 0.2s;
-}
-.scream-meter-wrap.active { height: 22px; }
-.scream-meter {
-  height: 100%; width: 0%;
-  background: linear-gradient(90deg, #48dbfb, #feca57, #ff9ff3, #ff6b6b);
-  border-radius: 4px;
-  transition: width 0.1s ease;
-  will-change: width;
-}
-.scream-label {
-  font-size: 11px;
-  color: #718096;
-  margin-top: 4px;
-  min-height: 16px;
-  transition: color 0.2s;
-}
-.scream-label.loud { color: #ff6b6b; font-weight: 700; }
+/* loading */
+.loading-bar-wrap { background:rgba(255,255,255,0.05); border-radius:10px; height:20px; margin:20px 0; overflow:hidden; }
+.loading-bar { height:100%; border-radius:10px; background:linear-gradient(90deg, #ff6b6b, #ff9ff3, #feca57); background-size:200% 100%; animation:progressBar 2.5s ease-out forwards, shimmer 1s linear infinite; }
+.loading-label { font-size:13px; color:#718096; margin-top:8px; animation:blink 0.8s step-end infinite; }
 
-/* ============================================================
-   MARQUEE
-   ============================================================ */
-.marquee {
-  position: fixed;
-  top: 0; left: 0; right: 0;
-  z-index: 3000;
-  background: linear-gradient(90deg, #ff6b6b, #ff9ff3);
-  color: #fff;
-  font-size: 13px;
-  font-weight: 700;
-  padding: 5px 0;
-  overflow: hidden;
-  white-space: nowrap;
-  display: none;
-  letter-spacing: 2px;
-}
-.marquee span { display: inline-block; animation: marqueeScroll 12s linear infinite; }
-.marquee.show { display: block; }
+/* global stats */
+.global-stats { position:fixed; bottom:0; left:0; right:0; background:linear-gradient(90deg, rgba(255,107,107,0.9), rgba(255,154,243,0.9), rgba(254,202,87,0.9)); backdrop-filter:blur(10px); -webkit-backdrop-filter:blur(10px); color:#1a0a0a; text-align:center; padding:10px 20px; font-size:14px; font-weight:700; z-index:500; animation:slideUp 0.5s ease; box-shadow:0 -4px 20px rgba(0,0,0,0.3); }
+.global-stats .count { font-size:24px; font-weight:900; margin:0 6px; animation:bounce 1s ease infinite; display:inline-block; color:#fff; text-shadow:0 0 10px rgba(0,0,0,0.3); will-change:transform; }
+.stats-detail { font-size:11px; opacity:0.8; margin-top:4px; }
 
-/* ============================================================
-   OVERLAY & MODAL
-   ============================================================ */
-.overlay {
-  position: fixed;
-  top: 0; left: 0; right: 0; bottom: 0;
-  background: rgba(0,0,0,0.7);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 2000;
-  animation: fadeIn 0.3s ease;
-  backdrop-filter: blur(3px);
-  -webkit-backdrop-filter: blur(3px);
-}
-.modal {
-  background: linear-gradient(145deg, #1a1a2e 0%, #16213e 100%);
-  border-radius: 20px;
-  padding: 40px 30px 30px;
-  text-align: center;
-  max-width: 440px;
-  width: 90%;
-  box-shadow: 0 20px 60px rgba(0,0,0,0.5), 0 0 40px rgba(255,107,107,0.1);
-  animation: popBounce 0.5s cubic-bezier(0.175,0.885,0.32,1.275);
-  position: relative;
-  border: 1px solid rgba(255,154,243,0.2);
-  color: #e2e8f0;
-  transition: border-color 0.3s, box-shadow 0.3s;
-  will-change: transform;
-}
-.modal.dramatic {
-  border-color: #ff6b6b;
-  box-shadow: 0 20px 80px rgba(255,107,107,0.3), 0 0 80px rgba(255,154,243,0.2);
-}
-.modal .pig-icon {
-  font-size: 80px;
-  animation: bounce 0.6s ease infinite;
-  filter: drop-shadow(0 0 20px rgba(255,107,107,0.5));
-  will-change: transform;
-}
-.modal .question {
-  font-size: 22px;
-  font-weight: 700;
-  color: #ff9ff3;
-  margin: 15px 0 25px;
-  line-height: 1.6;
-  text-shadow: 0 0 10px rgba(255,154,243,0.3);
-}
-.modal .buttons {
-  display: flex;
-  gap: 16px;
-  justify-content: center;
-  flex-wrap: wrap;
-  position: relative;
-  min-height: 50px;
-}
+/* confetti */
+.confetti { position:fixed; pointer-events:none; z-index:9999; animation:confettiFall 2.2s ease-out forwards; will-change:transform,opacity; }
 
-/* ============================================================
-   BUTTONS
-   ============================================================ */
-.btn {
-  padding: 14px 32px;
-  border: none;
-  border-radius: 50px;
-  font-size: 18px;
-  font-weight: 700;
-  cursor: pointer;
-  transition: all 0.15s ease;
-  min-width: 100px;
-  position: relative;
-  user-select: none;
-  -webkit-user-select: none;
-  outline: none;
-  letter-spacing: 1px;
-  touch-action: manipulation;
-  -webkit-tap-highlight-color: transparent;
-  font-family: inherit;
-}
-.btn-know {
-  background: linear-gradient(135deg, #ff6b6b, #ee5a5a);
-  color: #fff;
-  animation: pulse 2s ease infinite;
-  box-shadow: 0 4px 20px rgba(255,107,107,0.4);
-}
-.btn-know:hover { background: linear-gradient(135deg, #ff5252, #e04848); transform: scale(1.08); }
-.btn-know:active { transform: scale(0.95); }
+/* taunt bubble & pig print */
+.taunt-bubble { position:absolute; background:rgba(0,0,0,0.9); border:1px solid #ff9ff3; border-radius:12px; padding:5px 12px; font-size:13px; font-weight:600; color:#ff9ff3; pointer-events:none; z-index:20; white-space:nowrap; animation:popIn 0.2s ease-out, slideUp 1s ease-out forwards; }
+.pig-print { position:absolute; font-size:22px; pointer-events:none; z-index:10; animation:fadeIn 0.2s ease, floatUp 1.5s ease-out forwards; opacity:0.6; }
 
-.btn-dunno {
-  background: linear-gradient(135deg, #feca57, #ff9f43);
-  color: #1a0a0a;
-  transition: all 0.06s ease;
-  box-shadow: 0 4px 16px rgba(254,202,87,0.3);
-}
-.btn-dunno:hover { box-shadow: 0 6px 24px rgba(254,202,87,0.5); }
-.btn-dunno.shrinking { font-size: 15px; padding: 10px 24px; }
-.btn-dunno.tiny { font-size: 12px; padding: 6px 16px; opacity: 0.7; }
-.btn-dunno.micro { font-size: 10px; padding: 4px 10px; opacity: 0.5; }
+/* dramatic flash */
+.dramatic-flash { position:fixed; top:0; left:0; right:0; bottom:0; background:#fff; z-index:5000; pointer-events:none; animation:flashBoom 0.6s ease-out forwards; }
+@keyframes flashBoom { 0%{opacity:0.8;} 100%{opacity:0;} }
 
-.btn-back {
-  background: rgba(255,255,255,0.08);
-  color: #a0aec0;
-  font-size: 14px;
-  padding: 10px 24px;
-  margin-top: 12px;
-  border: 1px solid rgba(255,255,255,0.1);
+/* responsive */
+@media (max-width:480px) {
+  .funny-title h1 { font-size:48px; }
+  .modal { padding:28px 18px 22px; }
+  .btn { padding:12px 24px; font-size:16px; }
+  .visualizer-container { gap:2px; }
+  .visualizer-bar { width:4px; }
+  .mascot { font-size:48px; }
+  .mascot-container { bottom:70px; right:10px; }
+  .splash .s-radio { font-size:60px; }
+  .splash .s-title { font-size:24px; letter-spacing:4px; }
+  .splash .s-freq { font-size:17px; }
+  .ach-panel { max-width:95vw; padding:18px; }
+  .music-toggle { top:12px; right:10px; padding:6px 12px; font-size:11px; }
+  .achievement-btn { top:12px; right:100px; width:33px;height:33px; font-size:14px; }
 }
-.btn-back:hover { background: rgba(255,255,255,0.15); transform: scale(1.05); color: #fff; }
-
-.btn-later { background: rgba(255,255,255,0.05); color: #a0aec0; border: 1px solid rgba(255,255,255,0.1); }
-.btn-later:hover { background: rgba(255,255,255,0.1); }
-
-.btn-cert {
-  background: linear-gradient(135deg, #ff9ff3, #f368e0);
-  color: #fff;
-  font-size: 16px;
-  padding: 12px 28px;
-  margin-top: 10px;
-  animation: pulse 2s ease infinite;
-  box-shadow: 0 4px 20px rgba(255,154,243,0.4);
-}
-.btn-cert:hover { transform: scale(1.08); }
-
-.btn-share {
-  background: linear-gradient(135deg, #48dbfb, #0abde3);
-  color: #fff;
-  font-size: 14px;
-  padding: 10px 24px;
-  margin-top: 8px;
-  box-shadow: 0 4px 16px rgba(72,219,251,0.3);
-}
-.btn-share:hover { transform: scale(1.06); }
-
-/* ============================================================
-   ESCAPE BADGE
-   ============================================================ */
-.escape-badge {
-  position: absolute;
-  top: -10px; right: -10px;
-  background: #ff6b6b;
-  color: #fff;
-  border-radius: 50%;
-  width: 30px; height: 30px;
-  font-size: 13px; font-weight: 800;
-  display: flex; align-items: center; justify-content: center;
-  animation: bounce 0.6s ease infinite;
-  box-shadow: 0 2px 12px rgba(255,107,107,0.5);
-  pointer-events: none;
-  z-index: 5;
-}
-
-/* ============================================================
-   RESULT & CERTIFICATE
-   ============================================================ */
-.result-text {
-  font-size: 26px;
-  font-weight: 700;
-  color: #ff9ff3;
-  margin: 15px 0;
-  animation: wiggle 0.5s ease infinite;
-  text-shadow: 0 0 10px rgba(255,154,243,0.3);
-}
-.roast-text {
-  font-size: 15px;
-  color: #a0aec0;
-  margin-top: 8px;
-  font-style: italic;
-  animation: slideUp 0.5s ease;
-}
-.pig-name {
-  font-size: 22px;
-  font-weight: 900;
-  margin: 10px 0;
-  color: #feca57;
-  animation: popIn 0.4s cubic-bezier(0.175,0.885,0.32,1.275);
-  text-shadow: 0 0 10px rgba(254,202,87,0.3);
-  letter-spacing: 2px;
-}
-
-.certificate {
-  background: linear-gradient(135deg, #1a1a2e, #2d1b3e);
-  border: 2px solid #feca57;
-  border-radius: 8px;
-  padding: 25px 20px 20px;
-  margin: 15px 0;
-  position: relative;
-  box-shadow: inset 0 0 30px rgba(254,202,87,0.05), 0 0 20px rgba(254,202,87,0.1);
-}
-.certificate .cert-seal {
-  position: absolute;
-  top: -25px; right: -15px;
-  font-size: 64px;
-  animation: spin 10s linear infinite;
-  opacity: 0.8;
-  filter: drop-shadow(0 0 8px rgba(255,107,107,0.5));
-  will-change: transform;
-}
-.certificate .cert-title {
-  font-size: 22px;
-  font-weight: 900;
-  color: #feca57;
-  letter-spacing: 4px;
-  margin-bottom: 10px;
-}
-.certificate .cert-body {
-  font-size: 14px;
-  color: #e2e8f0;
-  line-height: 2;
-}
-.certificate .cert-no {
-  font-size: 11px;
-  color: #718096;
-  margin-top: 10px;
-  font-family: 'Courier New', monospace;
-}
-.certificate .cert-badge {
-  display: inline-block;
-  font-size: 60px;
-  animation: bounce 0.8s ease infinite;
-  filter: drop-shadow(0 0 10px rgba(255,107,107,0.4));
-  will-change: transform;
-}
-
-/* ============================================================
-   LOADING
-   ============================================================ */
-.loading-bar-wrap {
-  background: rgba(255,255,255,0.05);
-  border-radius: 10px;
-  height: 20px;
-  margin: 20px 0;
-  overflow: hidden;
-}
-.loading-bar {
-  height: 100%;
-  border-radius: 10px;
-  background: linear-gradient(90deg, #ff6b6b, #ff9ff3, #feca57);
-  background-size: 200% 100%;
-  animation: progressBar 2.5s ease-out forwards, shimmer 1s linear infinite;
-}
-.loading-label {
-  font-size: 13px;
-  color: #718096;
-  margin-top: 8px;
-  animation: blink 0.8s step-end infinite;
-}
-
-/* ============================================================
-   GLOBAL STATS
-   ============================================================ */
-.global-stats {
-  position: fixed;
-  bottom: 0; left: 0; right: 0;
-  background: linear-gradient(90deg, rgba(255,107,107,0.9), rgba(255,154,243,0.9), rgba(254,202,87,0.9));
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
-  color: #1a0a0a;
-  text-align: center;
-  padding: 10px 20px;
-  font-size: 14px;
-  font-weight: 700;
-  z-index: 500;
-  animation: slideUp 0.5s ease;
-  box-shadow: 0 -4px 20px rgba(0,0,0,0.3);
-}
-.global-stats .count {
-  font-size: 24px;
-  font-weight: 900;
-  margin: 0 6px;
-  animation: bounce 1s ease infinite;
-  display: inline-block;
-  color: #fff;
-  text-shadow: 0 0 10px rgba(0,0,0,0.3);
-  will-change: transform;
-}
-.stats-detail { font-size: 11px; opacity: 0.8; margin-top: 4px; }
-
-/* ============================================================
-   CONFETTI
-   ============================================================ */
-.confetti {
-  position: fixed;
-  pointer-events: none;
-  z-index: 9999;
-  animation: confettiFall 2.2s ease-out forwards;
-  will-change: transform, opacity;
-}
-
-/* ============================================================
-   TAUNT BUBBLE & PIG PRINT
-   ============================================================ */
-.taunt-bubble {
-  position: absolute;
-  background: rgba(0,0,0,0.9);
-  border: 1px solid #ff9ff3;
-  border-radius: 12px;
-  padding: 5px 12px;
-  font-size: 13px;
-  font-weight: 600;
-  color: #ff9ff3;
-  pointer-events: none;
-  z-index: 20;
-  white-space: nowrap;
-  animation: popIn 0.2s ease-out, slideUp 1s ease-out forwards;
-}
-.pig-print {
-  position: absolute;
-  font-size: 22px;
-  pointer-events: none;
-  z-index: 10;
-  animation: fadeIn 0.2s ease, floatUp 1.5s ease-out forwards;
-  opacity: 0.6;
-}
-
-/* ============================================================
-   DRAMATIC FLASH
-   ============================================================ */
-.dramatic-flash {
-  position: fixed;
-  top: 0; left: 0; right: 0; bottom: 0;
-  background: #fff;
-  z-index: 5000;
-  pointer-events: none;
-  animation: flashBoom 0.6s ease-out forwards;
-}
-@keyframes flashBoom {
-  0%   { opacity: 0.8; }
-  100% { opacity: 0; }
-}
-
-/* ============================================================
-   RESPONSIVE
-   ============================================================ */
-@media (max-width: 480px) {
-  .funny-title h1 { font-size: 48px; }
-  .modal { padding: 28px 18px 22px; }
-  .btn { padding: 12px 24px; font-size: 16px; }
-  .visualizer-container { gap: 2px; }
-  .visualizer-bar { width: 4px; }
-  .mascot { font-size: 48px; }
-  .mascot-container { bottom: 70px; right: 10px; }
-  .splash .s-radio { font-size: 60px; }
-  .splash .s-title { font-size: 24px; letter-spacing: 4px; }
-  .splash .s-freq { font-size: 17px; }
-  .ach-panel { max-width: 95vw; padding: 18px; }
-  .music-toggle { top: 12px; right: 10px; padding: 6px 12px; font-size: 11px; }
-  .achievement-btn { top: 12px; right: 100px; width: 33px; height: 33px; font-size: 14px; }
-}
-@media (max-width: 380px) {
-  .funny-title h1 { font-size: 38px; }
-  .btn { padding: 10px 18px; font-size: 14px; min-width: 80px; }
-  .modal .pig-icon { font-size: 56px; }
-  .modal .question { font-size: 17px; }
+@media (max-width:380px) {
+  .funny-title h1 { font-size:38px; }
+  .btn { padding:10px 18px; font-size:14px; min-width:80px; }
+  .modal .pig-icon { font-size:56px; }
+  .modal .question { font-size:17px; }
 }
 </style>
 </head>
 <body>
 
-<!-- 星空 -->
 <div class="starfield" id="starfield"></div>
 
-<!-- 电台开机画面 -->
 <div class="splash" id="splash">
   <span class="s-radio">📻</span>
   <span class="s-title">猪猪电台</span>
@@ -1048,39 +255,27 @@ body.screen-shake-light { animation: shake 0.3s ease-out; }
   <span class="s-msg" id="splashMsg">正在连接猪猪卫星...</span>
 </div>
 
-<!-- Toast 容器 -->
 <div class="toast-container" id="toastContainer"></div>
-
 <div class="ambient-bg"></div>
 <div class="spotlight"></div>
 
-<!-- 跑马灯 -->
 <div class="marquee" id="marquee">
   <span>📻 猪猪电台 FM 94.8 — 全球首家猪猪认证电台 — 正在直播中...</span>
 </div>
 
-<!-- 可视化频谱 -->
 <div class="visualizer-container" id="visualizer"></div>
 
-<!-- 猪猪DJ -->
 <div class="mascot-container" id="mascotContainer">
-  <div class="mascot" id="mascot" title="猪猪电台 DJ">
-    🐷
-    <span class="mascot-bubble" id="mascotBubble">哼哼~</span>
-  </div>
+  <div class="mascot" id="mascot" title="猪猪电台 DJ">🐷<span class="mascot-bubble" id="mascotBubble">哼哼~</span></div>
 </div>
 
-<!-- 音乐开关 -->
-<button class="music-toggle on" id="musicToggle" onclick="toggleMusic()" title="开关背景音乐">
-  🎵 电台BGM
-</button>
+<button class="music-toggle on" id="musicToggle" onclick="toggleMusic()" title="开关背景音乐">🎵 电台BGM</button>
 <button class="achievement-btn" id="achievementBtn" onclick="openAchievementPanel()" title="猪猪成就">🏆</button>
 
-<!-- 成就面板 -->
 <div class="ach-panel-overlay" id="achPanelOverlay" style="display:none;" onclick="maybeCloseAchPanel(event)">
   <div class="ach-panel" id="achPanel" onclick="event.stopPropagation()">
     <h3>🏆 猪猪成就</h3>
-    <p class="panel-subtitle">努力成为最猪的猪</p>
+    <p class="panel-subtitle" id="achPanelSubtitle">努力成为最猪的猪</p>
     <div id="achList"></div>
     <div class="panel-actions" style="margin-top:14px; text-align:right;">
       <button class="btn-sm ghost" onclick="closeAchievementPanel()" style="padding:8px 20px;border:none;border-radius:20px;font-size:12px;font-weight:600;cursor:pointer;background:rgba(255,255,255,0.05);color:#a0aec0;border:1px solid rgba(255,255,255,0.1);">关闭</button>
@@ -1088,14 +283,12 @@ body.screen-shake-light { animation: shake 0.3s ease-out; }
   </div>
 </div>
 
-<!-- 标题 -->
 <div class="funny-title" id="funnyTitle">
   <h1>🐷</h1>
   <p class="sub">📻 猪猪电台 FM 94.8 📻</p>
   <p class="easter-hint">👆 连戳有隐藏频道</p>
 </div>
 
-<!-- 主弹窗 -->
 <div class="overlay" id="mainModal">
   <div class="modal" id="mainBox">
     <span class="pig-icon">🐷</span>
@@ -1105,30 +298,18 @@ body.screen-shake-light { animation: shake 0.3s ease-out; }
       <button class="btn btn-dunno" id="dunnoBtn" onmouseenter="onDunnoHover(this)" onclick="onClickDunno()">不知道</button>
       <span class="escape-badge" id="escapeBadge" style="display:none;">0</span>
     </div>
-    <!-- 猪吼检测器 -->
-    <div class="scream-section" id="screamSection">
-      <button class="scream-btn" id="screamBtn"
-        onmousedown="startScream(event)" onmouseup="stopScream(event)" onmouseleave="stopScream(event)"
-        ontouchstart="startScream(event)" ontouchend="stopScream(event)" ontouchcancel="stopScream(event)">
-        🎤 按住喊「我不是猪！」
-      </button>
-      <div class="scream-meter-wrap" id="screamMeterWrap"><div class="scream-meter" id="screamMeter"></div></div>
-      <p class="scream-label" id="screamLabel"></p>
-    </div>
   </div>
 </div>
 
-<!-- 假加载弹窗 -->
 <div class="overlay" id="loadingModal" style="display:none;">
   <div class="modal">
     <span class="pig-icon">🤔</span>
     <p style="font-size:18px;font-weight:700;color:#ff9ff3;">正在分析中...</p>
     <div class="loading-bar-wrap"><div class="loading-bar" id="loadingBar"></div></div>
-    <p class="loading-label" id="loadingLabel">扫描大脑中 🧠</p>
+    <p class="loading-label" id="loadingLabel">正在入侵你的大脑 🧠</p>
   </div>
 </div>
 
-<!-- 连环确认弹窗 -->
 <div class="overlay" id="confirmModal" style="display:none;">
   <div class="modal" id="confirmBox">
     <span class="pig-icon" id="confirmIcon">🤨</span>
@@ -1140,46 +321,45 @@ body.screen-shake-light { animation: shake 0.3s ease-out; }
   </div>
 </div>
 
-<!-- 结果弹窗 -->
 <div class="overlay" id="resultModal" style="display:none;">
   <div class="modal" id="resultBox">
     <span class="pig-icon" id="resultFace"></span>
     <p class="pig-name" id="pigName"></p>
+    <p class="cert-rank-display" id="certRankDisplay"></p>
     <p class="result-text" id="resultText"></p>
     <p class="roast-text" id="roastText"></p>
     <div id="certContainer"></div>
-    <button class="btn btn-share" onclick="shareResult()">📤 分享给朋友</button>
-    <button class="btn btn-back" onclick="goBack()">🔄 返回重新选择</button>
-    <button class="btn btn-cert" onclick="showCertificate()" id="btnShowCert" style="display:none;">📜 查看猪猪证书</button>
+    <button class="btn btn-share" onclick="shareResult()">📤 骗朋友也来测</button>
+    <button class="btn btn-back" onclick="goBack()">🔄 我不服，再来</button>
+    <button class="btn btn-cert" onclick="showCertificate()" id="btnShowCert" style="display:none;">📜 领取猪猪身份证</button>
   </div>
 </div>
 
-<!-- 证书弹窗 -->
 <div class="overlay" id="certModal" style="display:none;">
   <div class="modal" style="max-width:480px;">
     <div class="certificate" id="certificateContent">
       <span class="cert-seal">🏅</span>
-      <div class="cert-title">🐷 官方猪猪认证证书 🐷</div>
+      <div class="cert-title" id="certTitle">🐷 官方猪猪认证证书 🐷</div>
       <div class="cert-body">
         <span class="cert-badge">🐷</span><br>
-        兹证明<br>
+        <span id="certPreamble">兹证明</span><br>
         <strong style="font-size:18px;">「<span id="certName">这位朋友</span>」</strong><br>
-        经国际猪猪协会（IPA）权威认证<br>
-        正式确认为<br>
-        <span style="font-size:20px;color:#ff6b6b;">🏆 官方认证猪猪 🏆</span><br>
-        特发此证，以资证明
+        <span id="certAuthority">经国际猪猪协会（IPA）权威认证</span><br>
+        <span id="certAction">正式确认为</span><br>
+        <span style="font-size:20px;color:#ff6b6b;" id="certRankTitle">🏆 官方认证猪猪 🏆</span><br>
+        <span id="certMotto">特发此证，以资证明</span>
       </div>
       <div class="cert-no">
         证书编号：PIG-<span id="certNumber">20260611</span><br>
         签发日期：<span id="certDate"></span><br>
-        全球排名：第 <strong id="certRank">0</strong> 位
+        全球排名：第 <strong id="certRank">0</strong> 位<br>
+        <span id="certFootnote">此证书永久有效，概不退换</span>
       </div>
     </div>
     <button class="btn btn-back" onclick="closeCertificate()">关闭</button>
   </div>
 </div>
 
-<!-- 全局统计条 -->
 <div class="global-stats" id="globalStats">
   📻 全球已有 <span class="count" id="globalCount">0</span> 只猪被确认！
   <div class="stats-detail">
@@ -1194,45 +374,211 @@ body.screen-shake-light { animation: shake 0.3s ease-out; }
 // GLOBAL STATE
 // ============================================================
 var musicOn = true;
-var escapeCount = 0;
-var escapeStartTime = 0;
-var backCount = 0;
-var shakeCount = 0;
-var confirmStep = 0;
-var audioCtx = null;
-var musicEngine = null;
-var visualizerTimer = null;
-var visBars = [];
+var escapeCount = 0, escapeStartTime = 0;
+var backCount = 0, shakeCount = 0, confirmStep = 0;
+var audioCtx = null, musicEngine = null;
+var visualizerTimer = null, visBars = [];
 var pageReady = false;
-var micStream = null;
-var micAnalyser = null;
-var micAnimId = null;
-var cursorTrails = [];
-var lastCursorTime = 0;
+var cursorTrails = [], lastCursorTime = 0;
 var paradeTimer = null;
 
 // ============================================================
-// LOCALSTORAGE
+// RANDOM PICK — pick random item from array, with optional seed for variety
 // ============================================================
-var ROASTS = {
-  know: [
-    '😏 算你还有点自知之明','😏 不错，诚实是猪的第一美德',
-    '😏 恭喜你，你是第#COUNT#只承认自己是猪的','😏 承认得这么干脆，看来早就知道了',
-    '😏 很好，你已正式加入猪猪联盟','😏 坦白从宽，抗拒从严，你选择了从宽',
-    '😏 欢迎来到猪猪大家庭！🐷','😏 全球已有#COUNT#只猪与你同行',
-    '😏 诚实是一种美德，猪猪为你骄傲','😏 你比别人少了一项烦恼：认清自己',
-    '😏 诺贝尔猪猪奖提名已提交','😏 猪猪协会发来贺电！',
-    '😏 勇敢面对真相，你做到了！','😏 第#COUNT#位认证会员，请收好你的猪猪证'
+function pick(arr) { return arr[Math.floor(Math.random() * arr.length)]; }
+
+// ============================================================
+// LOCAL STORAGE
+// ============================================================
+var ROASTS_KNOW = [
+  '😏 算你还有点自知之明——不过知道自己是猪还这么淡定，心理素质满分',
+  '😏 不错，诚实是猪的第一美德。今晚加餐：豪华猪饲料一份',
+  '😏 恭喜！你是第#COUNT#只承认自己是猪的。猪协已为你预留VIP猪圈',
+  '😏 承认得这么干脆……看来镜子没白买',
+  '😏 很好，你已正式加入猪猪联盟。会员卡是这张——🐽 拱一下就行',
+  '😏 坦白从宽，抗拒从严。由于你态度良好，判你——终身当猪',
+  '😏 欢迎来到猪猪大家庭！🐷 这里有#COUNT#只猪等你开派对',
+  '😏 诚实是一种美德……但诚实到承认自己是猪，属于美德过头了',
+  '😏 你比别人少了一项烦恼：认清自己。多了的烦恼是：怎么跟爸妈解释',
+  '😏 诺贝尔猪猪奖提名已提交，评审意见：「实至名归」',
+  '😏 猪猪协会发来贺电！🎉「热烈祝贺又一位优秀猪才被发现」',
+  '😏 勇敢面对真相，你做到了！虽然真相有点……猪',
+  '😏 第#COUNT#位认证会员！请收好你的猪猪证，年费：每天哼哼两声',
+  '😏 科学研究表明：知道自己是什么物种的猪，比不知道的幸福指数高47%'
+];
+
+var ROASTS_DUNNO = [
+  '🐷 现在你知道了！恭喜解锁新身份：猪猪宇宙公民',
+  '🐷 第#COUNT#只觉醒的猪！欢迎归队，你的猪队友们在等你',
+  '🐷 不知道没关系，现在你懂了吧。这就叫——恍然大悟（物理）',
+  '🐷 真相虽然残酷，但早晚要面对。就像早上照镜子一样',
+  '🐷 你已被成功添加到猪猪豪华套餐。套餐内容：泥巴浴、拱土、哼哼',
+  '🐷 没关系，猪不需要知道自己是什么。但现在你知道了——成长了',
+  '🐷 恭喜你找到了真实的自己！虽然真相比你想象的更猪',
+  '🐷 全球第#COUNT#只猪正在觉醒……你们可以组个猪猪合唱团了',
+  '🐷 镜子里看看自己，是不是越看越像了？那是你体内的猪猪基因在发光',
+  '🐷 这么多年你都没发现自己是猪，不得不说——你藏得真深',
+  '🐷 觉醒吧！你体内的猪猪之魂！🔓 新技能解锁：拱食、打滚',
+  '🐷 科学证明：不知道自己是猪的人里，99.87%都是猪。你是那0.13%——的误诊',
+  '🐷 没关系，猪猪的反射弧都比较长。你的反射弧大概……绕地球三圈',
+  '🐷 从现在开始，好好做一只快乐的猪吧！记得每天哼哼，有益身心健康'
+];
+
+var CERT_TITLES = [
+  '🐷 官方猪猪认证证书 🐷',
+  '🐷 国际猪协一级甲等证书 🐷',
+  '🐷 全球猪才认证计划 🐷',
+  '🐷 猪猪身份确认书 🐷',
+  '🐷 国际猪籍注册证明 🐷'
+];
+
+var CERT_PREAMBLES = [
+  '兹证明', '特此认证', '经猪协审核批准', '经全球猪才数据库比对', '经DNA检测确认（开玩笑的）'
+];
+
+var CERT_AUTHORITIES = [
+  '经国际猪猪协会（IPA）权威认证',
+  '经联合国猪类事务署（UNPA）认定',
+  '经世界猪才鉴定中心（WPAC）核验',
+  '经猪猪宇宙联盟（PUU）盖章确认',
+  '经全球猪类评级委员会（GPRC）评审'
+];
+
+var CERT_ACTIONS = [
+  '正式确认为', '特此授予称号：', '鉴定结果为：', '评级认定为：', '终身确认为：'
+];
+
+var CERT_RANK_TITLES = [
+  '🏆 官方认证猪猪 🏆',
+  '🥇 钻石级猪猪会员 🥇',
+  '👑 皇家猪猪勋章获得者 👑',
+  '🌟 五星级荣誉猪猪 🌟',
+  '💎 永久猪猪公民 💎',
+  '🎖️ 猪猪终身成就奖 🎖️',
+  '🏅 国际猪协认证猪才 🏅',
+  '🐽 荣耀猪猪勋章持有者 🐽'
+];
+
+var CERT_MOTTOS = [
+  '特发此证，以资证明', '此证永久有效，不可转让', '凭此证可享受全球猪圈VIP待遇',
+  '此证由猪猪协会会长（一头猪）签署', '拱土许可证，编号如上'
+];
+
+var CERT_FOOTNOTES = [
+  '此证书永久有效，概不退换', '证书一旦发出，拒不收回', '本证书具有法律效力（在猪界）',
+  '请妥善保管，遗失不补', '此证可作为猪圈入住凭证', '持此证可优先领取猪饲料'
+];
+
+var LOADING_TITLES = [
+  '正在分析中...', '正在鉴定中...', '正在计算猪指数...', '猪才评估系统启动中...',
+  '正在连接猪协数据库...', 'AI猪脸识别中...', '正在比对猪基因序列...'
+];
+
+var LOADING_MESSAGES = [
+  '正在入侵你的大脑 🧠', '正在扫描你的智商余额 📉', '正在连接猪猪云端数据库 ☁️',
+  'AI模型：你99%是猪 🐷', '正在检索你的前世今生 🔮', '正在分析你的猪猪指数 📊',
+  '猪才识别算法运行中 ⚙️', '正在跟猪协服务器握手 🤝', '正在破解你的DNA密码 🧬',
+  '别急，答案马上揭晓 ⏳', '正在确认你是否需要猪饲料 🍽️', '正在调取你的镜子记录 🪞',
+  '数据不足，请求猪协支援 📡', '系统显示：猪的概率极高 📈', '正在排除你是人类的可能 ❌'
+];
+
+var MARQUEE_MESSAGES = [
+  '📻 猪猪电台 FM 94.8 — 全球首家猪猪认证电台 — 正在直播中...',
+  '🐷 又一位猪猪确认身份！全球猪数+1！🐷',
+  '🏆 恭喜新晋猪猪获得官方认证证书！🏆',
+  '🌈 终极彩虹猪猪模式已激活！🌈',
+  '🎮 科乐美秘技激活！超级猪猪模式！🎮',
+  '🔥 猪猪电台听众突破#COUNT#位！🔥',
+  '🐽 今日猪价：一只猪 = 无价之宝 💎',
+  '📡 猪猪卫星信号满格！正在广播中 📡'
+];
+
+var TOASTS_ESCAPE = [
+  '🏃 抓不到！你的手速不如猪蹄', '💨 溜了溜了！猪猪敏捷+99', '🤣 你这手速，猪都比你快',
+  '😝 放弃吧，按钮比你会跑', '🐷 哼哼~ 追不上吧', '🏃‍♂️ 第N次逃跑成功！',
+  '✌️ 猪猪闪现！', '🐽 你的鼠标需要升级了'
+];
+
+var TOASTS_SHAKE = [
+  '📳 摇手机也没用！猪猪稳如泰山', '📳 你以为自己是调酒师？', '📳 再摇手机就飞出去了',
+  '📳 猪猪表示：毫无感觉', '📳 摇摇乐是吧？猪猪免疫'
+];
+
+var TOASTS_ACHIEVEMENT = [
+  '🏆 成就解锁！你离完美猪猪更近了', '🎉 新成就get！猪协发来祝贺', '⭐ 里程碑达成！你是最棒的猪',
+  '💎 稀有成就！大部分猪做不到', '🔥 厉害了！这只猪不简单'
+];
+
+var MASCOT_BUBBLES = {
+  idle: ['哼哼~','今天天气不错~','有点饿了...','泥巴在哪？','好无聊啊~','有人来玩吗？','拱一拱~'],
+  dancing: ['🎵 动次打次！','💃 来跳舞！','🕺 猪猪蹦迪！','🎶 这个节奏绝了！','🎵 猪猪电音！'],
+  laughing: ['😂 哈哈哈哈！','🤣 笑死猪了！','😆 你太逗了！','😂 不行了笑出猪叫！'],
+  angry: ['😡 气死猪了！','🤬 惹怒一只猪的后果很严重','😤 再这样我拱你了！'],
+  surprised: ['😱 你居然！','🤯 震惊猪猪一整年！','😲 这是人干的事？'],
+  clicked: ['别戳我！🐷💨','再戳生气了！😤','啊啊啊好痒！','住手！猪也有尊严！','拱你哦！🐽']
+};
+
+var TAUNTS = [
+  '🤣 抓不到~', '🐷 哼哼~', '💨 溜了溜了', '😝 太慢了',
+  '✌️ 在这呢~', '🙈 你够不着', '🏃 拜拜~', '🐽 再来啊',
+  '🤪 你的手速不如猪蹄', '💫 猪猪瞬移术！', '🫠 放弃吧人类',
+  '🫣 悄悄溜走', '🤭 又没抓到', '🦸 猪猪侠闪避！'
+];
+
+var QUESTION_TAUNTS = [
+  '你知不知道<br>你自己是猪？',
+  '再问一次：<br>你，是猪吗？',
+  '请认真回答：<br>你是不是猪？',
+  '摸着良心说：<br>你是猪吗？',
+  '第#ESC#次了！<br>你还不承认？',
+  '逃避是没用的<br>你就是猪🐷',
+  '科学表明：<br>点「不知道」的都是猪',
+  '别装了<br>镜子已经出卖你了',
+  '是就是，别不好意思<br>全球#COUNT#只猪陪着你'
+];
+
+var CONFIRM_CHAINS = [
+  [
+    { icon:'🤨', q:'你确定吗？', yes:'我确定！', no:'等一下...' },
+    { icon:'😏', q:'再考虑考虑？<br>一旦确认不可撤销', yes:'不用考虑了！', no:'我再想想...' },
+    { icon:'🙄', q:'最后通牒：<br>确认你是猪？', yes:'确认！我就是猪！', no:'我怂了...' }
   ],
-  dunno: [
-    '🐷 现在你知道了！恭喜解锁新身份','🐷 第#COUNT#只新觉醒的猪，欢迎归队',
-    '🐷 不知道没关系，现在你懂了吧','🐷 真相虽然残酷，但早晚要面对',
-    '🐷 你已加入猪猪豪华套餐','🐷 没关系，猪不需要知道自己是什么',
-    '🐷 恭喜你，终于找到了真实的自己','🐷 全球第#COUNT#只猪正在觉醒中……',
-    '🐷 镜子里看看自己，是不是越来越像了？','🐷 这么多年你都没发现，真是太不容易了',
-    '🐷 觉醒吧！你体内的猪猪之魂！','🐷 科学证明：不知道自己是猪的，99%都是猪',
-    '🐷 没关系，猪猪的反射弧都比较长','🐷 从现在开始，好好做一只快乐的猪吧'
+  [
+    { icon:'🧐', q:'你想清楚了吗？', yes:'想清楚了', no:'还没...' },
+    { icon:'😏', q:'这可是有法律效力的哦<br>（在猪界）', yes:'签！', no:'我撤了' },
+    { icon:'🫣', q:'真不后悔？<br>以后你就是有证的了', yes:'不后悔！发证吧', no:'让我再逃一会' }
+  ],
+  [
+    { icon:'🤔', q:'你确定知道<br>自己是什么物种？', yes:'确定，是猪', no:'不确定...' },
+    { icon:'😤', q:'想好了再说<br>这关乎你的物种认定', yes:'想好了，猪无疑', no:'物种待定' },
+    { icon:'😈', q:'签了这份猪籍确认书<br>你就是有身份的猪了', yes:'拿来我签！', no:'我选择逃跑' }
   ]
+];
+
+var PIG_FIRST = [
+  '拱拱','哼哼','胖胖','圆圆','粉粉','滚滚','嘟嘟','憨憨',
+  '笨笨','臭臭','球球','团子','坨坨','肥肥','懒懒','趴趴',
+  '泥泥','饱饱','睡睡','呆呆','肉肉','短短','卷卷','软软'
+];
+
+var PIG_TITLES = [
+  '·猪尔罗斯','·猪八戒第#NO#代传人','·国际猪协认证会员','·猪猪侠','·佩奇的远亲',
+  '·猪坚强二世','·猪猪BOY','·飞天小猪猪','·钻地小猪猪',
+  '·猪中贵族','·野生猪猪','·猪猪王子','·网易猪场代言人',
+  '·猪猪星球移民','·猪斯拉','·猪古力','·猪猪特工','·猪因斯坦',
+  '·猪界顶流','·猪圈一哥','·猪猪侠（已黑化）','·猪猪侠（未黑化）',
+  '·拱土达人','·猪猪练习生','·超级猪猪','·猪猪队长'
+];
+
+// Achievement popup subtitle variations
+var ACH_SUBTITLES = [
+  '努力成为最猪的猪','你离完美猪猪只差一步','猪才成长之路','解锁你的猪猪潜能',
+  '每一只猪都值得被记住','猪协官方认证体系','你的猪猪简历','猪生里程碑'
+];
+
+var RESULT_TEXTS = {
+  know: ['知道就好！', '没错，你就是！', '自知之明 ✓', '诚实的好猪！', '恭喜认清自己！', '你答对了！（奖品是猪籍）'],
+  dunno: ['好了，现在你知道了！', '恭喜发现真相！', '欢迎来到猪的世界！', '觉醒吧猪猪！', '真相只有一个：你是猪', '鉴定完毕：纯种猪']
 };
 
 var BASE_STATS = { total: 66, know: 18, dunno: 27 };
@@ -1242,32 +588,23 @@ function loadStats() {
   catch(e) { return { total:0, know:0, dunno:0, back:0 }; }
 }
 function saveStats(s) { try { localStorage.setItem('pig_radio_stats', JSON.stringify(s)); } catch(e) {} }
-function recordClick(type) { var s = loadStats(); s.total++; if (type==='know') s.know++; else if (type==='dunno') s.dunno++; else if (type==='back') s.back++; saveStats(s); return s; }
+function recordClick(type) { var s=loadStats(); s.total++; if(type==='know')s.know++; else if(type==='dunno')s.dunno++; else if(type==='back')s.back++; saveStats(s); return s; }
 function getGlobalTotal() { return BASE_STATS.total + loadStats().total; }
-function getRoast(type) { var list = ROASTS[type] || ROASTS['know']; return list[Math.floor(Math.random()*list.length)].replace('#COUNT#', getGlobalTotal()+1); }
+function getRoast(type) { var list = type==='know'?ROASTS_KNOW:ROASTS_DUNNO; return pick(list).replace('#COUNT#', getGlobalTotal()+1); }
 function refreshStats() {
-  var s = loadStats(), gt = BASE_STATS.total + s.total, gk = BASE_STATS.know + s.know, gd = BASE_STATS.dunno + s.dunno;
-  document.getElementById('globalCount').textContent = gt;
-  document.getElementById('knowCount').textContent = gk;
-  document.getElementById('dunnoCount').textContent = gd;
-  document.getElementById('uniqueCount').textContent = Math.max(1, Math.floor(gt/3));
+  var s=loadStats(), gt=BASE_STATS.total+s.total, gk=BASE_STATS.know+s.know, gd=BASE_STATS.dunno+s.dunno;
+  document.getElementById('globalCount').textContent=gt;
+  document.getElementById('knowCount').textContent=gk;
+  document.getElementById('dunnoCount').textContent=gd;
+  document.getElementById('uniqueCount').textContent=Math.max(1,Math.floor(gt/3));
 }
 
 // ============================================================
 // PIG NAME GENERATOR
 // ============================================================
-var PIG_FIRST = ['拱拱','哼哼','胖胖','圆圆','粉粉','滚滚','嘟嘟','憨憨','笨笨','臭臭','球球','团子','坨坨','肥肥'];
-var PIG_TITLES = [
-  '·猪尔罗斯','·猪八戒第#NO#代传人','·国际猪协认证会员','·猪猪侠','·佩奇的远亲',
-  '·乔治的表哥','·猪坚强二世','·猪猪BOY','·飞天小猪猪','·钻地小猪猪',
-  '·猪中贵族','·野生猪猪','·猪猪公主','·猪猪王子','·网易猪场代言人',
-  '·猪猪星球移民','·猪斯拉','·猪古力','·猪猪特工','·猪因斯坦'
-];
 function generatePigName() {
-  var s = loadStats(), total = BASE_STATS.total + s.total;
-  var idx = total % PIG_FIRST.length, first = PIG_FIRST[idx];
-  var titleIdx = (total * 7 + s.know * 3 + s.dunno * 11) % PIG_TITLES.length;
-  return first + PIG_TITLES[titleIdx].replace('#NO#', 100 + Math.floor(total/5)*50 + s.know*7);
+  var s=loadStats(), total=BASE_STATS.total+s.total;
+  return pick(PIG_FIRST) + pick(PIG_TITLES).replace('#NO#', 100+Math.floor(total/5)*50+s.know*7);
 }
 
 // ============================================================
@@ -1275,15 +612,15 @@ function generatePigName() {
 // ============================================================
 function haptic(p) {
   if (!navigator.vibrate) return;
-  switch(p) { case 'tap':navigator.vibrate(10);break; case 'double':navigator.vibrate([10,40,10]);break; case 'success':navigator.vibrate([15,50,15,50,30]);break; case 'warn':navigator.vibrate([30,40,30,40,30]);break; case 'long':navigator.vibrate(100);break; default:navigator.vibrate(p); }
+  switch(p){ case'tap':navigator.vibrate(10);break; case'double':navigator.vibrate([10,40,10]);break; case'success':navigator.vibrate([15,50,15,50,30]);break; case'warn':navigator.vibrate([30,40,30,40,30]);break; case'long':navigator.vibrate(100);break; default:navigator.vibrate(p); }
 }
 
 // ============================================================
 // TOAST
 // ============================================================
 function showToast(msg, dur) {
-  var c = document.getElementById('toastContainer'), t = document.createElement('div');
-  t.className = 'toast'; t.textContent = msg; c.appendChild(t);
+  var c=document.getElementById('toastContainer'), t=document.createElement('div');
+  t.className='toast'; t.textContent=msg; c.appendChild(t);
   setTimeout(function(){ t.style.opacity='0'; t.style.transition='opacity 0.3s'; setTimeout(function(){ t.remove(); },300); }, dur||2000);
 }
 
@@ -1291,409 +628,276 @@ function showToast(msg, dur) {
 // ACHIEVEMENT SYSTEM
 // ============================================================
 var ACHIEVEMENTS = [
-  { id:'runner',   icon:'🏃', name:'逃跑大师',  desc:'逃跑20次以上',                   check:function(a){return a.escapes>=20;}, progress:function(a){return Math.min(a.escapes,20)+'/20';} },
-  { id:'speed',    icon:'🎯', name:'手速达人',  desc:'3秒内点中逃跑按钮',              check:function(a){return a.fastCatch;}, progress:function(a){return a.fastCatch?'✅':(a.escapes>0?'再接再厉':'试试抓按钮');} },
-  { id:'backer',   icon:'🔄', name:'反复横跳',  desc:'返回重选5次',                    check:function(a){return a.backs>=5;}, progress:function(a){return Math.min(a.backs,5)+'/5';} },
-  { id:'honest',   icon:'🐷', name:'诚实猪猪',  desc:'第一次就点知道',                 check:function(a){return a.honestFirst;}, progress:function(a){return a.honestFirst?'✅':(a.totalClicks>0?'已选其他':'直接点「知道」试试');} },
-  { id:'konami',   icon:'🎮', name:'科乐美大师',desc:'触发科乐美秘技',                 check:function(a){return a.konami;}, progress:function(a){return a.konami?'✅':'↑↑↓↓←→←→BA';} },
-  { id:'rainbow',  icon:'🌈', name:'彩虹猪猪',  desc:'标题连点7次触发彩虹',            check:function(a){return a.rainbow;}, progress:function(a){return a.rainbow?'✅':'连戳标题7下';} },
-  { id:'shaker',   icon:'📳', name:'摇摇乐',    desc:'摇晃手机10次',                   check:function(a){return a.shakes>=10;}, progress:function(a){return Math.min(a.shakes,10)+'/10';} },
-  { id:'screamer', icon:'🎤', name:'河东狮吼',  desc:'吼叫达到猪猪标准',               check:function(a){return a.screamPassed;}, progress:function(a){return a.screamPassed?'✅':(a.screamTried?'再大声点！':'按住吼叫按钮');} },
+  { id:'runner',  icon:'🏃', name:'逃跑大师',  desc:'逃跑20次以上',                 check:function(a){return a.escapes>=20;}, progress:function(a){return Math.min(a.escapes,20)+'/20';} },
+  { id:'speed',   icon:'🎯', name:'手速达人',  desc:'3秒内点中逃跑按钮',            check:function(a){return a.fastCatch;}, progress:function(a){return a.fastCatch?'✅':(a.escapes>0?'再接再厉':'试试抓按钮');} },
+  { id:'backer',  icon:'🔄', name:'反复横跳',  desc:'返回重选5次',                  check:function(a){return a.backs>=5;}, progress:function(a){return Math.min(a.backs,5)+'/5';} },
+  { id:'honest',  icon:'🐷', name:'诚实猪猪',  desc:'第一次就点知道',               check:function(a){return a.honestFirst;}, progress:function(a){return a.honestFirst?'✅':(a.totalClicks>0?'已选其他':'直接点「知道」试试');} },
+  { id:'konami',  icon:'🎮', name:'科乐美大师',desc:'触发科乐美秘技',               check:function(a){return a.konami;}, progress:function(a){return a.konami?'✅':'↑↑↓↓←→←→BA';} },
+  { id:'rainbow', icon:'🌈', name:'彩虹猪猪',  desc:'标题连点7次触发彩虹',          check:function(a){return a.rainbow;}, progress:function(a){return a.rainbow?'✅':'连戳标题7下';} },
+  { id:'shaker',  icon:'📳', name:'摇摇乐',    desc:'摇晃手机10次',                 check:function(a){return a.shakes>=10;}, progress:function(a){return Math.min(a.shakes,10)+'/10';} }
 ];
 function loadAchievements() { try { return JSON.parse(localStorage.getItem('pig_achievements')) || {}; } catch(e) { return {}; } }
 function saveAchievement(id) {
-  var a = loadAchievements(); if (a[id]) return false;
-  var ach = null; for (var i=0;i<ACHIEVEMENTS.length;i++) { if (ACHIEVEMENTS[i].id===id) { ach=ACHIEVEMENTS[i]; break; } }
-  a[id] = { unlockedAt: Date.now(), icon: ach?ach.icon:'🏆', name: ach?ach.name:id, desc: ach?ach.desc:'' };
-  localStorage.setItem('pig_achievements', JSON.stringify(a));
-  showToast((ach?ach.icon:'🏆')+' 成就解锁：'+(ach?ach.name:id)+'！', 3000);
+  var a=loadAchievements(); if (a[id]) return false;
+  var ach=null; for (var i=0;i<ACHIEVEMENTS.length;i++) { if (ACHIEVEMENTS[i].id===id) { ach=ACHIEVEMENTS[i]; break; } }
+  a[id]={ unlockedAt:Date.now(), icon:ach?ach.icon:'🏆', name:ach?ach.name:id, desc:ach?ach.desc:'' };
+  localStorage.setItem('pig_achievements',JSON.stringify(a));
+  showToast(pick(['🏆 成就解锁！你离完美猪猪更近了','🎉 新成就get！猪协发来祝贺','⭐ 里程碑达成！你是最棒的猪','💎 稀有成就！大部分猪做不到','🔥 厉害了！这只猪不简单'])+'：'+(ach?ach.name:id), 3000);
   haptic('success'); updateAchievementBadge(); screenShake('light');
   return true;
 }
 function getAchievementData() {
-  var a = loadAchievements();
+  var a=loadAchievements();
   return {
-    escapes: escapeCount, fastCatch: escapeStartTime>0 && (Date.now()-escapeStartTime<3000) && escapeCount>0,
-    backs: backCount, totalClicks: loadStats().total, honestFirst: loadStats().know===1 && loadStats().total===1,
-    konami: !!a.konami, rainbow: !!a.rainbow, shakes: shakeCount,
-    screamPassed: !!a.screamer, screamTried: !!a.screamTried
+    escapes:escapeCount, fastCatch:escapeStartTime>0&&(Date.now()-escapeStartTime<3000)&&escapeCount>0,
+    backs:backCount, totalClicks:loadStats().total, honestFirst:loadStats().know===1&&loadStats().total===1,
+    konami:!!a.konami, rainbow:!!a.rainbow, shakes:shakeCount
   };
 }
 function checkAchievements() {
-  var data = getAchievementData(), stored = loadAchievements();
-  for (var i=0;i<ACHIEVEMENTS.length;i++) { var ach=ACHIEVEMENTS[i]; if (!stored[ach.id] && ach.check(data)) { saveAchievement(ach.id); stored[ach.id]=true; } }
+  var data=getAchievementData(), stored=loadAchievements();
+  for (var i=0;i<ACHIEVEMENTS.length;i++) { var ach=ACHIEVEMENTS[i]; if (!stored[ach.id]&&ach.check(data)) { saveAchievement(ach.id); stored[ach.id]=true; } }
 }
 function renderAchievementList() {
-  var data = getAchievementData(), stored = loadAchievements(), html = '';
+  var data=getAchievementData(), stored=loadAchievements(), html='';
   for (var i=0;i<ACHIEVEMENTS.length;i++) {
     var ach=ACHIEVEMENTS[i], unlocked=!!stored[ach.id];
     html+='<div class="ach-item '+(unlocked?'unlocked':'locked')+'"><span class="ach-icon">'+(unlocked?ach.icon:'🔒')+'</span><div class="ach-info"><div class="ach-name">'+ach.name+'</div><div class="ach-desc">'+ach.desc+'</div>'+(unlocked?'<div class="ach-progress">已解锁 ✅</div>':'<div class="ach-progress">'+ach.progress(data)+'</div>')+'</div></div>';
   }
-  document.getElementById('achList').innerHTML = html;
+  document.getElementById('achList').innerHTML=html;
+  document.getElementById('achPanelSubtitle').textContent=pick(ACH_SUBTITLES);
 }
 function openAchievementPanel() { renderAchievementList(); document.getElementById('achPanelOverlay').style.display='flex'; }
 function closeAchievementPanel() { document.getElementById('achPanelOverlay').style.display='none'; }
 function maybeCloseAchPanel(e) { if (e.target===document.getElementById('achPanelOverlay')) closeAchievementPanel(); }
 function updateAchievementBadge() {
   var data=getAchievementData(), stored=loadAchievements(), newCount=0;
-  for (var i=0;i<ACHIEVEMENTS.length;i++) { if (ACHIEVEMENTS[i].check(data) && !stored[ACHIEVEMENTS[i].id]) newCount++; }
+  for (var i=0;i<ACHIEVEMENTS.length;i++) { if (ACHIEVEMENTS[i].check(data)&&!stored[ACHIEVEMENTS[i].id]) newCount++; }
   var btn=document.getElementById('achievementBtn');
   if (newCount>0) { btn.classList.add('has-new'); btn.title=newCount+'个新成就待解锁！'; }
   else { btn.classList.remove('has-new'); btn.title='猪猪成就'; }
 }
 
 // ============================================================
-// SCREEN SHAKE
+// VISUAL EFFECTS
 // ============================================================
 function screenShake(intensity) {
-  var cls = intensity === 'light' ? 'screen-shake-light' : 'screen-shake';
+  var cls=intensity==='light'?'screen-shake-light':'screen-shake';
   document.body.classList.add(cls);
   setTimeout(function(){ document.body.classList.remove(cls); }, intensity==='light'?300:400);
 }
-
-// ============================================================
-// PULSE RING — expanding rings at a position
-// ============================================================
 function spawnPulseRing(parent, x, y) {
-  var ring = document.createElement('div'); ring.className = 'pulse-ring';
-  ring.style.left = x + 'px'; ring.style.top = y + 'px';
-  parent.appendChild(ring);
-  setTimeout(function(){ ring.remove(); }, 700);
+  var ring=document.createElement('div'); ring.className='pulse-ring'; ring.style.left=x+'px'; ring.style.top=y+'px';
+  parent.appendChild(ring); setTimeout(function(){ ring.remove(); },700);
 }
-
-// ============================================================
-// PARTICLE BURST — explosion from a point
-// ============================================================
 function spawnParticleBurst(x, y, count, emojis) {
-  count = count || 30; emojis = emojis || ['🐷','✨','💥','🌟','💖','🎉','🐽','🎵'];
-  for (var i = 0; i < count; i++) {
-    var p = document.createElement('span'); p.className = 'burst-particle';
-    p.textContent = emojis[Math.floor(Math.random()*emojis.length)];
-    var angle = Math.random() * Math.PI * 2, dist = 60 + Math.random() * 160;
-    p.style.setProperty('--dx', Math.cos(angle) * dist + 'px');
-    p.style.setProperty('--dy', Math.sin(angle) * dist + 'px');
-    p.style.left = x + 'px'; p.style.top = y + 'px';
-    p.style.fontSize = (14 + Math.random() * 24) + 'px';
-    p.style.animationDuration = (0.7 + Math.random() * 0.8) + 's';
-    document.body.appendChild(p);
-    setTimeout(function(){ p.remove(); }, 1600);
+  count=count||30; emojis=emojis||['🐷','✨','💥','🌟','💖','🎉','🐽','🎵'];
+  for (var i=0;i<count;i++) {
+    var p=document.createElement('span'); p.className='burst-particle';
+    p.textContent=emojis[Math.floor(Math.random()*emojis.length)];
+    var angle=Math.random()*Math.PI*2, dist=60+Math.random()*160;
+    p.style.setProperty('--dx',Math.cos(angle)*dist+'px'); p.style.setProperty('--dy',Math.sin(angle)*dist+'px');
+    p.style.left=x+'px'; p.style.top=y+'px'; p.style.fontSize=(14+Math.random()*24)+'px';
+    p.style.animationDuration=(0.7+Math.random()*0.8)+'s';
+    document.body.appendChild(p); setTimeout(function(){ p.remove(); },1600);
   }
 }
-
-// ============================================================
-// BUTTON SPARK LINE
-// ============================================================
 function spawnSparkBetween(el1, el2) {
-  var r1 = el1.getBoundingClientRect(), r2 = el2.getBoundingClientRect();
-  var x1 = r1.left + r1.width/2, y1 = r1.top + r1.height/2;
-  var x2 = r2.left + r2.width/2, y2 = r2.top + r2.height/2;
-  var dist = Math.sqrt((x2-x1)*(x2-x1) + (y2-y1)*(y2-y1));
-  var steps = Math.floor(dist / 8);
-  for (var i = 0; i < steps; i++) {
-    var t = i / steps, sx = x1 + (x2-x1)*t + (Math.random()-0.5)*20, sy = y1 + (y2-y1)*t + (Math.random()-0.5)*20;
-    var spark = document.createElement('div'); spark.className = 'btn-spark';
-    spark.style.left = sx + 'px'; spark.style.top = sy + 'px';
-    spark.style.animationDelay = Math.random() * 0.25 + 's';
-    spark.style.animationDuration = (0.2 + Math.random() * 0.3) + 's';
-    document.body.appendChild(spark);
-    setTimeout(function(){ spark.remove(); }, 600);
+  var r1=el1.getBoundingClientRect(), r2=el2.getBoundingClientRect();
+  var x1=r1.left+r1.width/2, y1=r1.top+r1.height/2, x2=r2.left+r2.width/2, y2=r2.top+r2.height/2;
+  var dist=Math.sqrt((x2-x1)*(x2-x1)+(y2-y1)*(y2-y1)), steps=Math.floor(dist/8);
+  for (var i=0;i<steps;i++) {
+    var t=i/steps, sx=x1+(x2-x1)*t+(Math.random()-0.5)*20, sy=y1+(y2-y1)*t+(Math.random()-0.5)*20;
+    var spark=document.createElement('div'); spark.className='btn-spark';
+    spark.style.left=sx+'px'; spark.style.top=sy+'px'; spark.style.animationDelay=Math.random()*0.25+'s';
+    spark.style.animationDuration=(0.2+Math.random()*0.3)+'s';
+    document.body.appendChild(spark); setTimeout(function(){ spark.remove(); },600);
   }
 }
-
-// ============================================================
-// RAINBOW TRAIL — behind the dunno button
-// ============================================================
 function spawnRainbowTrail(btn) {
-  var r = btn.getBoundingClientRect();
-  var colors = ['#ff6b6b','#feca57','#48dbfb','#ff9ff3','#54a0ff','#5f27cd','#ff6b6b'];
-  for (var i = 0; i < 5; i++) {
-    var t = document.createElement('span'); t.className = 'rainbow-trail';
-    t.style.left = (r.left + r.width/2 + (Math.random()-0.5)*50) + 'px';
-    t.style.top = (r.top + r.height/2 + (Math.random()-0.5)*50) + 'px';
-    t.style.width = (6 + Math.random()*10) + 'px'; t.style.height = t.style.width;
-    t.style.background = colors[Math.floor(Math.random()*colors.length)];
-    t.style.boxShadow = '0 0 8px ' + t.style.background;
-    t.style.position = 'fixed';
-    document.body.appendChild(t);
-    setTimeout(function(){ t.remove(); }, 500);
+  var r=btn.getBoundingClientRect(), colors=['#ff6b6b','#feca57','#48dbfb','#ff9ff3','#54a0ff','#5f27cd','#ff6b6b'];
+  for (var i=0;i<5;i++) {
+    var t=document.createElement('span'); t.className='rainbow-trail';
+    t.style.left=(r.left+r.width/2+(Math.random()-0.5)*50)+'px'; t.style.top=(r.top+r.height/2+(Math.random()-0.5)*50)+'px';
+    t.style.width=(6+Math.random()*10)+'px'; t.style.height=t.style.width;
+    t.style.background=colors[Math.floor(Math.random()*colors.length)];
+    t.style.boxShadow='0 0 8px '+t.style.background; t.style.position='fixed';
+    document.body.appendChild(t); setTimeout(function(){ t.remove(); },500);
   }
 }
-
-// ============================================================
-// CURSOR PIG TRAIL
-// ============================================================
 function spawnCursorTrail(x, y) {
-  var emojis = ['🐷','🐽','🐗','🐖','✨','💫'];
-  var t = document.createElement('span'); t.className = 'cursor-trail';
-  t.textContent = emojis[Math.floor(Math.random()*emojis.length)];
-  t.style.left = x + 'px'; t.style.top = y + 'px';
-  t.style.fontSize = (10 + Math.random() * 14) + 'px';
-  document.body.appendChild(t);
-  setTimeout(function(){ t.remove(); }, 600);
-  // Limit total trails
-  var all = document.querySelectorAll('.cursor-trail');
-  if (all.length > 18) { for (var i = 0; i < 3 && all[i]; i++) all[i].remove(); }
+  var t=document.createElement('span'); t.className='cursor-trail';
+  t.textContent=pick(['🐷','🐽','🐗','🐖','✨','💫','🫧','⭐']);
+  t.style.left=x+'px'; t.style.top=y+'px'; t.style.fontSize=(10+Math.random()*14)+'px';
+  document.body.appendChild(t); setTimeout(function(){ t.remove(); },600);
+  var all=document.querySelectorAll('.cursor-trail');
+  if (all.length>18) { for (var i=0;i<3&&all[i];i++) all[i].remove(); }
 }
 
-document.addEventListener('mousemove', function(e) {
-  if (!pageReady) return;
-  var now = Date.now();
-  if (now - lastCursorTime > 60) { spawnCursorTrail(e.clientX, e.clientY); lastCursorTime = now; }
+document.addEventListener('mousemove', function(e){
+  if (!pageReady) return; var now=Date.now();
+  if (now-lastCursorTime>60) { spawnCursorTrail(e.clientX,e.clientY); lastCursorTime=now; }
 });
-document.addEventListener('touchmove', function(e) {
-  if (!pageReady) return;
-  var now = Date.now(), t = e.touches[0];
-  if (now - lastCursorTime > 80) { spawnCursorTrail(t.clientX, t.clientY); lastCursorTime = now; }
-}, { passive: true });
+document.addEventListener('touchmove', function(e){
+  if (!pageReady) return; var now=Date.now(), t=e.touches[0];
+  if (now-lastCursorTime>80) { spawnCursorTrail(t.clientX,t.clientY); lastCursorTime=now; }
+}, { passive:true });
 
-// ============================================================
-// PIG PARADE — background pig marchers
-// ============================================================
 function spawnPigParade() {
-  var top = 15 + Math.random() * 75;
-  var count = 3 + Math.floor(Math.random() * 5);
-  var pigs = '';
-  for (var i = 0; i < count; i++) pigs += ['🐷','🐽','🐗','🐖'][Math.floor(Math.random()*4)] + ' ';
-  var p = document.createElement('div'); p.className = 'pig-parade';
-  p.textContent = pigs;
-  p.style.setProperty('--top', top + '%');
-  p.style.setProperty('--speed', (8 + Math.random() * 14) + 's');
-  p.style.top = top + '%';
-  if (Math.random() > 0.5) { p.style.right = '0'; p.style.animationName = 'none'; p.style.animation = 'pigMarch ' + (8+Math.random()*14) + 's linear forwards'; p.style.animationDirection = 'reverse'; }
+  var top=15+Math.random()*75, count=3+Math.floor(Math.random()*5), pigs='';
+  for (var i=0;i<count;i++) pigs+=pick(['🐷','🐽','🐗','🐖'])+' ';
+  var p=document.createElement('div'); p.className='pig-parade'; p.textContent=pigs;
+  p.style.setProperty('--top',top+'%'); p.style.setProperty('--speed',(8+Math.random()*14)+'s');
+  p.style.top=top+'%';
+  if (Math.random()>0.5) { p.style.right='0'; p.style.animation=pigMarch+' '+(8+Math.random()*14)+'s linear forwards'; p.style.animationDirection='reverse'; }
   document.body.appendChild(p);
-  var dur = parseFloat(p.style.getPropertyValue('--speed')) * 1000;
-  setTimeout(function(){ p.remove(); }, dur + 500);
+  var dur=parseFloat(p.style.getPropertyValue('--speed'))*1000;
+  setTimeout(function(){ p.remove(); },dur+500);
 }
-function startPigParade() {
-  spawnPigParade();
-  paradeTimer = setInterval(function(){ if (Math.random() > 0.4) spawnPigParade(); }, 9000);
-}
+function startPigParade() { spawnPigParade(); paradeTimer=setInterval(function(){ if(Math.random()>0.4) spawnPigParade(); },9000); }
 
-// ============================================================
-// RANDOM METEORS
-// ============================================================
 function spawnMeteor() {
-  var m = document.createElement('div'); m.className = 'meteor';
-  m.style.left = (10 + Math.random() * 80) + '%';
-  m.style.top = -(Math.random() * 40) + 'px';
-  m.style.animationDuration = (1 + Math.random() * 1.5) + 's';
-  document.body.appendChild(m);
-  setTimeout(function(){ m.remove(); }, 2500);
+  var m=document.createElement('div'); m.className='meteor';
+  m.style.left=(10+Math.random()*80)+'%'; m.style.top=-(Math.random()*40)+'px';
+  m.style.animationDuration=(1+Math.random()*1.5)+'s'; document.body.appendChild(m);
+  setTimeout(function(){ m.remove(); },2500);
 }
-var meteorTimer = null;
-function startMeteors() { meteorTimer = setInterval(function(){ if (Math.random()>0.6) spawnMeteor(); }, 4000); }
+var meteorTimer=null;
+function startMeteors() { meteorTimer=setInterval(function(){ if(Math.random()>0.6) spawnMeteor(); },4000); }
 
-// ============================================================
-// STARFIELD INIT
-// ============================================================
 function initStarfield() {
-  var sf = document.getElementById('starfield'), html = '';
-  for (var i = 0; i < 30; i++) {
-    var size = 1 + Math.random() * 2.5;
-    html += '<div class="star" style="left:'+(Math.random()*100)+'%;top:'+(Math.random()*100)+'%;width:'+size+'px;height:'+size+'px;--dur:'+(1.5+Math.random()*3)+'s;--delay:'+(Math.random()*4)+'s;"></div>';
-  }
-  sf.innerHTML = html;
+  var sf=document.getElementById('starfield'), html='';
+  for (var i=0;i<30;i++) { var size=1+Math.random()*2.5; html+='<div class="star" style="left:'+(Math.random()*100)+'%;top:'+(Math.random()*100)+'%;width:'+size+'px;height:'+size+'px;--dur:'+(1.5+Math.random()*3)+'s;--delay:'+(Math.random()*4)+'s;"></div>'; }
+  sf.innerHTML=html;
 }
 
 // ============================================================
 // SHAKE DETECTION
 // ============================================================
-var lastShakeTime = 0;
+var lastShakeTime=0;
 function initShakeDetector() {
-  if (typeof DeviceMotionEvent === 'undefined') return;
-  if (typeof DeviceMotionEvent.requestPermission === 'function') {
+  if (typeof DeviceMotionEvent==='undefined') return;
+  if (typeof DeviceMotionEvent.requestPermission==='function') {
     document.addEventListener('click', function askMotion(){
-      DeviceMotionEvent.requestPermission().then(function(r){
-        if (r==='granted') window.addEventListener('devicemotion', handleMotion);
-      }).catch(function(){});
-    }, { once: true });
-  } else { window.addEventListener('devicemotion', handleMotion); }
+      DeviceMotionEvent.requestPermission().then(function(r){ if(r==='granted') window.addEventListener('devicemotion',handleMotion); }).catch(function(){});
+    }, { once:true });
+  } else { window.addEventListener('devicemotion',handleMotion); }
 }
 function handleMotion(e) {
-  var acc = e.accelerationIncludingGravity; if (!acc) return;
-  var mag = Math.sqrt((acc.x||0)*(acc.x||0)+(acc.y||0)*(acc.y||0)+(acc.z||0)*(acc.z||0));
-  if (mag > 20) { var now=Date.now(); if (now-lastShakeTime<600) return; lastShakeTime=now; shakeCount++; onShake(); }
+  var acc=e.accelerationIncludingGravity; if (!acc) return;
+  var mag=Math.sqrt((acc.x||0)*(acc.x||0)+(acc.y||0)*(acc.y||0)+(acc.z||0)*(acc.z||0));
+  if (mag>20) { var now=Date.now(); if (now-lastShakeTime<600) return; lastShakeTime=now; shakeCount++; onShake(); }
 }
 function onShake() {
   if (!pageReady) return;
   haptic('warn'); teleportDunnoBtn(); screenShake('light');
-  showToast(['📳 摇手机也没用！','📳 摇不掉的~','📳 猪猪纹丝不动','📳 你以为你是搅拌机？','📳 摇摇乐！但你还是猪'][Math.floor(Math.random()*5)], 1800);
-  if (shakeCount >= 10) saveAchievement('shaker');
-  var a = loadAchievements(); a.screamTried = a.screamTried || false; localStorage.setItem('pig_achievements', JSON.stringify(a));
+  showToast(pick(TOASTS_SHAKE), 1800);
+  if (shakeCount>=10) saveAchievement('shaker');
   checkAchievements();
 }
 function teleportDunnoBtn() {
-  var btn = document.getElementById('dunnoBtn');
-  if (!btn || document.getElementById('mainModal').style.display === 'none') return;
-  var box = document.getElementById('mainBox'), br = box.getBoundingClientRect();
-  var pad = 35;
-  btn.style.position = 'absolute';
-  btn.style.left = Math.max(pad, Math.min(Math.random()*(br.width-(btn.offsetWidth||100)-pad), br.width-(btn.offsetWidth||100)-pad)) + 'px';
-  btn.style.top = Math.max(pad, Math.min(Math.random()*(br.height-(btn.offsetHeight||50)-pad), br.height-(btn.offsetHeight||50)-pad)) + 'px';
+  var btn=document.getElementById('dunnoBtn');
+  if (!btn||document.getElementById('mainModal').style.display==='none') return;
+  var box=document.getElementById('mainBox'), br=box.getBoundingClientRect(), pad=35;
+  btn.style.position='absolute';
+  btn.style.left=Math.max(pad,Math.min(Math.random()*(br.width-(btn.offsetWidth||100)-pad),br.width-(btn.offsetWidth||100)-pad))+'px';
+  btn.style.top=Math.max(pad,Math.min(Math.random()*(br.height-(btn.offsetHeight||50)-pad),br.height-(btn.offsetHeight||50)-pad))+'px';
   spawnRainbowTrail(btn);
 }
 
 // ============================================================
-// SCREAM-O-METER
-// ============================================================
-function startScream(e) {
-  e.preventDefault(); haptic('tap');
-  document.getElementById('screamBtn').classList.add('active');
-  document.getElementById('screamMeterWrap').classList.add('active');
-  document.getElementById('screamMeter').style.width = '0%';
-  document.getElementById('screamLabel').textContent = '🎤 正在听...';
-  document.getElementById('screamLabel').classList.remove('loud');
-  if (micStream) stopMic();
-  var ctx = getAudioCtx();
-  navigator.mediaDevices.getUserMedia({ audio:true, video:false }).then(function(stream){
-    micStream = stream; micAnalyser = ctx.createAnalyser(); micAnalyser.fftSize = 256;
-    var source = ctx.createMediaStreamSource(stream); source.connect(micAnalyser);
-    readMicLevel();
-  }).catch(function(){
-    document.getElementById('screamLabel').textContent = '🎤 麦克风不可用（权限未授予）';
-    document.getElementById('screamBtn').classList.remove('active');
-    document.getElementById('screamMeterWrap').classList.remove('active');
-    var a = loadAchievements(); a.screamTried = true; localStorage.setItem('pig_achievements', JSON.stringify(a));
-  });
-}
-function stopScream(e) {
-  if (e) e.preventDefault();
-  document.getElementById('screamBtn').classList.remove('active');
-  document.getElementById('screamMeterWrap').classList.remove('active');
-  stopMic();
-  var label = document.getElementById('screamLabel'), meter = document.getElementById('screamMeter');
-  var level = parseFloat(meter.style.width) || 0;
-  if (level > 80) {
-    label.textContent = '🐷 你就是猪！喊这么大声！'; label.classList.add('loud');
-    saveAchievement('screamer'); showToast('🎤 河东狮吼！你就是猪！', 2500);
-    sprayConfetti(); mascotLaugh(); screenShake();
-  } else if (level > 30) { label.textContent = '😏 还不够，再大声点！'; }
-  else if (level > 0) { label.textContent = '🤫 就这？蚊子都比你有气势'; }
-  else { label.textContent = '按住按钮，对着手机喊「我不是猪」'; }
-  var a = loadAchievements(); a.screamTried = true; localStorage.setItem('pig_achievements', JSON.stringify(a));
-  checkAchievements();
-}
-function readMicLevel() {
-  if (!micAnalyser) return;
-  var data = new Uint8Array(micAnalyser.frequencyBinCount); micAnalyser.getByteFrequencyData(data);
-  var sum = 0; for (var i=0;i<data.length;i++) sum+=data[i];
-  var pct = Math.min(100, Math.round((sum/data.length/128)*100));
-  document.getElementById('screamMeter').style.width = pct+'%';
-  document.getElementById('screamLabel').textContent = pct>80?'🔥 '+pct+'% — 猪吼级别！':(pct>30?'📢 '+pct+'%':'🎤 '+pct+'%');
-  if (pct>80) document.getElementById('screamLabel').classList.add('loud');
-  micAnimId = requestAnimationFrame(readMicLevel);
-}
-function stopMic() {
-  if (micAnimId) { cancelAnimationFrame(micAnimId); micAnimId = null; }
-  if (micStream) { micStream.getTracks().forEach(function(t){t.stop();}); micStream = null; }
-  micAnalyser = null;
-}
-
-// ============================================================
-// AUDIO CONTEXT
+// AUDIO
 // ============================================================
 function getAudioCtx() {
-  if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-  if (audioCtx.state === 'suspended') audioCtx.resume();
+  if (!audioCtx) audioCtx=new (window.AudioContext||window.webkitAudioContext)();
+  if (audioCtx.state==='suspended') audioCtx.resume();
   return audioCtx;
 }
-
-// ============================================================
-// MUSIC ENGINE
-// ============================================================
 function MusicEngine() {
-  var ctx = getAudioCtx(), gain = ctx.createGain(); gain.gain.value = 0.06; gain.connect(ctx.destination);
-  var bpm = 115, beatMs = 60000/bpm/2, seqTimer = null, step = 0, running = false;
-  function kick(t) { var o=ctx.createOscillator(),g=ctx.createGain(); o.type='sine'; o.frequency.setValueAtTime(150,t); o.frequency.exponentialRampToValueAtTime(40,t+0.12); g.gain.setValueAtTime(0.5,t); g.gain.exponentialRampToValueAtTime(0.001,t+0.2); o.connect(g);g.connect(gain); o.start(t);o.stop(t+0.2); }
-  function snare(t) { var o=ctx.createOscillator(),g=ctx.createGain(); o.type='triangle'; o.frequency.setValueAtTime(200,t); o.frequency.exponentialRampToValueAtTime(100,t+0.08); g.gain.setValueAtTime(0.3,t); g.gain.exponentialRampToValueAtTime(0.001,t+0.12); o.connect(g);g.connect(gain); o.start(t);o.stop(t+0.12); }
-  function hihat(t) { var o=ctx.createOscillator(),g=ctx.createGain(); o.type='square'; o.frequency.setValueAtTime(800,t); g.gain.setValueAtTime(0.08,t); g.gain.exponentialRampToValueAtTime(0.001,t+0.04); o.connect(g);g.connect(gain); o.start(t);o.stop(t+0.04); }
-  function bass(t,f) { var o=ctx.createOscillator(),g=ctx.createGain(); o.type='triangle'; o.frequency.setValueAtTime(f,t); g.gain.setValueAtTime(0.25,t); g.gain.exponentialRampToValueAtTime(0.001,t+0.3); o.connect(g);g.connect(gain); o.start(t);o.stop(t+0.3); }
-  function melody(t,f) { var o=ctx.createOscillator(),g=ctx.createGain(); o.type='sine'; o.frequency.setValueAtTime(f,t); g.gain.setValueAtTime(0.1,t); g.gain.exponentialRampToValueAtTime(0.001,t+0.25); o.connect(g);g.connect(gain); o.start(t);o.stop(t+0.25); }
-  var bN = [130.8,155.6,174.6,196,155.6,174.6,196,233.1,130.8,155.6,174.6,196,233.1,196,174.6,155.6];
-  var mN = [523,587,622,698,784,932,1047,784];
-  function seq() { if (!running) return; var now=ctx.currentTime+0.05; if (step%2===0&&step%4!==2) kick(now); if (step===4||step===12) snare(now+0.005); hihat(now+0.01); if (step%2===0) hihat(now+beatMs/1000/2); bass(now,bN[step%bN.length]); if (step%32===0) { for (var m=0;m<8;m++) melody(now+m*0.25,mN[m]); } step=(step+1)%64; seqTimer=setTimeout(seq,beatMs); }
-  this.start = function(){ if(running)return; running=true;step=0;seq(); };
-  this.stop = function(){ running=false;clearTimeout(seqTimer); };
-  this.setVolume = function(v){ gain.gain.value=v; };
-  this.isRunning = function(){ return running; };
+  var ctx=getAudioCtx(), gain=ctx.createGain(); gain.gain.value=0.06; gain.connect(ctx.destination);
+  var bpm=115, beatMs=60000/bpm/2, seqTimer=null, step=0, running=false;
+  function kick(t){var o=ctx.createOscillator(),g=ctx.createGain();o.type='sine';o.frequency.setValueAtTime(150,t);o.frequency.exponentialRampToValueAtTime(40,t+0.12);g.gain.setValueAtTime(0.5,t);g.gain.exponentialRampToValueAtTime(0.001,t+0.2);o.connect(g);g.connect(gain);o.start(t);o.stop(t+0.2);}
+  function snare(t){var o=ctx.createOscillator(),g=ctx.createGain();o.type='triangle';o.frequency.setValueAtTime(200,t);o.frequency.exponentialRampToValueAtTime(100,t+0.08);g.gain.setValueAtTime(0.3,t);g.gain.exponentialRampToValueAtTime(0.001,t+0.12);o.connect(g);g.connect(gain);o.start(t);o.stop(t+0.12);}
+  function hihat(t){var o=ctx.createOscillator(),g=ctx.createGain();o.type='square';o.frequency.setValueAtTime(800,t);g.gain.setValueAtTime(0.08,t);g.gain.exponentialRampToValueAtTime(0.001,t+0.04);o.connect(g);g.connect(gain);o.start(t);o.stop(t+0.04);}
+  function bass(t,f){var o=ctx.createOscillator(),g=ctx.createGain();o.type='triangle';o.frequency.setValueAtTime(f,t);g.gain.setValueAtTime(0.25,t);g.gain.exponentialRampToValueAtTime(0.001,t+0.3);o.connect(g);g.connect(gain);o.start(t);o.stop(t+0.3);}
+  function melody(t,f){var o=ctx.createOscillator(),g=ctx.createGain();o.type='sine';o.frequency.setValueAtTime(f,t);g.gain.setValueAtTime(0.1,t);g.gain.exponentialRampToValueAtTime(0.001,t+0.25);o.connect(g);g.connect(gain);o.start(t);o.stop(t+0.25);}
+  var bN=[130.8,155.6,174.6,196,155.6,174.6,196,233.1,130.8,155.6,174.6,196,233.1,196,174.6,155.6];
+  var mN=[523,587,622,698,784,932,1047,784];
+  function seq(){if(!running)return;var now=ctx.currentTime+0.05;if(step%2===0&&step%4!==2)kick(now);if(step===4||step===12)snare(now+0.005);hihat(now+0.01);if(step%2===0)hihat(now+beatMs/1000/2);bass(now,bN[step%bN.length]);if(step%32===0){for(var m=0;m<8;m++)melody(now+m*0.25,mN[m]);}step=(step+1)%64;seqTimer=setTimeout(seq,beatMs);}
+  this.start=function(){if(running)return;running=true;step=0;seq();};
+  this.stop=function(){running=false;clearTimeout(seqTimer);};
+  this.setVolume=function(v){gain.gain.value=v;};
+  this.isRunning=function(){return running;};
 }
-
 function startMusic() {
   if (!musicOn) return;
-  if (!musicEngine) musicEngine = new MusicEngine();
+  if (!musicEngine) musicEngine=new MusicEngine();
   musicEngine.start();
-  var btn = document.getElementById('musicToggle'); btn.className = 'music-toggle on'; btn.textContent = '🎵 电台BGM';
+  var btn=document.getElementById('musicToggle'); btn.className='music-toggle on'; btn.textContent='🎵 电台BGM';
 }
 function stopMusic() {
   if (musicEngine) musicEngine.stop();
-  var btn = document.getElementById('musicToggle'); btn.className = 'music-toggle'; btn.textContent = '🔇 BGM关';
+  var btn=document.getElementById('musicToggle'); btn.className='music-toggle'; btn.textContent='🔇 BGM关';
 }
 function toggleMusic() { musicOn=!musicOn; musicOn?startMusic():stopMusic(); haptic('tap'); }
 
 // ============================================================
-// AUDIO VISUALIZER
+// VISUALIZER
 // ============================================================
 function initVisualizer() {
-  var cnt = document.getElementById('visualizer'), isMobile = window.innerWidth < 480, n = isMobile ? 8 : 16, html = '';
-  for (var i=0;i<n;i++) html += '<div class="visualizer-bar"></div>';
-  cnt.innerHTML = html; visBars = cnt.querySelectorAll('.visualizer-bar');
+  var cnt=document.getElementById('visualizer'), isMobile=window.innerWidth<480, n=isMobile?8:16, html='';
+  for (var i=0;i<n;i++) html+='<div class="visualizer-bar"></div>';
+  cnt.innerHTML=html; visBars=cnt.querySelectorAll('.visualizer-bar');
 }
-function startVisualizer() { document.getElementById('visualizer').classList.add('active'); if (!visualizerTimer) animateVisualizer(); }
+function startVisualizer() { document.getElementById('visualizer').classList.add('active'); if(!visualizerTimer) animateVisualizer(); }
 function stopVisualizer() { document.getElementById('visualizer').classList.remove('active'); }
 function animateVisualizer() {
-  if (!document.getElementById('visualizer').classList.contains('active')) { visualizerTimer = null; return; }
+  if (!document.getElementById('visualizer').classList.contains('active')) { visualizerTimer=null; return; }
   visBars.forEach(function(bar,i){
-    var base = 0.15 + Math.random()*0.25;
-    if (musicEngine && musicEngine.isRunning()) base += 0.15;
-    if (micAnalyser) base += 0.35;
-    var wave = Math.sin(Date.now()/200+i*0.4)*0.3+0.5;
-    bar.style.height = Math.max(4, Math.min(50, base*50*wave*(0.5+Math.random()))) + 'px';
+    var base=0.15+Math.random()*0.25;
+    if (musicEngine&&musicEngine.isRunning()) base+=0.15;
+    var wave=Math.sin(Date.now()/200+i*0.4)*0.3+0.5;
+    bar.style.height=Math.max(4,Math.min(50,base*50*wave*(0.5+Math.random())))+'px';
   });
-  visualizerTimer = requestAnimationFrame(animateVisualizer);
+  visualizerTimer=requestAnimationFrame(animateVisualizer);
 }
 
 // ============================================================
-// MASCOT CONTROLLER
+// MASCOT
 // ============================================================
-var mascotBubbleTimer = null;
+var mascotBubbleTimer=null;
 function mascotSet(state, bubbleText) {
-  var m = document.getElementById('mascot'); m.className = 'mascot ' + state;
-  if (bubbleText) { document.getElementById('mascotBubble').textContent = bubbleText; clearTimeout(mascotBubbleTimer); mascotBubbleTimer = setTimeout(function(){ document.getElementById('mascotBubble').textContent = '哼哼~'; }, 3000); }
+  var m=document.getElementById('mascot'); m.className='mascot '+(state||'');
+  if (bubbleText) { document.getElementById('mascotBubble').textContent=bubbleText; clearTimeout(mascotBubbleTimer); mascotBubbleTimer=setTimeout(function(){ mascotSetIdleBubble(); },3000); }
 }
-function mascotIdle() { mascotSet('', '哼哼~'); }
-function mascotDance() { mascotSet('dancing', '🎵 动次打次！'); }
-function mascotLaugh() { mascotSet('laughing', '😂 哈哈哈哈！'); }
-function mascotAngry() { mascotSet('angry', '😡 气死猪了！'); }
-function mascotSurprise() { mascotSet('surprised', '😱 你居然！'); }
+function mascotSetIdleBubble() { document.getElementById('mascotBubble').textContent=pick(MASCOT_BUBBLES.idle); }
+function mascotIdle() { mascotSet('', pick(MASCOT_BUBBLES.idle)); }
+function mascotDance() { mascotSet('dancing', pick(MASCOT_BUBBLES.dancing)); }
+function mascotLaugh() { mascotSet('laughing', pick(MASCOT_BUBBLES.laughing)); }
+function mascotAngry() { mascotSet('angry', pick(MASCOT_BUBBLES.angry)); }
+function mascotSurprise() { mascotSet('surprised', pick(MASCOT_BUBBLES.surprised)); }
 
 document.getElementById('mascot').addEventListener('click', function(e){
-  e.stopPropagation(); mascotLaugh(); oinkSound(); oinkSound(); haptic('double');
+  e.stopPropagation(); mascotSet('laughing', pick(MASCOT_BUBBLES.clicked)); oinkSound(); oinkSound(); haptic('double');
 });
 
 // ============================================================
-// SOUND EFFECTS (no voice)
+// SOUND EFFECTS
 // ============================================================
-function playJingle() {
-  try { var ctx=getAudioCtx(),now=ctx.currentTime; [784,988,1175,1319].forEach(function(f,i){ var o=ctx.createOscillator(),g=ctx.createGain(); o.type='triangle'; o.frequency.setValueAtTime(f,now+i*0.06); g.gain.setValueAtTime(0,now+i*0.06); g.gain.linearRampToValueAtTime(0.06,now+i*0.06+0.01); g.gain.linearRampToValueAtTime(0,now+i*0.06+0.18); o.connect(g);g.connect(ctx.destination); o.start(now+i*0.06);o.stop(now+i*0.06+0.18); }); } catch(e) {}
-}
-function oinkSound() {
-  try { var ctx=getAudioCtx(),now=ctx.currentTime,o=ctx.createOscillator(),g=ctx.createGain(); o.connect(g);g.connect(ctx.destination); var r=Math.floor(Math.random()*4); switch(r){ case 0:o.type='sawtooth';o.frequency.setValueAtTime(280,now);o.frequency.linearRampToValueAtTime(180,now+0.12);o.frequency.linearRampToValueAtTime(320,now+0.25);g.gain.setValueAtTime(0.1,now);g.gain.linearRampToValueAtTime(0,now+0.3);o.start(now);o.stop(now+0.3);break; case 1:o.type='triangle';o.frequency.setValueAtTime(350,now);o.frequency.linearRampToValueAtTime(200,now+0.55);g.gain.setValueAtTime(0.12,now);g.gain.linearRampToValueAtTime(0,now+0.6);o.start(now);o.stop(now+0.6);break; case 2:o.type='sawtooth';o.frequency.setValueAtTime(300,now);o.frequency.linearRampToValueAtTime(220,now+0.1);o.frequency.setValueAtTime(310,now+0.15);o.frequency.linearRampToValueAtTime(200,now+0.28);g.gain.setValueAtTime(0.08,now);g.gain.linearRampToValueAtTime(0,now+0.32);o.start(now);o.stop(now+0.32);break; case 3:o.type='square';o.frequency.setValueAtTime(500,now);o.frequency.linearRampToValueAtTime(150,now+0.5);g.gain.setValueAtTime(0.06,now);g.gain.linearRampToValueAtTime(0,now+0.55);o.start(now);o.stop(now+0.55);break; } } catch(e) {}
-}
-function playSlideWhistle() { try { var ctx=getAudioCtx(),now=ctx.currentTime,o=ctx.createOscillator(),g=ctx.createGain(); o.connect(g);g.connect(ctx.destination); o.type='sine';o.frequency.setValueAtTime(700,now);o.frequency.exponentialRampToValueAtTime(180,now+0.35); g.gain.setValueAtTime(0.05,now);g.gain.linearRampToValueAtTime(0,now+0.35); o.start(now);o.stop(now+0.35); } catch(e) {} }
-function playSadTrombone() { try { var ctx=getAudioCtx(),now=ctx.currentTime,o=ctx.createOscillator(),g=ctx.createGain(); o.connect(g);g.connect(ctx.destination); o.type='sawtooth';o.frequency.setValueAtTime(350,now);o.frequency.linearRampToValueAtTime(300,now+0.2);o.frequency.linearRampToValueAtTime(180,now+0.5); g.gain.setValueAtTime(0.08,now);g.gain.linearRampToValueAtTime(0,now+0.55); o.start(now);o.stop(now+0.55); } catch(e) {} }
-function playFanfare() { try { var ctx=getAudioCtx(),now=ctx.currentTime; [523,659,784,1047].forEach(function(f,i){ var o=ctx.createOscillator(),g=ctx.createGain(); o.connect(g);g.connect(ctx.destination); o.type='triangle'; o.frequency.setValueAtTime(f,now+i*0.15); g.gain.setValueAtTime(0,now+i*0.15); g.gain.linearRampToValueAtTime(0.08,now+i*0.15+0.02); g.gain.linearRampToValueAtTime(0,now+i*0.15+0.32); o.start(now+i*0.15);o.stop(now+i*0.15+0.32); }); } catch(e) {} }
-
-function dramaticFlash() {
-  var d = document.createElement('div'); d.className = 'dramatic-flash';
-  document.body.appendChild(d); setTimeout(function(){ d.remove(); }, 700);
-}
+function playJingle() { try{var ctx=getAudioCtx(),now=ctx.currentTime;[784,988,1175,1319].forEach(function(f,i){var o=ctx.createOscillator(),g=ctx.createGain();o.type='triangle';o.frequency.setValueAtTime(f,now+i*0.06);g.gain.setValueAtTime(0,now+i*0.06);g.gain.linearRampToValueAtTime(0.06,now+i*0.06+0.01);g.gain.linearRampToValueAtTime(0,now+i*0.06+0.18);o.connect(g);g.connect(ctx.destination);o.start(now+i*0.06);o.stop(now+i*0.06+0.18);});}catch(e){} }
+function oinkSound() { try{var ctx=getAudioCtx(),now=ctx.currentTime,o=ctx.createOscillator(),g=ctx.createGain();o.connect(g);g.connect(ctx.destination);var r=Math.floor(Math.random()*4);switch(r){case 0:o.type='sawtooth';o.frequency.setValueAtTime(280,now);o.frequency.linearRampToValueAtTime(180,now+0.12);o.frequency.linearRampToValueAtTime(320,now+0.25);g.gain.setValueAtTime(0.1,now);g.gain.linearRampToValueAtTime(0,now+0.3);o.start(now);o.stop(now+0.3);break;case 1:o.type='triangle';o.frequency.setValueAtTime(350,now);o.frequency.linearRampToValueAtTime(200,now+0.55);g.gain.setValueAtTime(0.12,now);g.gain.linearRampToValueAtTime(0,now+0.6);o.start(now);o.stop(now+0.6);break;case 2:o.type='sawtooth';o.frequency.setValueAtTime(300,now);o.frequency.linearRampToValueAtTime(220,now+0.1);o.frequency.setValueAtTime(310,now+0.15);o.frequency.linearRampToValueAtTime(200,now+0.28);g.gain.setValueAtTime(0.08,now);g.gain.linearRampToValueAtTime(0,now+0.32);o.start(now);o.stop(now+0.32);break;case 3:o.type='square';o.frequency.setValueAtTime(500,now);o.frequency.linearRampToValueAtTime(150,now+0.5);g.gain.setValueAtTime(0.06,now);g.gain.linearRampToValueAtTime(0,now+0.55);o.start(now);o.stop(now+0.55);break;}}catch(e){} }
+function playSlideWhistle() { try{var ctx=getAudioCtx(),now=ctx.currentTime,o=ctx.createOscillator(),g=ctx.createGain();o.connect(g);g.connect(ctx.destination);o.type='sine';o.frequency.setValueAtTime(700,now);o.frequency.exponentialRampToValueAtTime(180,now+0.35);g.gain.setValueAtTime(0.05,now);g.gain.linearRampToValueAtTime(0,now+0.35);o.start(now);o.stop(now+0.35);}catch(e){} }
+function playSadTrombone() { try{var ctx=getAudioCtx(),now=ctx.currentTime,o=ctx.createOscillator(),g=ctx.createGain();o.connect(g);g.connect(ctx.destination);o.type='sawtooth';o.frequency.setValueAtTime(350,now);o.frequency.linearRampToValueAtTime(300,now+0.2);o.frequency.linearRampToValueAtTime(180,now+0.5);g.gain.setValueAtTime(0.08,now);g.gain.linearRampToValueAtTime(0,now+0.55);o.start(now);o.stop(now+0.55);}catch(e){} }
+function playFanfare() { try{var ctx=getAudioCtx(),now=ctx.currentTime;[523,659,784,1047].forEach(function(f,i){var o=ctx.createOscillator(),g=ctx.createGain();o.connect(g);g.connect(ctx.destination);o.type='triangle';o.frequency.setValueAtTime(f,now+i*0.15);g.gain.setValueAtTime(0,now+i*0.15);g.gain.linearRampToValueAtTime(0.08,now+i*0.15+0.02);g.gain.linearRampToValueAtTime(0,now+i*0.15+0.32);o.start(now+i*0.15);o.stop(now+i*0.15+0.32);});}catch(e){} }
+function dramaticFlash() { var d=document.createElement('div');d.className='dramatic-flash';document.body.appendChild(d);setTimeout(function(){d.remove();},700); }
 
 // ============================================================
 // MARQUEE
 // ============================================================
 function showMarquee(text, dur) {
-  var m = document.getElementById('marquee'); m.querySelector('span').textContent = text || '📻 猪猪电台 FM 94.8 — 全球首家猪猪认证电台 — 正在直播中...';
-  m.classList.add('show'); if (dur) setTimeout(function(){ m.classList.remove('show'); }, dur);
+  var m=document.getElementById('marquee');
+  m.querySelector('span').textContent=text||pick(MARQUEE_MESSAGES).replace('#COUNT#',getGlobalTotal());
+  m.classList.add('show'); if(dur) setTimeout(function(){m.classList.remove('show');},dur);
 }
 function hideMarquee() { document.getElementById('marquee').classList.remove('show'); }
 
@@ -1702,169 +906,180 @@ function hideMarquee() { document.getElementById('marquee').classList.remove('sh
 // ============================================================
 function shareResult() {
   haptic('tap');
-  var text = '🐷 我刚被确认为官方认证猪猪！你也来测测？👉 https://hhl-06.github.io/pig-radio/';
+  var msgs=['🐷 我刚被确认为官方认证猪猪！你也来测测？','🐷 我刚刚发现自己是一只猪……你也来鉴定一下？','🐷 震惊！我居然是猪！快来测试你是不是→'];
+  var text=pick(msgs)+' 👉 https://hhl-06.github.io/pig-radio/';
   if (navigator.share) { navigator.share({ title:'猪猪电台 FM 94.8', text:text, url:'https://hhl-06.github.io/pig-radio/' }).catch(function(){ copyLinkFallback(); }); }
   else { copyLinkFallback(); }
 }
 function copyLinkFallback() {
-  var input = document.createElement('textarea'); input.value = 'https://hhl-06.github.io/pig-radio/'; input.style.position='fixed';input.style.opacity='0';
+  var input=document.createElement('textarea'); input.value='https://hhl-06.github.io/pig-radio/'; input.style.position='fixed';input.style.opacity='0';
   document.body.appendChild(input); input.select();
-  try { document.execCommand('copy'); showToast('📋 链接已复制！发给朋友吧', 2000); haptic('success'); }
-  catch(e) { showToast('📤 https://hhl-06.github.io/pig-radio/', 3000); }
+  try { document.execCommand('copy'); showToast('📋 链接已复制！快去骗朋友',2000); haptic('success'); }
+  catch(e) { showToast('📤 https://hhl-06.github.io/pig-radio/',3000); }
   document.body.removeChild(input);
 }
 
 // ============================================================
-// DUNNO BUTTON ESCAPE
+// DUNNO BUTTON
 // ============================================================
 function onDunnoHover(btn) {
   if (!pageReady) return;
-  if (escapeCount === 0) escapeStartTime = Date.now();
-  else if (escapeCount === 1 && Date.now()-escapeStartTime < 3000) { var a=loadAchievements(); a.fastCatchTime=Date.now(); localStorage.setItem('pig_achievements',JSON.stringify(a)); }
+  if (escapeCount===0) escapeStartTime=Date.now();
+  else if (escapeCount===1&&Date.now()-escapeStartTime<3000) { var a=loadAchievements();a.fastCatchTime=Date.now();localStorage.setItem('pig_achievements',JSON.stringify(a)); }
   escapeCount++; updateEscapeBadge();
-  var box = document.getElementById('mainBox'), br = box.getBoundingClientRect();
-  var pad = 35, btnW = btn.offsetWidth || 100, btnH = btn.offsetHeight || 50;
-  var maxX = br.width - btnW - pad, maxY = br.height - btnH - pad;
-  btn.style.position = 'absolute';
-  btn.style.left = Math.max(pad, Math.min(Math.random()*maxX, maxX)) + 'px';
-  btn.style.top = Math.max(pad, Math.min(Math.random()*maxY, maxY)) + 'px';
-  if (escapeCount >= 15) btn.className = 'btn btn-dunno micro';
-  else if (escapeCount >= 8) btn.className = 'btn btn-dunno tiny';
-  else if (escapeCount >= 4) btn.className = 'btn btn-dunno shrinking';
-  if (escapeCount % 3 === 0) spawnTauntBubble(btn, br);
-  spawnPigPrint(btn, br);
+  var box=document.getElementById('mainBox'), br=box.getBoundingClientRect();
+  var pad=35, btnW=btn.offsetWidth||100, btnH=btn.offsetHeight||50;
+  var maxX=br.width-btnW-pad, maxY=br.height-btnH-pad;
+  btn.style.position='absolute';
+  btn.style.left=Math.max(pad,Math.min(Math.random()*maxX,maxX))+'px';
+  btn.style.top=Math.max(pad,Math.min(Math.random()*maxY,maxY))+'px';
+  if (escapeCount>=15) btn.className='btn btn-dunno micro';
+  else if (escapeCount>=8) btn.className='btn btn-dunno tiny';
+  else if (escapeCount>=4) btn.className='btn btn-dunno shrinking';
+  if (escapeCount%3===0) spawnTauntBubble(btn,br);
+  spawnPigPrint(btn,br);
   spawnRainbowTrail(btn);
-  if (escapeCount % 2 === 0) oinkSound();
-  if (escapeCount % 3 === 0) playSlideWhistle();
-  if (escapeCount % 7 === 0) { box.classList.remove('shake'); void box.offsetWidth; box.classList.add('shake'); screenShake(); }
-  if (escapeCount % 5 === 0) mascotLaugh();
+  if (escapeCount%2===0) oinkSound();
+  if (escapeCount%3===0) playSlideWhistle();
+  if (escapeCount%7===0) { box.classList.remove('shake'); void box.offsetWidth; box.classList.add('shake'); screenShake(); }
+  if (escapeCount%5===0) mascotLaugh();
   updateMainQuestion();
   checkAchievements();
   haptic('tap');
-  // Spawn pulse rings at button center
-  var btnR = btn.getBoundingClientRect();
-  spawnPulseRing(box, btnR.left-box.getBoundingClientRect().left+btnR.width/2, btnR.top-box.getBoundingClientRect().top+btnR.height/2);
+  var btnR=btn.getBoundingClientRect();
+  spawnPulseRing(box,btnR.left-box.getBoundingClientRect().left+btnR.width/2,btnR.top-box.getBoundingClientRect().top+btnR.height/2);
+  // Random toast for escape milestones
+  if (escapeCount===5||escapeCount===10||escapeCount===15||escapeCount===20)
+    showToast(pick(TOASTS_ESCAPE).replace('N',escapeCount),1800);
 }
-function updateEscapeBadge() { var b=document.getElementById('escapeBadge'); b.style.display='flex'; b.textContent=escapeCount; if (escapeCount>=20){b.style.background='#5f27cd';b.textContent='∞';} }
+function updateEscapeBadge() { var b=document.getElementById('escapeBadge');b.style.display='flex';b.textContent=escapeCount;if(escapeCount>=20){b.style.background='#5f27cd';b.textContent='∞';} }
 function updateMainQuestion() {
-  var q = document.getElementById('mainQuestion');
-  var taunts = ['你知不知道<br>你自己是猪？','再问你一次<br>你自己是猪？','别挣扎了<br>你就是猪🐷','第'+escapeCount+'次逃跑...<br>你累不累啊','鼠标追不上吧？<br>承认吧你','这个按钮会跑哦<br>你抓不到的~','🐷 猪猪逃跑中...<br>追我呀追我呀','已经'+escapeCount+'次了！<br>你还不放弃？','放弃抵抗吧<br>这就是命运'];
-  q.innerHTML = escapeCount >= 20 ? '🏳️ 按钮投降了<br>你赢了...但你还是猪' : taunts[Math.min(Math.floor(escapeCount/3), taunts.length-1)];
+  var q=document.getElementById('mainQuestion');
+  q.innerHTML=escapeCount>=20?'🏳️ 按钮投降了<br>你赢了...但你还是猪':pick(QUESTION_TAUNTS).replace('#ESC#',escapeCount).replace('#COUNT#',getGlobalTotal());
 }
 function spawnTauntBubble(btn, boxRect) {
-  var b = document.createElement('div'); b.className = 'taunt-bubble';
-  b.textContent = ['🤣 抓不到~','🐷 哼哼~','💨 溜了溜了','😝 太慢了','✌️ 在这呢~','🙈 你够不着','🏃 拜拜~','🐽 再来啊'][Math.floor(Math.random()*8)];
-  var btnR = btn.getBoundingClientRect();
-  b.style.left = (btnR.left-boxRect.left+btnR.width/2-40) + 'px'; b.style.top = (btnR.top-boxRect.top-28) + 'px';
-  document.getElementById('mainBox').appendChild(b); setTimeout(function(){ b.remove(); }, 1200);
+  var b=document.createElement('div'); b.className='taunt-bubble'; b.textContent=pick(TAUNTS);
+  var btnR=btn.getBoundingClientRect();
+  b.style.left=(btnR.left-boxRect.left+btnR.width/2-40)+'px'; b.style.top=(btnR.top-boxRect.top-28)+'px';
+  document.getElementById('mainBox').appendChild(b); setTimeout(function(){b.remove();},1200);
 }
 function spawnPigPrint(btn, boxRect) {
-  var p = document.createElement('span'); p.className = 'pig-print'; p.textContent = '🐾';
-  var btnR = btn.getBoundingClientRect();
-  p.style.left = (btnR.left-boxRect.left+btnR.width/2-10) + 'px'; p.style.top = (btnR.top-boxRect.top+btnR.height/2) + 'px';
-  document.getElementById('mainBox').appendChild(p); setTimeout(function(){ p.remove(); }, 1800);
+  var p=document.createElement('span'); p.className='pig-print'; p.textContent=pick(['🐾','🐾','🐾','🐽','💨','🦶','👣']);
+  var btnR=btn.getBoundingClientRect();
+  p.style.left=(btnR.left-boxRect.left+btnR.width/2-10)+'px'; p.style.top=(btnR.top-boxRect.top+btnR.height/2)+'px';
+  document.getElementById('mainBox').appendChild(p); setTimeout(function(){p.remove();},1800);
 }
 function onClickDunno() {
   haptic('double'); mascotSurprise();
-  var btnR = document.getElementById('dunnoBtn').getBoundingClientRect();
+  var btnR=document.getElementById('dunnoBtn').getBoundingClientRect();
   spawnParticleBurst(btnR.left+btnR.width/2, btnR.top+btnR.height/2, 40);
   spawnSparkBetween(document.querySelector('.btn-know'), document.getElementById('dunnoBtn'));
   showFakeLoading(function(){ showResult('dunno'); });
 }
 
 // ============================================================
-// CONFIRMATION CHAIN
+// CONFIRMATION CHAIN — picks a random chain each time
 // ============================================================
-var confirmChain = [
-  { icon:'🤨', q:'你确定吗？', yes:'确定', no:'再想想...' },
-  { icon:'😏', q:'真的确定？<br>这可是没有回头路的', yes:'真的确定！', no:'算了...' },
-  { icon:'🙄', q:'最后问你一次<br>不后悔？', yes:'不后悔！', no:'我怂了' },
-];
+var currentChain = [];
+function getConfirmChain() { return pick(CONFIRM_CHAINS); }
 function onClickKnow() {
   haptic('tap');
-  var knowBtn = document.querySelector('.btn-know'), dunnoBtn = document.getElementById('dunnoBtn');
-  if (knowBtn && dunnoBtn) spawnSparkBetween(knowBtn, dunnoBtn);
-  confirmStep = 0; showConfirmStep();
+  var knowBtn=document.querySelector('.btn-know'), dunnoBtn=document.getElementById('dunnoBtn');
+  if (knowBtn&&dunnoBtn) spawnSparkBetween(knowBtn,dunnoBtn);
+  confirmStep=0; currentChain=getConfirmChain(); showConfirmStep();
 }
 function showConfirmStep() {
-  if (confirmStep >= confirmChain.length) {
-    document.getElementById('mainModal').style.display = 'none';
-    document.getElementById('confirmModal').style.display = 'none';
+  if (confirmStep>=currentChain.length) {
+    document.getElementById('mainModal').style.display='none';
+    document.getElementById('confirmModal').style.display='none';
     mascotSurprise();
-    var knowBtn = document.querySelector('#confirmBox .btn-know');
-    if (knowBtn) { var r = knowBtn.getBoundingClientRect(); spawnParticleBurst(r.left+r.width/2, r.top+r.height/2, 40); }
+    var knowBtn=document.querySelector('#confirmBox .btn-know');
+    if (knowBtn) { var r=knowBtn.getBoundingClientRect(); spawnParticleBurst(r.left+r.width/2,r.top+r.height/2,40); }
     showFakeLoading(function(){ showResult('know'); });
     return;
   }
-  var s = confirmChain[confirmStep];
-  document.getElementById('confirmIcon').textContent = s.icon;
-  document.getElementById('confirmQuestion').innerHTML = s.q;
-  document.getElementById('confirmYes').textContent = s.yes;
-  document.getElementById('mainModal').style.display = 'none';
-  document.getElementById('confirmModal').style.display = 'flex';
+  var s=currentChain[confirmStep];
+  document.getElementById('confirmIcon').textContent=s.icon;
+  document.getElementById('confirmQuestion').innerHTML=s.q;
+  document.getElementById('confirmYes').textContent=s.yes;
+  document.getElementById('mainModal').style.display='none';
+  document.getElementById('confirmModal').style.display='flex';
 }
 function onConfirmYes() { haptic('tap'); confirmStep++; showConfirmStep(); }
 function onConfirmNo() {
   haptic('tap');
-  document.getElementById('confirmModal').style.display = 'none';
-  document.getElementById('mainModal').style.display = 'flex';
-  confirmStep = 0; mascotIdle();
+  document.getElementById('confirmModal').style.display='none';
+  document.getElementById('mainModal').style.display='flex';
+  confirmStep=0; mascotIdle();
 }
 
 // ============================================================
 // FAKE LOADING
 // ============================================================
 function showFakeLoading(callback) {
-  document.getElementById('loadingModal').style.display = 'flex';
-  var bar = document.getElementById('loadingBar'), label = document.getElementById('loadingLabel');
-  var labels = ['扫描大脑中 🧠','分析智商中 📊','计算猪指数 🐷','查询数据库 🔍','比对基因序列 🧬','生成报告中 📝','即将揭晓... 🎉'];
-  var idx = 0, t = setInterval(function(){ idx=(idx+1)%labels.length; label.textContent=labels[idx]; }, 380);
-  bar.style.animation = 'none'; void bar.offsetWidth;
-  bar.style.animation = 'progressBar 2.5s ease-out forwards, shimmer 1s linear infinite';
+  document.getElementById('loadingModal').style.display='flex';
+  // Update the title randomly too
+  var titleEl=document.getElementById('loadingModal').querySelector('.modal p');
+  if (titleEl) titleEl.textContent=pick(LOADING_TITLES);
+  var bar=document.getElementById('loadingBar'), label=document.getElementById('loadingLabel');
+  var idx=0, used=[], t=setInterval(function(){
+    var msg; do { msg=pick(LOADING_MESSAGES); } while (msg===label.textContent&&LOADING_MESSAGES.length>1);
+    label.textContent=msg;
+  },380);
+  bar.style.animation='none'; void bar.offsetWidth;
+  bar.style.animation='progressBar 2.5s ease-out forwards, shimmer 1s linear infinite';
   playJingle();
-  setTimeout(function(){ clearInterval(t); document.getElementById('loadingModal').style.display='none'; callback(); }, 2500);
+  setTimeout(function(){ clearInterval(t); document.getElementById('loadingModal').style.display='none'; callback(); },2500);
 }
 
 // ============================================================
 // RESULT
 // ============================================================
 function showResult(type) {
-  document.getElementById('resultModal').style.display = 'flex';
-  document.getElementById('certContainer').innerHTML = '';
-  document.getElementById('btnShowCert').style.display = 'none';
+  document.getElementById('resultModal').style.display='flex';
+  document.getElementById('certContainer').innerHTML='';
+  document.getElementById('btnShowCert').style.display='none';
   document.getElementById('mainBox').classList.remove('shake');
   document.getElementById('resultBox').classList.add('dramatic');
-  document.getElementById('resultFace').textContent = type === 'know' ? '😏' : '🐷';
-  document.getElementById('resultText').textContent = type === 'know' ? '知道就好！' : '好了，现在你知道了！';
-  document.getElementById('pigName').textContent = '🏷️ ' + generatePigName();
+  document.getElementById('resultFace').textContent=type==='know'?'😏':'🐷';
+  document.getElementById('resultText').textContent=pick(RESULT_TEXTS[type]);
+  document.getElementById('pigName').textContent='🏷️ '+generatePigName();
+  document.getElementById('certRankDisplay').textContent='你是全球第 '+(getGlobalTotal()+1)+' 只被确认的猪 🐷';
   dramaticFlash(); playSadTrombone(); mascotLaugh(); screenShake();
-  showMarquee('🐷 又一位猪猪确认身份！全球猪数+1！🐷', 4000);
+  showMarquee(pick(MARQUEE_MESSAGES).replace('#COUNT#',getGlobalTotal()+1), 4000);
   recordClick(type); refreshStats();
-  document.getElementById('roastText').textContent = getRoast(type);
-  document.getElementById('btnShowCert').style.display = 'inline-block';
+  document.getElementById('roastText').textContent=getRoast(type);
+  document.getElementById('btnShowCert').style.display='inline-block';
   sprayConfetti(); haptic('success');
-  // Big particle burst at center
   spawnParticleBurst(window.innerWidth/2, window.innerHeight/2, 50, ['🐷','🎉','🎊','💥','✨','🏆','👑','🌟','💖','🎵']);
-  setTimeout(function(){ document.getElementById('resultBox').classList.remove('dramatic'); }, 1500);
+  setTimeout(function(){ document.getElementById('resultBox').classList.remove('dramatic'); },1500);
   checkAchievements();
 }
 
 // ============================================================
-// CERTIFICATE
+// CERTIFICATE — randomized text each time
 // ============================================================
 function showCertificate() {
   haptic('tap');
-  document.getElementById('certName').textContent = generatePigName();
-  document.getElementById('certNumber').textContent = 'PIG-' + Date.now().toString(36).toUpperCase();
-  var now = new Date();
-  document.getElementById('certDate').textContent = now.getFullYear()+'年'+(now.getMonth()+1)+'月'+now.getDate()+'日';
-  document.getElementById('certRank').textContent = getGlobalTotal() + 1;
-  document.getElementById('certModal').style.display = 'flex';
+  document.getElementById('certName').textContent=generatePigName();
+  document.getElementById('certNumber').textContent='PIG-'+Date.now().toString(36).toUpperCase();
+  var now=new Date();
+  document.getElementById('certDate').textContent=now.getFullYear()+'年'+(now.getMonth()+1)+'月'+now.getDate()+'日';
+  document.getElementById('certRank').textContent=getGlobalTotal()+1;
+  // Randomize all text fields
+  document.getElementById('certTitle').textContent=pick(CERT_TITLES);
+  document.getElementById('certPreamble').textContent=pick(CERT_PREAMBLES);
+  document.getElementById('certAuthority').textContent=pick(CERT_AUTHORITIES);
+  document.getElementById('certAction').textContent=pick(CERT_ACTIONS);
+  document.getElementById('certRankTitle').textContent=pick(CERT_RANK_TITLES);
+  document.getElementById('certMotto').textContent=pick(CERT_MOTTOS);
+  document.getElementById('certFootnote').textContent=pick(CERT_FOOTNOTES);
+  document.getElementById('certModal').style.display='flex';
   playFanfare(); mascotDance(); screenShake('light');
-  showMarquee('🏆 恭喜新晋猪猪获得官方认证证书！🏆', 5000);
-  sprayConfetti(); setTimeout(sprayConfetti, 500);
+  showMarquee(pick(['🏆 恭喜新晋猪猪获得官方认证证书！🏆','📜 又一张猪猪证书签发！📜','🎓 猪猪身份已确认！证书已发放 🎓']), 5000);
+  sprayConfetti(); setTimeout(sprayConfetti,500);
 }
-function closeCertificate() { document.getElementById('certModal').style.display = 'none'; mascotIdle(); }
+function closeCertificate() { document.getElementById('certModal').style.display='none'; mascotIdle(); }
 
 // ============================================================
 // GO BACK
@@ -1872,14 +1087,14 @@ function closeCertificate() { document.getElementById('certModal').style.display
 function goBack() {
   haptic('tap'); backCount++;
   recordClick('back'); refreshStats();
-  document.getElementById('resultModal').style.display = 'none';
-  document.getElementById('mainModal').style.display = 'flex';
-  var btn = document.getElementById('dunnoBtn');
-  btn.style.position = ''; btn.style.left = ''; btn.style.top = '';
-  btn.className = 'btn btn-dunno'; escapeCount = 0; confirmStep = 0;
-  document.getElementById('escapeBadge').style.display = 'none';
-  document.getElementById('mainQuestion').innerHTML = '你知不知道<br>你自己是猪？';
-  var box = document.getElementById('mainBox'); box.classList.remove('shake'); void box.offsetWidth; box.classList.add('shake');
+  document.getElementById('resultModal').style.display='none';
+  document.getElementById('mainModal').style.display='flex';
+  var btn=document.getElementById('dunnoBtn');
+  btn.style.position='';btn.style.left='';btn.style.top='';
+  btn.className='btn btn-dunno'; escapeCount=0; confirmStep=0;
+  document.getElementById('escapeBadge').style.display='none';
+  document.getElementById('mainQuestion').innerHTML=pick(['你知不知道<br>你自己是猪？','再来一次：<br>你是猪吗？','换了个问法：<br>你是不是猪？']);
+  var box=document.getElementById('mainBox'); box.classList.remove('shake'); void box.offsetWidth; box.classList.add('shake');
   mascotIdle(); hideMarquee(); checkAchievements();
 }
 
@@ -1887,110 +1102,92 @@ function goBack() {
 // CONFETTI
 // ============================================================
 function sprayConfetti() {
-  var emojis = ['🐷','🎉','🎊','💥','✨','🐽','🍩','💩','🏆','👑','🥇','🌟','💖','🦄','🎵','📻','🎙️'];
-  for (var i=0;i<45;i++){setTimeout(function(){var s=document.createElement('span');s.className='confetti';s.textContent=emojis[Math.floor(Math.random()*emojis.length)];s.style.left=Math.random()*100+'%';s.style.top=-(Math.random()*80)+'px';s.style.fontSize=(18+Math.random()*45)+'px';s.style.animationDuration=(1.5+Math.random()*3)+'s';document.body.appendChild(s);setTimeout(function(){s.remove();},4000);},i*30);}
+  var emojis=['🐷','🎉','🎊','💥','✨','🐽','🍩','💩','🏆','👑','🥇','🌟','💖','🦄','🎵','📻','🎙️'];
+  for (var i=0;i<45;i++){setTimeout(function(){var s=document.createElement('span');s.className='confetti';s.textContent=pick(emojis);s.style.left=Math.random()*100+'%';s.style.top=-(Math.random()*80)+'px';s.style.fontSize=(18+Math.random()*45)+'px';s.style.animationDuration=(1.5+Math.random()*3)+'s';document.body.appendChild(s);setTimeout(function(){s.remove();},4000);},i*30);}
 }
 
 // ============================================================
-// FLOATING PIGS (delayed start)
+// FLOATING PIGS
 // ============================================================
-var floatPigTimer = null;
+var floatPigTimer=null;
 function startFloatingPigs() {
-  floatPigTimer = setInterval(function(){
-    var p = document.createElement('span'); p.className = 'floating-pig';
-    p.textContent = ['🐷','🐽','🐗','🐖','🎵','📻'][Math.floor(Math.random()*6)];
-    p.style.left = Math.random()*100+'%'; p.style.bottom = '-30px';
-    p.style.fontSize = (20+Math.random()*55)+'px';
-    document.body.appendChild(p); setTimeout(function(){ p.remove(); }, 6000);
-  }, 2200);
+  floatPigTimer=setInterval(function(){
+    var p=document.createElement('span');p.className='floating-pig';
+    p.textContent=pick(['🐷','🐽','🐗','🐖','🎵','📻','🎶','💿','🎸','🎹','🥁']);
+    p.style.left=Math.random()*100+'%';p.style.bottom='-30px';p.style.fontSize=(20+Math.random()*55)+'px';
+    document.body.appendChild(p);setTimeout(function(){p.remove();},6000);
+  },2200);
 }
 
 // ============================================================
 // TITLE EASTER EGGS
 // ============================================================
-var titleClicks = 0, titleTimer = null;
+var titleClicks=0, titleTimer=null;
 document.getElementById('funnyTitle').addEventListener('click', function(){
-  titleClicks++; clearTimeout(titleTimer); titleTimer = setTimeout(function(){ titleClicks=0; }, 900);
-  if (titleClicks === 7) {
-    document.body.style.background = 'linear-gradient(135deg, #ff6b6b, #feca57, #48dbfb, #ff9ff3, #54a0ff, #5f27cd, #ff6b6b)';
-    document.body.style.backgroundSize = '600% 600%'; sprayConfetti(); sprayConfetti(); mascotDance(); screenShake();
-    showMarquee('🌈 终极彩虹猪猪模式已激活！🌈', 5000);
-    setTimeout(function(){ document.body.style.background = '#1a0a0a'; document.body.style.backgroundSize = ''; }, 4000);
-    saveAchievement('rainbow'); titleClicks = 0;
-  } else if (titleClicks === 5) {
-    document.body.style.background = '#2d1b3e'; sprayConfetti();
-    setTimeout(function(){ document.body.style.background = '#1a0a0a'; }, 2500);
-  } else if (titleClicks === 3) {
-    document.body.style.background = '#3d1a2e'; oinkSound();
-    setTimeout(function(){ document.body.style.background = '#1a0a0a'; }, 1500);
-  }
+  titleClicks++; clearTimeout(titleTimer); titleTimer=setTimeout(function(){titleClicks=0;},900);
+  if (titleClicks===7) {
+    document.body.style.background='linear-gradient(135deg, #ff6b6b, #feca57, #48dbfb, #ff9ff3, #54a0ff, #5f27cd, #ff6b6b)';
+    document.body.style.backgroundSize='600% 600%'; sprayConfetti();sprayConfetti(); mascotDance(); screenShake();
+    showMarquee('🌈 终极彩虹猪猪模式已激活！🌈',5000);
+    setTimeout(function(){document.body.style.background='#1a0a0a';document.body.style.backgroundSize='';},4000);
+    saveAchievement('rainbow'); titleClicks=0;
+  } else if (titleClicks===5) { document.body.style.background='#2d1b3e';sprayConfetti();setTimeout(function(){document.body.style.background='#1a0a0a';},2500); }
+  else if (titleClicks===3) { document.body.style.background='#3d1a2e';oinkSound();setTimeout(function(){document.body.style.background='#1a0a0a';},1500); }
 });
 
 // ============================================================
 // KONAMI CODE
 // ============================================================
-var konamiCode = [], konamiSeq = [38,38,40,40,37,39,37,39,66,65];
+var konamiCode=[], konamiSeq=[38,38,40,40,37,39,37,39,66,65];
 document.addEventListener('keydown', function(e){
-  konamiCode.push(e.keyCode); if (konamiCode.length > konamiSeq.length) konamiCode.shift();
-  if (konamiCode.join(',') === konamiSeq.join(',')) {
-    document.body.style.background = '#000'; document.body.style.color = '#0f0';
-    document.querySelector('.funny-title h1').textContent = '🐷🎮';
-    document.querySelector('.funny-title .sub').textContent = '🏆 科乐美秘技！超级猪猪 🏆';
-    sprayConfetti(); sprayConfetti(); sprayConfetti(); dramaticFlash(); mascotDance(); screenShake();
-    showMarquee('🎮 科乐美秘技激活！超级猪猪模式！🎮', 6000);
+  konamiCode.push(e.keyCode); if(konamiCode.length>konamiSeq.length) konamiCode.shift();
+  if (konamiCode.join(',')===konamiSeq.join(',')) {
+    document.body.style.background='#000';document.body.style.color='#0f0';
+    document.querySelector('.funny-title h1').textContent='🐷🎮';
+    document.querySelector('.funny-title .sub').textContent='🏆 科乐美秘技！超级猪猪 🏆';
+    sprayConfetti();sprayConfetti();sprayConfetti(); dramaticFlash(); mascotDance(); screenShake();
+    showMarquee('🎮 科乐美秘技激活！超级猪猪模式！🎮',6000);
     saveAchievement('konami');
-    setTimeout(function(){
-      document.body.style.background = '#1a0a0a'; document.body.style.color = '';
-      document.querySelector('.funny-title h1').textContent = '🐷';
-      document.querySelector('.funny-title .sub').textContent = '📻 猪猪电台 FM 94.8 📻';
-    }, 5000);
+    setTimeout(function(){document.body.style.background='#1a0a0a';document.body.style.color='';document.querySelector('.funny-title h1').textContent='🐷';document.querySelector('.funny-title .sub').textContent='📻 猪猪电台 FM 94.8 📻';},5000);
   }
 });
 
 // ============================================================
-// SPLASH SCREEN
+// SPLASH
 // ============================================================
 function runSplash(callback) {
-  var bar = document.getElementById('splashBar'), msg = document.getElementById('splashMsg');
-  var messages = ['正在连接猪猪卫星...','正在调频 FM 94.8...','正在校准猪猪信号...','正在加载猪猪数据库...','正在启动电台设备...','🐷 哼哼~ 马上就好！'];
-  var mIdx = 0, progress = 0;
-  var interval = setInterval(function(){
-    progress += Math.random() * 25; if (progress > 90) progress = 90;
-    bar.style.width = Math.min(90, progress) + '%';
-    if (progress > 30 && mIdx===0) { mIdx=1; msg.textContent=messages[mIdx]; }
-    if (progress > 55 && mIdx===1) { mIdx=2; msg.textContent=messages[mIdx]; }
-    if (progress > 75 && mIdx===2) { mIdx=3; msg.textContent=messages[mIdx]; }
-  }, 150);
+  var bar=document.getElementById('splashBar'), msg=document.getElementById('splashMsg');
+  var messages=['正在连接猪猪卫星...','正在调频 FM 94.8...','正在校准猪猪信号...','正在加载猪猪数据库...','正在启动电台设备...','正在唤醒猪猪DJ...','🐷 哼哼~ 马上就好！','正在投喂猪猪...'];
+  var mIdx=0, progress=0;
+  var interval=setInterval(function(){
+    progress+=Math.random()*25; if(progress>90) progress=90;
+    bar.style.width=Math.min(90,progress)+'%';
+    if (progress>30&&mIdx===0){mIdx=1;msg.textContent=messages[Math.floor(Math.random()*3)+1];}
+    if (progress>55&&mIdx===1){mIdx=2;msg.textContent=pick(messages);}
+    if (progress>75&&mIdx===2){mIdx=3;msg.textContent=pick(messages);}
+  },150);
   setTimeout(function(){
-    clearInterval(interval); bar.style.width = '100%'; msg.textContent = '✅ 猪猪电台已就绪！';
+    clearInterval(interval); bar.style.width='100%'; msg.textContent='✅ 猪猪电台已就绪！';
     haptic('success');
-    setTimeout(function(){
-      document.getElementById('splash').classList.add('hide');
-      document.body.classList.add('ready');
-      callback();
-    }, 400);
-  }, 800);
+    setTimeout(function(){document.getElementById('splash').classList.add('hide');document.body.classList.add('ready');callback();},400);
+  },800);
 }
 
 // ============================================================
-// PAGE INIT
+// INIT
 // ============================================================
 refreshStats(); initVisualizer(); initStarfield(); updateAchievementBadge();
 
-runSplash(function() {
-  pageReady = true;
+runSplash(function(){
+  pageReady=true;
   if (musicOn) startMusic();
-  startVisualizer();
-  startFloatingPigs();
-  startPigParade();
-  startMeteors();
+  startVisualizer(); startFloatingPigs(); startPigParade(); startMeteors();
   initShakeDetector();
 });
 
 document.addEventListener('click', function initAudio(){
-  getAudioCtx();
-  if (musicOn && !(musicEngine && musicEngine.isRunning())) startMusic();
-}, { once: true });
+  getAudioCtx(); if (musicOn&&!(musicEngine&&musicEngine.isRunning())) startMusic();
+}, { once:true });
 </script>
 </body>
 </html>

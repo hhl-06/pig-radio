@@ -1,0 +1,595 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
+<title>⚠️ 系统警告 ⚠️</title>
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+body {
+  font-family: "PingFang SC","Microsoft YaHei",sans-serif;
+  min-height:100vh; min-height:100dvh;
+  background:#0a0a0a;
+  display:flex; align-items:center; justify-content:center;
+  overflow:hidden; position:relative;
+  user-select:none; -webkit-user-select:none;
+  transition: background 0.5s, filter 0.3s;
+}
+body.glitch { filter: hue-rotate(90deg) saturate(2); }
+body.invert { filter: invert(1) hue-rotate(180deg); }
+body.shaking { animation: bodyShake 0.15s linear infinite; }
+body.crashing { background:#000; animation: crashFlicker 0.3s linear infinite; }
+@keyframes bodyShake {
+  0%,100%{transform:translate(0,0);}
+  25%{transform:translate(-6px,4px);}
+  50%{transform:translate(4px,-6px);}
+  75%{transform:translate(-2px,2px);}
+}
+@keyframes crashFlicker {
+  0%,100%{opacity:1;}
+  50%{opacity:0.3;}
+}
+
+/* Warning stripes background */
+.bg-stripes {
+  position:fixed; top:0;left:0;right:0;bottom:0; z-index:0; pointer-events:none;
+  background: repeating-linear-gradient(45deg, rgba(255,0,0,0.03) 0px, rgba(255,0,0,0.03) 20px, rgba(0,0,0,0) 20px, rgba(0,0,0,0) 40px);
+}
+
+/* Fake overlay for alerts */
+.alert-overlay {
+  position:fixed; top:0;left:0;right:0;bottom:0;
+  background:rgba(0,0,0,0.6);
+  z-index:3000; display:flex; align-items:center; justify-content:center;
+  animation: fadeIn 0.15s ease;
+}
+@keyframes fadeIn { from{opacity:0;} to{opacity:1;} }
+.fake-alert {
+  background:#f0f0f0; border:1px solid #999;
+  border-radius:4px; box-shadow: 0 8px 32px rgba(0,0,0,0.5);
+  max-width:380px; width:90%; overflow:hidden;
+  animation: popIn 0.25s cubic-bezier(0.175,0.885,0.32,1.275);
+  font-family: "Microsoft YaHei",sans-serif;
+}
+@keyframes popIn { from{transform:scale(0.5);opacity:0;} to{transform:scale(1);opacity:1;} }
+.fake-alert .alert-titlebar {
+  background:#fff; padding:4px 10px; display:flex; align-items:center;
+  border-bottom:1px solid #ddd; font-size:12px; color:#333;
+}
+.fake-alert .alert-body { padding:20px; text-align:center; background:#fff; }
+.fake-alert .alert-body .alert-icon { font-size:40px; margin-bottom:10px; }
+.fake-alert .alert-body .alert-msg { font-size:14px; color:#333; line-height:1.8; }
+.fake-alert .alert-body .alert-btn {
+  margin-top:14px; padding:8px 40px; border:1px solid #999; border-radius:3px;
+  background:#e1e1e1; font-size:13px; cursor:pointer; font-family:inherit;
+}
+.fake-alert .alert-body .alert-btn:hover { background:#d0d0d0; }
+
+/* Error dialog */
+.fake-error {
+  background:#fff; border:1px solid #ccc; border-radius:8px;
+  box-shadow:0 8px 32px rgba(0,0,0,0.4); max-width:420px; width:90%;
+  overflow:hidden; animation:popIn 0.25s cubic-bezier(0.175,0.885,0.32,1.275);
+}
+.fake-error .err-header {
+  background:#c42b1c; color:#fff; padding:8px 14px; font-size:13px;
+  display:flex; align-items:center; gap:8px;
+}
+.fake-error .err-body { padding:20px; text-align:center; }
+.fake-error .err-body .err-icon { font-size:48px; margin-bottom:8px; }
+.fake-error .err-body .err-msg { font-size:14px; color:#333; line-height:1.8; }
+.fake-error .err-body button {
+  margin-top:12px; padding:6px 30px; border:1px solid #999; border-radius:4px;
+  background:#f0f0f0; font-size:12px; cursor:pointer; font-family:inherit;
+}
+
+/* BSOD */
+.bsod {
+  position:fixed; top:0;left:0;right:0;bottom:0;
+  background:#0078d7; color:#fff; z-index:9999;
+  display:flex; flex-direction:column; align-items:center; justify-content:center;
+  font-family:"Microsoft YaHei",sans-serif; text-align:center;
+  animation: fadeIn 0.3s ease;
+}
+.bsod .bsod-face { font-size:100px; margin-bottom:20px; }
+.bsod .bsod-title { font-size:28px; font-weight:300; margin-bottom:10px; }
+.bsod .bsod-code { font-size:14px; opacity:0.8; margin-bottom:20px; }
+.bsod .bsod-progress { font-size:13px; opacity:0.6; }
+
+/* Main container */
+.main-container {
+  position:relative; z-index:10; text-align:center; max-width:500px; padding:20px;
+}
+
+/* Title area */
+.title-area { margin-bottom:30px; }
+.title-area .warn-label {
+  display:inline-block; background:rgba(255,0,0,0.15); border:1px solid rgba(255,0,0,0.3);
+  color:#ff4444; padding:4px 16px; border-radius:20px; font-size:12px; font-weight:700;
+  letter-spacing:3px; animation: pulseWarn 1.5s ease infinite;
+}
+@keyframes pulseWarn {
+  0%,100%{box-shadow:0 0 0 0 rgba(255,0,0,0.4);}
+  50%{box-shadow:0 0 0 16px rgba(255,0,0,0);}
+}
+.title-area h1 {
+  font-size:22px; color:#aaa; margin-top:16px; font-weight:400; line-height:1.8;
+  transition:all 0.3s;
+}
+.title-area h1.angry { color:#ff4444; font-size:26px; font-weight:700; }
+
+/* THE BUTTON */
+.btn-wrap { position:relative; display:inline-block; margin:20px 0; }
+.btn-doom {
+  display:inline-block; padding:24px 60px; border:none; border-radius:16px;
+  font-size:22px; font-weight:900; font-family:inherit;
+  cursor:pointer; letter-spacing:2px; position:relative;
+  background:linear-gradient(135deg, #ff2020, #cc0000);
+  color:#fff; box-shadow:0 0 40px rgba(255,0,0,0.5), 0 8px 24px rgba(0,0,0,0.5);
+  transition:all 0.1s ease; animation: pulseDoom 1.2s ease infinite;
+  touch-action:manipulation; -webkit-tap-highlight-color:transparent;
+  z-index:5;
+}
+.btn-doom:hover { transform:scale(1.05); box-shadow:0 0 60px rgba(255,0,0,0.7),0 12px 32px rgba(0,0,0,0.6); }
+.btn-doom:active { transform:scale(0.95); }
+.btn-doom.shrunk { padding:16px 40px; font-size:17px; }
+.btn-doom.tiny { padding:10px 28px; font-size:13px; opacity:0.8; }
+.btn-doom.micro { padding:6px 16px; font-size:10px; opacity:0.5; }
+.btn-doom.fleeing { position:fixed; z-index:5000; transition:left 0.08s ease, top 0.08s ease; }
+@keyframes pulseDoom {
+  0%,100%{box-shadow:0 0 40px rgba(255,0,0,0.5),0 8px 24px rgba(0,0,0,0.5);}
+  50%{box-shadow:0 0 80px rgba(255,0,0,0.8),0 8px 24px rgba(0,0,0,0.5);}
+}
+
+/* Click counter */
+.click-counter {
+  color:#666; font-size:13px; margin-top:8px; font-family:"Courier New",monospace;
+  transition:color 0.3s;
+}
+.click-counter.hot { color:#ff4444; }
+
+/* Reaction text */
+.reaction {
+  position:fixed; pointer-events:none; z-index:2500;
+  color:#ff4444; font-weight:900; font-size:28px;
+  animation: reactFloat 1.5s ease-out forwards;
+  white-space:nowrap;
+}
+@keyframes reactFloat {
+  0%{transform:translateY(0) scale(0.5);opacity:1;}
+  100%{transform:translateY(-120px) scale(1.5);opacity:0;}
+}
+
+/* Exit trap overlay */
+.exit-trap {
+  position:fixed; top:0;left:0;right:0;bottom:0;
+  background:rgba(0,0,0,0.85); z-index:8000;
+  display:flex; flex-direction:column; align-items:center; justify-content:center;
+  animation:fadeIn 0.2s ease;
+}
+.exit-trap .trap-emoji { font-size:64px; margin-bottom:16px; }
+.exit-trap .trap-msg { color:#fff; font-size:18px; text-align:center; line-height:1.8; max-width:300px; }
+
+/* Crack effect */
+.crack {
+  position:fixed; top:0;left:0;right:0;bottom:0;
+  pointer-events:none; z-index:6000;
+  background: radial-gradient(crack at 50% 50%, rgba(255,255,255,0.9) 0%, transparent 3%),
+              radial-gradient(crack at 30% 40%, rgba(255,255,255,0.7) 0%, transparent 2%),
+              radial-gradient(crack at 70% 60%, rgba(255,255,255,0.7) 0%, transparent 2%);
+  animation: crackFlash 0.5s ease-out forwards;
+}
+@keyframes crackFlash {
+  0%{opacity:1;}
+  100%{opacity:0;}
+}
+
+/* Confetti */
+.confetti-piece {
+  position:fixed; pointer-events:none; z-index:9998;
+  animation: confettiRain 2.5s ease-out forwards;
+}
+@keyframes confettiRain {
+  0%{transform:translateY(-100px) rotate(0deg) scale(1);opacity:1;}
+  100%{transform:translateY(110vh) rotate(720deg) scale(0.5);opacity:0;}
+}
+
+/* Screen inversion overlay */
+.invert-flash {
+  position:fixed; top:0;left:0;right:0;bottom:0;
+  background:#fff; z-index:7000; pointer-events:none;
+  animation: invertBoom 0.4s ease-out forwards;
+}
+@keyframes invertBoom {
+  0%{opacity:1;}
+  100%{opacity:0;}
+}
+
+/* Fake progress */
+.fake-progress-overlay {
+  position:fixed; top:0;left:0;right:0;bottom:0;
+  background:rgba(0,0,0,0.9); z-index:8500;
+  display:flex; flex-direction:column; align-items:center; justify-content:center;
+}
+.fake-progress-overlay .prog-icon { font-size:48px; margin-bottom:16px; }
+.fake-progress-overlay .prog-title { color:#f0f0f0; font-size:16px; margin-bottom:20px; }
+.fake-progress-overlay .prog-bar-wrap {
+  width:280px; height:8px; background:rgba(255,255,255,0.1); border-radius:4px; overflow:hidden;
+}
+.fake-progress-overlay .prog-bar {
+  height:100%; background:linear-gradient(90deg, #ff4444, #ff8800);
+  border-radius:4px; transition:width 0.5s ease; width:0%;
+}
+.fake-progress-overlay .prog-label { color:#888; font-size:12px; margin-top:8px; }
+
+/* Toast */
+.toast {
+  position:fixed; top:20px; left:50%; transform:translateX(-50%); z-index:9500;
+  background:rgba(0,0,0,0.9); border:1px solid rgba(255,255,255,0.2);
+  color:#fff; padding:10px 24px; border-radius:20px; font-size:14px; font-weight:600;
+  animation: toastIn 0.3s ease-out; pointer-events:none; white-space:nowrap;
+}
+@keyframes toastIn { from{transform:translateX(-50%) translateY(-40px);opacity:0;} to{transform:translateX(-50%) translateY(0);opacity:1;} }
+
+/* Responsive */
+@media (max-width:480px) {
+  .btn-doom { padding:20px 44px; font-size:18px; }
+  .title-area h1 { font-size:17px; }
+  .bsod .bsod-face { font-size:64px; }
+  .bsod .bsod-title { font-size:20px; }
+}
+</style>
+</head>
+<body>
+<div class="bg-stripes"></div>
+
+<div class="main-container" id="mainContainer">
+  <div class="title-area">
+    <span class="warn-label">⚠️ 警告 WARNING ⚠️</span>
+    <h1 id="titleText">下面的按钮<br><span style="color:#ff4444;">绝对</span>不要按</h1>
+  </div>
+
+  <div class="btn-wrap" id="btnWrap">
+    <button class="btn-doom" id="doomBtn" onclick="handleClick(event)">
+      ⚠️ 不要按 ⚠️
+    </button>
+  </div>
+  <p class="click-counter" id="clickCounter">你还没按，很好</p>
+</div>
+
+<script>
+// ============================================================
+// STATE
+// ============================================================
+var clicks = 0;
+var btnFleeMode = false;
+var effectsPool = [];
+var escapeCount = 0;
+var exitTrapCount = 0;
+
+var btn = document.getElementById('doomBtn');
+var title = document.getElementById('titleText');
+var counter = document.getElementById('clickCounter');
+var container = document.getElementById('mainContainer');
+
+// ============================================================
+// REACTIONS — floating angry text
+// ============================================================
+function spawnReaction(text, x, y) {
+  var r = document.createElement('div'); r.className = 'reaction';
+  r.textContent = text; r.style.left = x + 'px'; r.style.top = y + 'px';
+  r.style.fontSize = (20 + Math.random() * 30) + 'px';
+  var colors = ['#ff4444','#ff8800','#ff0','#f0f','#0ff'];
+  r.style.color = colors[Math.floor(Math.random() * colors.length)];
+  document.body.appendChild(r);
+  setTimeout(function(){ r.remove(); }, 1500);
+}
+
+// ============================================================
+// TOAST
+// ============================================================
+function toast(msg, dur) {
+  var t = document.createElement('div'); t.className = 'toast'; t.textContent = msg;
+  document.body.appendChild(t);
+  setTimeout(function(){ t.style.opacity='0';t.style.transition='opacity 0.3s';setTimeout(function(){t.remove();},300); }, dur||2000);
+}
+
+// ============================================================
+// FAKE BSOD
+// ============================================================
+function showBSOD() {
+  var bsod = document.createElement('div'); bsod.className = 'bsod';
+  bsod.innerHTML = '<span class="bsod-face">😵</span>'
+    + '<div class="bsod-title">你的设备遇到问题，需要重启。</div>'
+    + '<div class="bsod-code">错误代码：YOU_PRESSED_THE_BUTTON</div>'
+    + '<div class="bsod-progress">正在收集错误信息... 0%</div>';
+  document.body.appendChild(bsod);
+  var pct = 0, t = setInterval(function(){
+    pct += Math.random() * 15; if (pct > 100) pct = 100;
+    bsod.querySelector('.bsod-progress').textContent = '正在收集错误信息... ' + Math.floor(pct) + '%';
+    if (pct >= 100) { clearInterval(t);
+      setTimeout(function(){ bsod.style.opacity='0';bsod.style.transition='opacity 0.5s';
+        setTimeout(function(){ bsod.remove(); },500);
+      }, 2500);
+    }
+  }, 400);
+}
+
+// ============================================================
+// FAKE ALERT
+// ============================================================
+function showFakeAlert(icon, msg, btnText) {
+  var overlay = document.createElement('div'); overlay.className = 'alert-overlay';
+  overlay.innerHTML = '<div class="fake-alert"><div class="alert-titlebar">⚠️ 系统消息</div>'
+    + '<div class="alert-body"><div class="alert-icon">'+icon+'</div>'
+    + '<div class="alert-msg">'+msg+'</div>'
+    + '<button class="alert-btn" onclick="this.closest(\'.alert-overlay\').remove()">'+btnText+'</button></div></div>';
+  document.body.appendChild(overlay);
+  overlay.addEventListener('click', function(e){ if(e.target===overlay) overlay.remove(); });
+}
+
+// ============================================================
+// FAKE ERROR
+// ============================================================
+function showFakeError(title, icon, msg) {
+  var overlay = document.createElement('div'); overlay.className = 'alert-overlay';
+  overlay.innerHTML = '<div class="fake-error"><div class="err-header"><span>❌</span>'+title+'</div>'
+    + '<div class="err-body"><div class="err-icon">'+icon+'</div>'
+    + '<div class="err-msg">'+msg+'</div>'
+    + '<button onclick="this.closest(\'.alert-overlay\').remove()">确定</button></div></div>';
+  document.body.appendChild(overlay);
+  overlay.addEventListener('click', function(e){ if(e.target===overlay) overlay.remove(); });
+}
+
+// ============================================================
+// EXIT TRAP
+// ============================================================
+function showExitTrap() {
+  exitTrapCount++;
+  var msgs = [
+    { emoji:'😢', msg:'等等！你真的要走吗？<br>你还没按够呢...' },
+    { emoji:'🥺', msg:'别走别走别走<br>再玩一会嘛' },
+    { emoji:'😭', msg:'第'+exitTrapCount+'次想走<br>你的良心不会痛吗' },
+    { emoji:'🫣', msg:'你忍心抛弃我吗？<br>我自己在这好害怕' },
+    { emoji:'😤', msg:'走？你想得美！<br>先把按钮按到100次再说' },
+    { emoji:'🤬', msg:'行行行你走吧！<br>...开玩笑的，不能走' },
+  ];
+  var m = msgs[Math.min(exitTrapCount-1, msgs.length-1)];
+  var trap = document.createElement('div'); trap.className = 'exit-trap';
+  trap.innerHTML = '<span class="trap-emoji">'+m.emoji+'</span><p class="trap-msg">'+m.msg+'</p>';
+  document.body.appendChild(trap);
+  setTimeout(function(){ trap.remove(); }, exitTrapCount >= 4 ? 2500 : 1800);
+}
+
+document.addEventListener('mouseleave', function(e){
+  if (clicks > 0 && e.clientY <= 0) showExitTrap();
+});
+// Mobile: detect when user switches tab or minimizes
+document.addEventListener('visibilitychange', function(){
+  if (document.hidden && clicks > 0) showExitTrap();
+});
+
+// ============================================================
+// SCREEN EFFECTS
+// ============================================================
+function screenShake(dur) {
+  document.body.classList.add('shaking');
+  setTimeout(function(){ document.body.classList.remove('shaking'); }, dur||500);
+}
+function screenGlitch() {
+  document.body.classList.add('glitch');
+  setTimeout(function(){ document.body.classList.remove('glitch'); }, 800);
+}
+function screenInvert() {
+  var flash = document.createElement('div'); flash.className = 'invert-flash';
+  document.body.appendChild(flash);
+  document.body.classList.add('invert');
+  setTimeout(function(){ document.body.classList.remove('invert'); flash.remove(); }, 1200);
+}
+function screenCrack() {
+  var c = document.createElement('div'); c.className = 'crack';
+  document.body.appendChild(c); setTimeout(function(){ c.remove(); }, 600);
+}
+function screenCrash() {
+  document.body.classList.add('crashing');
+  setTimeout(function(){ document.body.classList.remove('crashing'); }, 1500);
+}
+
+// ============================================================
+// CONFETTI
+// ============================================================
+function sprayConfetti() {
+  var emojis = ['💥','🔥','⚠️','🚫','💀','😱','🤯','💣','🧨','❌','⚡','🌟'];
+  for (var i = 0; i < 50; i++) {
+    setTimeout(function(){
+      var p = document.createElement('span'); p.className = 'confetti-piece';
+      p.textContent = emojis[Math.floor(Math.random()*emojis.length)];
+      p.style.left = Math.random()*100+'%'; p.style.top = -(Math.random()*60)+'px';
+      p.style.fontSize = (16+Math.random()*40)+'px'; p.style.animationDuration = (1.8+Math.random()*2.5)+'s';
+      document.body.appendChild(p); setTimeout(function(){ p.remove(); }, 4000);
+    }, i*25);
+  }
+}
+
+// ============================================================
+// FAKE PROGRESS
+// ============================================================
+function fakeProgress(title, endMsg, duration) {
+  return new Promise(function(resolve){
+    var overlay = document.createElement('div'); overlay.className = 'fake-progress-overlay';
+    overlay.innerHTML = '<span class="prog-icon">⏳</span><div class="prog-title">'+title+'</div>'
+      + '<div class="prog-bar-wrap"><div class="prog-bar" id="progBar"></div></div>'
+      + '<div class="prog-label">0%</div>';
+    document.body.appendChild(overlay);
+    var bar = overlay.querySelector('#progBar'), label = overlay.querySelector('.prog-label');
+    var pct = 0, t = setInterval(function(){
+      pct += Math.random() * 8;
+      if (pct > 98) { pct = 98; clearInterval(t);
+        label.textContent = '99%...';
+        setTimeout(function(){
+          label.textContent = endMsg||'失败了';
+          setTimeout(function(){ overlay.remove(); resolve(); }, 1500);
+        }, 1500);
+        return;
+      }
+      bar.style.width = pct + '%'; label.textContent = Math.floor(pct) + '%';
+    }, duration/20||200);
+  });
+}
+
+// ============================================================
+// BUTTON FLEE (runs from cursor)
+// ============================================================
+function fleeButton(e) {
+  if (!btnFleeMode) return;
+  var btnR = btn.getBoundingClientRect();
+  var mx = e.clientX || (e.touches && e.touches[0].clientX) || btnR.left + btnR.width/2;
+  var my = e.clientY || (e.touches && e.touches[0].clientY) || btnR.top + btnR.height/2;
+  // Run away from cursor
+  var dx = btnR.left + btnR.width/2 - mx;
+  var dy = btnR.top + btnR.height/2 - my;
+  var dist = Math.sqrt(dx*dx + dy*dy);
+  if (dist < 200) {
+    var nx = btnR.left + (dx/dist) * 80 + (Math.random()-0.5)*40;
+    var ny = btnR.top + (dy/dist) * 80 + (Math.random()-0.5)*40;
+    nx = Math.max(10, Math.min(window.innerWidth - btnR.width - 10, nx));
+    ny = Math.max(10, Math.min(window.innerHeight - btnR.height - 10, ny));
+    btn.style.left = nx + 'px'; btn.style.top = ny + 'px';
+    escapeCount++;
+  }
+}
+
+// ============================================================
+// MAIN CLICK HANDLER
+// ============================================================
+function handleClick(e) {
+  e.stopPropagation();
+  clicks++;
+
+  // Update button appearance
+  if (clicks >= 15) btn.className = 'btn-doom micro';
+  else if (clicks >= 8) btn.className = 'btn-doom tiny';
+  else if (clicks >= 3) btn.className = 'btn-doom shrunk';
+
+  // Spawn reaction at click
+  spawnReaction(['说了别按！','？？？','又来？','你疯了','住手！','不听劝是吧','你完了','哈哈哈','别按了！','有完没完'][Math.min(clicks-1,9)], e.clientX - 30, e.clientY - 40);
+
+  // Update counter
+  var counterMsgs = [
+    '你按了第1次...好吧，就这一次', '第2次了！你是故意的吗', '第3次...我开始害怕了',
+    '第4次！你疯了吗', '第5次！！系统开始不稳定了', '第6次！！！快停手',
+    '第7次...我已经无法阻止你了', '第8次，你赢了行了吧', '第9次，你是魔鬼吗',
+    '第10次...世界要毁灭了', '第11次！我开始记录你的罪行', '第12次...（系统已崩溃）',
+    '第13次...我不知道该说什么了', '第14次...继续吧，反正我也拦不住',
+    '第'+clicks+'次...你以为会有彩蛋吗'
+  ];
+  counter.textContent = counterMsgs[Math.min(clicks-1, counterMsgs.length-1)];
+  if (clicks >= 5) counter.classList.add('hot');
+
+  // === EFFECTS BY CLICK COUNT ===
+  switch(clicks) {
+    case 1:
+      title.innerHTML = '说了<span style="color:#ff4444;">不要按</span>！<br>你怎么回事？';
+      screenShake(300);
+      break;
+    case 2:
+      title.innerHTML = '你是<span style="color:#ff0;">看不懂字</span>吗？<br>还是<span style="color:#f0f;">故意</span>的？';
+      title.classList.add('angry');
+      screenShake(400);
+      break;
+    case 3:
+      title.innerHTML = '好吧，你成功引起了我的注意。<br>但<span style="color:#ff4444;">别再按了</span>。';
+      showFakeAlert('⚠️', '检测到异常操作。<br>系统建议您：<strong>立即停止点击该按钮</strong>。<br>继续操作可能导致不可预知的后果。', '我知道了');
+      break;
+    case 4:
+      title.innerHTML = '我警告过你了。<br>现在开始，<span style="color:#ff4444;">后果自负</span>。';
+      screenGlitch();
+      btnFleeMode = true;
+      btn.classList.add('fleeing');
+      document.addEventListener('mousemove', fleeButton);
+      document.addEventListener('touchmove', fleeButton, {passive:true});
+      toast('⚠️ 按钮逃跑模式已激活', 2000);
+      break;
+    case 5:
+      screenCrash(); screenCrack();
+      title.innerHTML = '系统正在<span style="color:#f00;">崩溃</span>...<br>这都是你的错！';
+      showFakeError('严重错误', '💀', '进程 system32/patience.exe 已停止响应。<br>错误码：0xYOU_SHOULD_HAVE_STOPPED<br><br>这全是你的错。');
+      break;
+    case 6:
+      screenInvert();
+      title.innerHTML = '啊——<br>屏幕都<span style="color:#0f0;">坏掉</span>了！';
+      break;
+    case 7:
+      screenShake(800); screenGlitch();
+      title.innerHTML = '<span style="font-size:28px;">😱 为什么你就是不听！！！</span>';
+      showBSOD();
+      break;
+    case 8:
+      title.innerHTML = '你已经按了8次。<br>正常人按<span style="color:#ff0;">1次</span>就停了。';
+      screenCrack();
+      break;
+    case 9:
+      title.innerHTML = '行行行，你厉害。<br>我倒要看看你能按多少次。';
+      toast('🏆 成就解锁：倔驴', 2000);
+      break;
+    case 10:
+      title.innerHTML = '<span style="font-size:30px;">🎉 十次！</span><br>你正式成为<span style="color:#ff0;">"最不听话的人"</span>';
+      sprayConfetti();
+      fakeProgress('正在计算你的破坏力...', '破坏力评估：MAX级别').then(function(){
+        showFakeAlert('🤯', '经系统评估，您已造成：<br>• 3次屏幕抖动<br>• 2次系统崩溃<br>• 1次蓝屏<br>• 无数次精神损伤<br><br>恭喜，你赢了。', '我不服，继续按');
+      });
+      break;
+    case 15:
+      title.innerHTML = '第15次。<br>你<span style="color:#ff0;">不需要工作</span>的吗？';
+      screenCrash(); screenCrack(); screenShake(1000);
+      break;
+    case 20:
+      title.innerHTML = '<span style="font-size:32px;">🏆</span><br>20次！成就：<span style="color:#f0f;">按钮毁灭者</span>';
+      sprayConfetti(); sprayConfetti();
+      fakeProgress('正在将你加入黑名单...', '已加入全球不听话黑名单').then(function(){
+        toast('🌍 你已被全球系统拉黑', 3000);
+      });
+      break;
+    case 25:
+      title.innerHTML = '已经25次了。<br>我<span style="color:#f00;">佩服</span>你的毅力。';
+      break;
+    case 30:
+      title.innerHTML = '<span style="font-size:26px;">算了，按钮送你。</span><br>我不玩了。';
+      btn.textContent = '🏳️ 我投降';
+      btn.style.background = 'linear-gradient(135deg, #888, #555)';
+      sprayConfetti();
+      break;
+    default:
+      if (clicks > 30) {
+        title.innerHTML = '第'+clicks+'次...<br><span style="color:#888;">我已经麻木了</span>';
+      }
+      // Random extra effects
+      if (clicks % 3 === 0) screenShake(200 + Math.random()*400);
+      if (clicks % 5 === 0) screenGlitch();
+      if (clicks % 7 === 0) screenCrack();
+      break;
+  }
+
+  // Escape key trap
+  if (clicks >= 3) {
+    document.addEventListener('keydown', function escTrap(ev){
+      if (ev.key === 'Escape') { ev.preventDefault(); toast('按ESC也没用 🤷', 1500); }
+    });
+  }
+
+  // Right-click trap
+  if (clicks >= 2) {
+    document.addEventListener('contextmenu', function(e){ e.preventDefault(); toast('右键已被封印 🔒', 1200); });
+  }
+}
+
+// ============================================================
+// INIT
+// ============================================================
+// Subtle initial pulsing
+setTimeout(function(){
+  toast('⚠️ 记住：不要按那个按钮', 2500);
+}, 1000);
+</script>
+</body>
+</html>

@@ -23,7 +23,7 @@ body {
   justify-content: center;
   overflow-x: hidden;
   position: relative;
-  transition: background 0.8s ease;
+  transition: background 1.5s ease;
   user-select: none;
   -webkit-user-select: none;
   -webkit-tap-highlight-color: transparent;
@@ -32,8 +32,41 @@ body {
 }
 body.ready { opacity: 1; }
 
+/* Dynamic background hue shift */
+body::before {
+  content: '';
+  position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+  background: radial-gradient(ellipse at 30% 30%, rgba(255,107,107,0.06) 0%, transparent 50%),
+              radial-gradient(ellipse at 70% 70%, rgba(255,154,243,0.06) 0%, transparent 50%),
+              radial-gradient(ellipse at 50% 50%, rgba(254,202,87,0.04) 0%, transparent 50%);
+  pointer-events: none; z-index: 0;
+  animation: bgShift 12s ease-in-out infinite;
+}
+@keyframes bgShift {
+  0%,100% { opacity: 0.7; }
+  33% { opacity: 1; }
+  66% { opacity: 0.5; }
+}
+
 /* ============================================================
-   SPLASH SCREEN — 电台开机画面
+   STARFIELD
+   ============================================================ */
+.starfield { position: fixed; top: 0; left: 0; right: 0; bottom: 0; pointer-events: none; z-index: 0; }
+.star {
+  position: absolute;
+  background: #fff;
+  border-radius: 50%;
+  animation: twinkle var(--dur) ease-in-out infinite;
+  animation-delay: var(--delay);
+  opacity: 0;
+}
+@keyframes twinkle {
+  0%,100% { opacity: 0.15; }
+  50% { opacity: 0.7; }
+}
+
+/* ============================================================
+   SPLASH SCREEN
    ============================================================ */
 .splash {
   position: fixed;
@@ -48,65 +81,16 @@ body.ready { opacity: 1; }
   will-change: opacity;
 }
 .splash.hide { opacity: 0; visibility: hidden; pointer-events: none; }
-.splash .s-radio {
-  font-size: 80px;
-  animation: splashBounce 0.6s ease infinite;
-  filter: drop-shadow(0 0 30px rgba(255,107,107,0.5));
-}
-.splash .s-title {
-  font-size: 32px;
-  font-weight: 900;
-  color: #ff9ff3;
-  margin-top: 12px;
-  letter-spacing: 6px;
-  text-shadow: 0 0 20px rgba(255,154,243,0.4);
-}
-.splash .s-freq {
-  font-size: 22px;
-  font-weight: 700;
-  color: #feca57;
-  margin: 4px 0 20px;
-  letter-spacing: 4px;
-}
-.splash .s-dial-wrap {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  margin-bottom: 14px;
-}
-.splash .s-dial {
-  width: 6px; height: 6px;
-  background: rgba(255,255,255,0.2);
-  border-radius: 50%;
-  transition: background 0.2s;
-}
-.splash .s-dial.on { background: #ff6b6b; box-shadow: 0 0 8px #ff6b6b; }
-.splash .s-bar-wrap {
-  width: 180px; height: 4px;
-  background: rgba(255,255,255,0.08);
-  border-radius: 2px;
-  overflow: hidden;
-  margin-bottom: 16px;
-}
-.splash .s-bar {
-  height: 100%; width: 0%;
-  background: linear-gradient(90deg, #ff6b6b, #ff9ff3);
-  border-radius: 2px;
-  transition: width 0.3s ease;
-  will-change: width;
-}
-.splash .s-msg {
-  font-size: 13px;
-  color: #718096;
-  letter-spacing: 2px;
-}
-@keyframes splashBounce {
-  0%,100% { transform: translateY(0); }
-  50% { transform: translateY(-10px); }
-}
+.splash .s-radio { font-size: 80px; animation: splashBounce 0.6s ease infinite; filter: drop-shadow(0 0 30px rgba(255,107,107,0.5)); }
+.splash .s-title { font-size: 32px; font-weight: 900; color: #ff9ff3; margin-top: 12px; letter-spacing: 6px; text-shadow: 0 0 20px rgba(255,154,243,0.4); }
+.splash .s-freq { font-size: 22px; font-weight: 700; color: #feca57; margin: 4px 0 20px; letter-spacing: 4px; }
+.splash .s-bar-wrap { width: 180px; height: 4px; background: rgba(255,255,255,0.08); border-radius: 2px; overflow: hidden; margin-bottom: 16px; }
+.splash .s-bar { height: 100%; width: 0%; background: linear-gradient(90deg, #ff6b6b, #ff9ff3); border-radius: 2px; transition: width 0.3s ease; will-change: width; }
+.splash .s-msg { font-size: 13px; color: #718096; letter-spacing: 2px; }
+@keyframes splashBounce { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
 
 /* ============================================================
-   ANIMATIONS
+   ANIMATIONS — base
    ============================================================ */
 @keyframes floatUp {
   0%   { transform: translateY(0) scale(0.5); opacity: 1; }
@@ -208,6 +192,11 @@ body.ready { opacity: 1; }
   75%  { transform: scale(1.2) rotate(5deg); }
   100% { transform: scale(1) rotate(0); }
 }
+@keyframes mascotAngry {
+  0%,100% { transform: translateX(0); }
+  25% { transform: translateX(-6px) rotate(-4deg); }
+  75% { transform: translateX(6px) rotate(4deg); }
+}
 @keyframes visualizerBar {
   0%,100% { transform: scaleY(0.3); }
   50%  { transform: scaleY(1); }
@@ -232,9 +221,29 @@ body.ready { opacity: 1; }
   from { transform: translateY(-60px); opacity: 0; }
   to   { transform: translateY(0); opacity: 1; }
 }
-@keyframes meterPulse {
-  0%,100% { box-shadow: 0 0 8px rgba(255,107,107,0.3); }
-  50% { box-shadow: 0 0 24px rgba(255,107,107,0.7); }
+@keyframes pulseRing {
+  0%   { transform: translate(-50%,-50%) scale(0); opacity: 0.8; }
+  100% { transform: translate(-50%,-50%) scale(2.5); opacity: 0; }
+}
+@keyframes particleBurst {
+  0%   { transform: translate(0,0) scale(1); opacity: 1; }
+  100% { transform: translate(var(--dx), var(--dy)) scale(0); opacity: 0; }
+}
+@keyframes trailFade {
+  0%   { opacity: 0.9; transform: scale(1); }
+  100% { opacity: 0; transform: scale(0.2); }
+}
+@keyframes pigMarch {
+  0%   { transform: translateX(-120px); }
+  100% { transform: translateX(calc(100vw + 120px)); }
+}
+@keyframes sparkFlash {
+  0%,100% { opacity: 0; }
+  50% { opacity: 0.7; }
+}
+@keyframes meteorFall {
+  0%   { transform: translate(0, -100px) rotate(30deg); opacity: 1; }
+  100% { transform: translate(300px, 110vh) rotate(30deg); opacity: 0; }
 }
 
 /* ============================================================
@@ -246,9 +255,9 @@ body.ready { opacity: 1; }
   pointer-events: none;
   z-index: 0;
   background:
-    radial-gradient(ellipse at 30% 20%, rgba(255,107,107,0.12) 0%, transparent 60%),
-    radial-gradient(ellipse at 70% 60%, rgba(255,154,243,0.1) 0%, transparent 60%),
-    radial-gradient(ellipse at 50% 80%, rgba(254,202,87,0.08) 0%, transparent 50%);
+    radial-gradient(ellipse at 30% 20%, rgba(255,107,107,0.1) 0%, transparent 60%),
+    radial-gradient(ellipse at 70% 60%, rgba(255,154,243,0.08) 0%, transparent 60%),
+    radial-gradient(ellipse at 50% 80%, rgba(254,202,87,0.06) 0%, transparent 50%);
 }
 .spotlight {
   position: fixed;
@@ -256,7 +265,7 @@ body.ready { opacity: 1; }
   left: 50%;
   width: 600px;
   height: 400px;
-  background: radial-gradient(ellipse, rgba(255,154,243,0.15) 0%, transparent 70%);
+  background: radial-gradient(ellipse, rgba(255,154,243,0.12) 0%, transparent 70%);
   transform: translateX(-50%);
   pointer-events: none;
   z-index: 0;
@@ -273,6 +282,103 @@ body.ready { opacity: 1; }
   z-index: 1;
   animation: floatUp 5s ease-in forwards;
   will-change: transform, opacity;
+}
+
+/* ============================================================
+   CURSOR TRAIL
+   ============================================================ */
+.cursor-trail {
+  position: fixed;
+  pointer-events: none;
+  z-index: 9998;
+  font-size: 14px;
+  animation: trailFade 0.6s ease-out forwards;
+  will-change: transform, opacity;
+}
+
+/* ============================================================
+   BUTTON RAINBOW TRAIL
+   ============================================================ */
+.rainbow-trail {
+  position: absolute;
+  pointer-events: none;
+  z-index: 5;
+  border-radius: 50%;
+  animation: trailFade 0.5s ease-out forwards;
+  will-change: transform, opacity;
+}
+
+/* ============================================================
+   PULSE RING
+   ============================================================ */
+.pulse-ring {
+  position: absolute;
+  pointer-events: none;
+  z-index: 4;
+  border-radius: 50%;
+  border: 2px solid rgba(255,107,107,0.6);
+  width: 60px; height: 60px;
+  animation: pulseRing 0.7s ease-out forwards;
+}
+
+/* ============================================================
+   PARTICLE BURST
+   ============================================================ */
+.burst-particle {
+  position: fixed;
+  pointer-events: none;
+  z-index: 9997;
+  font-size: 20px;
+  animation: particleBurst 1s ease-out forwards;
+  will-change: transform, opacity;
+}
+
+/* ============================================================
+   PIG PARADE
+   ============================================================ */
+.pig-parade {
+  position: fixed;
+  pointer-events: none;
+  z-index: 1;
+  white-space: nowrap;
+  font-size: 36px;
+  animation: pigMarch var(--speed) linear forwards;
+  top: var(--top);
+}
+
+/* ============================================================
+   SCREEN SHAKE
+   ============================================================ */
+body.screen-shake { animation: superShake 0.4s ease-out; }
+body.screen-shake-light { animation: shake 0.3s ease-out; }
+
+/* ============================================================
+   BUTTON SPARK
+   ============================================================ */
+.btn-spark {
+  position: absolute;
+  pointer-events: none;
+  z-index: 3;
+  width: 3px; height: 3px;
+  background: #feca57;
+  border-radius: 50%;
+  box-shadow: 0 0 6px 2px #feca57;
+  animation: sparkFlash 0.3s ease-out forwards;
+}
+
+/* ============================================================
+   METEOR
+   ============================================================ */
+.meteor {
+  position: fixed;
+  pointer-events: none;
+  z-index: 0;
+  width: 2px;
+  height: 80px;
+  background: linear-gradient(to bottom, #fff, transparent);
+  border-radius: 1px;
+  animation: meteorFall 1.2s linear forwards;
+  opacity: 0.6;
 }
 
 /* ============================================================
@@ -330,6 +436,7 @@ body.ready { opacity: 1; }
 }
 .mascot.dancing { animation: mascotDance 0.4s ease-in-out infinite; }
 .mascot.laughing { animation: mascotLaugh 0.5s ease; }
+.mascot.angry { animation: mascotAngry 0.25s ease infinite; }
 .mascot.surprised { font-size: 80px; }
 .mascot .mascot-bubble {
   position: absolute;
@@ -379,29 +486,9 @@ body.ready { opacity: 1; }
 }
 
 /* ============================================================
-   MUSIC & VOICE CONTROLS
+   MUSIC TOGGLE
    ============================================================ */
 .music-toggle {
-  position: fixed;
-  top: 56px;
-  right: 16px;
-  z-index: 2000;
-  background: rgba(0,0,0,0.7);
-  border: 1px solid rgba(255,154,243,0.3);
-  border-radius: 20px;
-  padding: 6px 14px;
-  font-size: 12px;
-  cursor: pointer;
-  font-weight: 600;
-  color: #ff9ff3;
-  transition: all 0.2s;
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
-}
-.music-toggle:hover { background: rgba(255,107,107,0.2); border-color: #ff6b6b; }
-.music-toggle.on { animation: pulseGlow 2s ease infinite; }
-
-.voice-toggle {
   position: fixed;
   top: 16px;
   right: 16px;
@@ -409,7 +496,7 @@ body.ready { opacity: 1; }
   background: rgba(0,0,0,0.7);
   border: 1px solid rgba(255,154,243,0.3);
   border-radius: 20px;
-  padding: 6px 14px;
+  padding: 8px 16px;
   font-size: 13px;
   cursor: pointer;
   font-weight: 600;
@@ -417,12 +504,12 @@ body.ready { opacity: 1; }
   transition: all 0.2s;
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
+  font-family: inherit;
 }
-.voice-toggle:hover { background: rgba(255,107,107,0.2); }
-.voice-toggle.on { color: #48dbfb; border-color: #48dbfb; animation: pulseGlow 2s ease infinite; }
-.voice-toggle.off { color: #666; border-color: #333; }
+.music-toggle:hover { background: rgba(255,107,107,0.2); border-color: #ff6b6b; }
+.music-toggle.on { animation: pulseGlow 2s ease infinite; }
 
-.voice-gear {
+.achievement-btn {
   position: fixed;
   top: 16px;
   right: 130px;
@@ -430,8 +517,8 @@ body.ready { opacity: 1; }
   background: rgba(0,0,0,0.7);
   border: 1px solid rgba(255,154,243,0.3);
   border-radius: 50%;
-  width: 32px; height: 32px;
-  font-size: 15px;
+  width: 37px; height: 37px;
+  font-size: 16px;
   cursor: pointer;
   display: flex;
   align-items: center;
@@ -440,27 +527,7 @@ body.ready { opacity: 1; }
   color: #ff9ff3;
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
-}
-.voice-gear:hover { transform: rotate(90deg); border-color: #ff6b6b; }
-
-.achievement-btn {
-  position: fixed;
-  top: 16px;
-  right: 175px;
-  z-index: 2001;
-  background: rgba(0,0,0,0.7);
-  border: 1px solid rgba(255,154,243,0.3);
-  border-radius: 50%;
-  width: 32px; height: 32px;
-  font-size: 15px;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: all 0.2s;
-  color: #ff9ff3;
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
+  font-family: inherit;
 }
 .achievement-btn:hover { border-color: #feca57; transform: scale(1.1); }
 .achievement-btn.has-new { animation: pulse 1.5s ease infinite; border-color: #feca57; }
@@ -495,62 +562,6 @@ body.ready { opacity: 1; }
   box-shadow: 0 8px 24px rgba(0,0,0,0.3);
   white-space: nowrap;
 }
-
-/* ============================================================
-   VOICE PANEL
-   ============================================================ */
-.voice-panel-overlay {
-  position: fixed;
-  top: 0; left: 0; right: 0; bottom: 0;
-  background: rgba(0,0,0,0.7);
-  z-index: 4000;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  animation: fadeIn 0.2s ease;
-  backdrop-filter: blur(4px);
-  -webkit-backdrop-filter: blur(4px);
-}
-.voice-panel {
-  background: #1a1a2e;
-  border-radius: 16px;
-  padding: 24px;
-  max-width: 420px;
-  width: 90%;
-  max-height: 70vh;
-  overflow-y: auto;
-  box-shadow: 0 20px 60px rgba(0,0,0,0.5), 0 0 40px rgba(255,107,107,0.15);
-  animation: popIn 0.3s cubic-bezier(0.175,0.885,0.32,1.275);
-  border: 1px solid rgba(255,154,243,0.2);
-  color: #e2e8f0;
-}
-.voice-panel h3 { font-size: 18px; margin-bottom: 4px; color: #ff9ff3; }
-.voice-panel .panel-subtitle { font-size: 11px; color: #718096; margin-bottom: 16px; }
-.voice-list { max-height: 280px; overflow-y: auto; }
-.voice-option {
-  display: flex; align-items: center; gap: 10px;
-  padding: 10px 12px; border-radius: 10px;
-  cursor: pointer; transition: all 0.15s;
-  margin-bottom: 4px; border: 1px solid transparent;
-}
-.voice-option:hover { background: rgba(255,107,107,0.1); border-color: rgba(255,107,107,0.2); }
-.voice-option.selected { border-color: #ff6b6b; background: rgba(255,107,107,0.15); }
-.voice-option .vo-name { font-weight: 600; font-size: 13px; flex: 1; color: #e2e8f0; }
-.vo-tag { font-size: 9px; padding: 2px 8px; border-radius: 10px; font-weight: 700; }
-.vo-tag.neural { background: rgba(72,219,251,0.2); color: #48dbfb; }
-.vo-tag.hd { background: rgba(72,219,251,0.1); color: #0abde3; }
-.vo-tag.standard { background: rgba(254,202,87,0.15); color: #feca57; }
-.voice-option .vo-preview { font-size: 16px; cursor: pointer; opacity: 0.4; transition: opacity 0.15s; }
-.voice-option .vo-preview:hover { opacity: 1; }
-.panel-actions { display: flex; gap: 10px; margin-top: 16px; justify-content: flex-end; }
-.btn-sm {
-  padding: 8px 20px; border: none; border-radius: 20px;
-  font-size: 12px; font-weight: 600; cursor: pointer; transition: all 0.15s;
-}
-.btn-sm.primary { background: #ff6b6b; color: #fff; }
-.btn-sm.primary:hover { background: #ee5a5a; }
-.btn-sm.ghost { background: rgba(255,255,255,0.05); color: #a0aec0; border: 1px solid rgba(255,255,255,0.1); }
-.btn-sm.ghost:hover { background: rgba(255,255,255,0.1); }
 
 /* ============================================================
    ACHIEVEMENT PANEL
@@ -620,6 +631,7 @@ body.ready { opacity: 1; }
   -webkit-user-select: none;
   user-select: none;
   touch-action: manipulation;
+  font-family: inherit;
 }
 .scream-btn:active, .scream-btn.active { background: rgba(255,107,107,0.25); border-color: #ff6b6b; transform: scale(0.97); }
 .scream-meter-wrap {
@@ -743,6 +755,7 @@ body.ready { opacity: 1; }
   letter-spacing: 1px;
   touch-action: manipulation;
   -webkit-tap-highlight-color: transparent;
+  font-family: inherit;
 }
 .btn-know {
   background: linear-gradient(135deg, #ff6b6b, #ee5a5a);
@@ -996,7 +1009,7 @@ body.ready { opacity: 1; }
 }
 
 /* ============================================================
-   RESPONSIVE — MOBILE
+   RESPONSIVE
    ============================================================ */
 @media (max-width: 480px) {
   .funny-title h1 { font-size: 48px; }
@@ -1009,7 +1022,9 @@ body.ready { opacity: 1; }
   .splash .s-radio { font-size: 60px; }
   .splash .s-title { font-size: 24px; letter-spacing: 4px; }
   .splash .s-freq { font-size: 17px; }
-  .ach-panel, .voice-panel { max-width: 95vw; padding: 18px; }
+  .ach-panel { max-width: 95vw; padding: 18px; }
+  .music-toggle { top: 12px; right: 10px; padding: 6px 12px; font-size: 11px; }
+  .achievement-btn { top: 12px; right: 100px; width: 33px; height: 33px; font-size: 14px; }
 }
 @media (max-width: 380px) {
   .funny-title h1 { font-size: 38px; }
@@ -1021,18 +1036,15 @@ body.ready { opacity: 1; }
 </head>
 <body>
 
+<!-- 星空 -->
+<div class="starfield" id="starfield"></div>
+
 <!-- 电台开机画面 -->
 <div class="splash" id="splash">
   <span class="s-radio">📻</span>
   <span class="s-title">猪猪电台</span>
   <span class="s-freq">FM 94.8</span>
   <div class="s-bar-wrap"><div class="s-bar" id="splashBar"></div></div>
-  <div class="s-dial-wrap" id="splashDials">
-    <span class="s-dial"></span><span class="s-dial"></span><span class="s-dial"></span>
-    <span class="s-dial"></span><span class="s-dial"></span><span class="s-dial"></span>
-    <span class="s-dial"></span><span class="s-dial"></span><span class="s-dial"></span>
-    <span class="s-dial"></span>
-  </div>
   <span class="s-msg" id="splashMsg">正在连接猪猪卫星...</span>
 </div>
 
@@ -1062,28 +1074,7 @@ body.ready { opacity: 1; }
 <button class="music-toggle on" id="musicToggle" onclick="toggleMusic()" title="开关背景音乐">
   🎵 电台BGM
 </button>
-
-<!-- 语音开关 -->
-<button class="voice-toggle on" id="voiceToggle" onclick="toggleVoice()" title="每次说话随机变声！点击关闭语音">
-  🐷 猪猪模式
-</button>
-<button class="voice-gear" id="voiceGear" onclick="openVoicePanel()" title="语音设置">⚙️</button>
 <button class="achievement-btn" id="achievementBtn" onclick="openAchievementPanel()" title="猪猪成就">🏆</button>
-
-<!-- 语音设置面板 -->
-<div class="voice-panel-overlay" id="voicePanelOverlay" style="display:none;" onclick="maybeCloseVoicePanel(event)">
-  <div class="voice-panel" id="voicePanel" onclick="event.stopPropagation()">
-    <h3>🎙️ 语音设置</h3>
-    <p class="panel-subtitle">选择更自然的语音，或关闭语音播报</p>
-    <div class="voice-list" id="voiceList">
-      <p style="color:#718096;text-align:center;padding:20px;">正在扫描语音...</p>
-    </div>
-    <div class="panel-actions">
-      <button class="btn-sm ghost" onclick="closeVoicePanel()">关闭</button>
-      <button class="btn-sm primary" onclick="applyVoiceSettings()">✅ 确定</button>
-    </div>
-  </div>
-</div>
 
 <!-- 成就面板 -->
 <div class="ach-panel-overlay" id="achPanelOverlay" style="display:none;" onclick="maybeCloseAchPanel(event)">
@@ -1091,8 +1082,8 @@ body.ready { opacity: 1; }
     <h3>🏆 猪猪成就</h3>
     <p class="panel-subtitle">努力成为最猪的猪</p>
     <div id="achList"></div>
-    <div class="panel-actions" style="margin-top:14px;">
-      <button class="btn-sm ghost" onclick="closeAchievementPanel()">关闭</button>
+    <div class="panel-actions" style="margin-top:14px; text-align:right;">
+      <button class="btn-sm ghost" onclick="closeAchievementPanel()" style="padding:8px 20px;border:none;border-radius:20px;font-size:12px;font-weight:600;cursor:pointer;background:rgba(255,255,255,0.05);color:#a0aec0;border:1px solid rgba(255,255,255,0.1);">关闭</button>
     </div>
   </div>
 </div>
@@ -1202,19 +1193,13 @@ body.ready { opacity: 1; }
 // ============================================================
 // GLOBAL STATE
 // ============================================================
-var voiceOn = true;
 var musicOn = true;
-var voiceMode = 0;
 var escapeCount = 0;
 var escapeStartTime = 0;
 var backCount = 0;
 var shakeCount = 0;
 var confirmStep = 0;
 var audioCtx = null;
-var selectedVoice = null;
-var availableVoices = [];
-var isSpeaking = false;
-var speechQueue = [];
 var musicEngine = null;
 var visualizerTimer = null;
 var visBars = [];
@@ -1222,9 +1207,12 @@ var pageReady = false;
 var micStream = null;
 var micAnalyser = null;
 var micAnimId = null;
+var cursorTrails = [];
+var lastCursorTime = 0;
+var paradeTimer = null;
 
 // ============================================================
-// LOCALSTORAGE — replaces PHP backend
+// LOCALSTORAGE
 // ============================================================
 var ROASTS = {
   know: [
@@ -1247,35 +1235,22 @@ var ROASTS = {
   ]
 };
 
-// Seed base stats from real data
 var BASE_STATS = { total: 66, know: 18, dunno: 27 };
 
 function loadStats() {
   try { return JSON.parse(localStorage.getItem('pig_radio_stats')) || { total:0, know:0, dunno:0, back:0 }; }
   catch(e) { return { total:0, know:0, dunno:0, back:0 }; }
 }
-function saveStats(s) {
-  try { localStorage.setItem('pig_radio_stats', JSON.stringify(s)); } catch(e) {}
-}
-function recordClick(type) {
-  var s = loadStats(); s.total++;
-  if (type === 'know') s.know++;
-  else if (type === 'dunno') s.dunno++;
-  else if (type === 'back') s.back++;
-  saveStats(s); return s;
-}
+function saveStats(s) { try { localStorage.setItem('pig_radio_stats', JSON.stringify(s)); } catch(e) {} }
+function recordClick(type) { var s = loadStats(); s.total++; if (type==='know') s.know++; else if (type==='dunno') s.dunno++; else if (type==='back') s.back++; saveStats(s); return s; }
 function getGlobalTotal() { return BASE_STATS.total + loadStats().total; }
-function getRoast(type) {
-  var list = ROASTS[type] || ROASTS['know'];
-  return list[Math.floor(Math.random() * list.length)].replace('#COUNT#', getGlobalTotal() + 1);
-}
+function getRoast(type) { var list = ROASTS[type] || ROASTS['know']; return list[Math.floor(Math.random()*list.length)].replace('#COUNT#', getGlobalTotal()+1); }
 function refreshStats() {
-  var s = loadStats();
-  var gt = BASE_STATS.total + s.total, gk = BASE_STATS.know + s.know, gd = BASE_STATS.dunno + s.dunno;
+  var s = loadStats(), gt = BASE_STATS.total + s.total, gk = BASE_STATS.know + s.know, gd = BASE_STATS.dunno + s.dunno;
   document.getElementById('globalCount').textContent = gt;
   document.getElementById('knowCount').textContent = gk;
   document.getElementById('dunnoCount').textContent = gd;
-  document.getElementById('uniqueCount').textContent = Math.max(1, Math.floor(gt / 3));
+  document.getElementById('uniqueCount').textContent = Math.max(1, Math.floor(gt/3));
 }
 
 // ============================================================
@@ -1288,122 +1263,236 @@ var PIG_TITLES = [
   '·猪中贵族','·野生猪猪','·猪猪公主','·猪猪王子','·网易猪场代言人',
   '·猪猪星球移民','·猪斯拉','·猪古力','·猪猪特工','·猪因斯坦'
 ];
-
 function generatePigName() {
-  var s = loadStats(); var total = BASE_STATS.total + s.total;
-  var idx = total % PIG_FIRST.length;
-  var first = PIG_FIRST[idx];
+  var s = loadStats(), total = BASE_STATS.total + s.total;
+  var idx = total % PIG_FIRST.length, first = PIG_FIRST[idx];
   var titleIdx = (total * 7 + s.know * 3 + s.dunno * 11) % PIG_TITLES.length;
-  var title = PIG_TITLES[titleIdx].replace('#NO#', 100 + Math.floor(total / 5) * 50 + (s.know * 7));
-  return first + title;
+  return first + PIG_TITLES[titleIdx].replace('#NO#', 100 + Math.floor(total/5)*50 + s.know*7);
 }
-
-// ============================================================
-// VOICE MODES
-// ============================================================
-var voiceModes = [
-  { emoji:'🐷', name:'猪猪模式',   pitch:1.4, rate:1.05, vol:0.9 },
-  { emoji:'🤡', name:'小丑模式',   pitch:2.4, rate:1.25, vol:0.8 },
-  { emoji:'👹', name:'恶魔模式',   pitch:0.35, rate:0.7, vol:1.0 },
-  { emoji:'🤖', name:'机器人模式', pitch:0.75, rate:0.95, vol:0.85 },
-  { emoji:'🐿️', name:'花栗鼠模式', pitch:3.0, rate:1.6, vol:0.65 },
-  { emoji:'🎤', name:'大喇叭模式', pitch:0.95, rate:0.9, vol:1.0 },
-];
-function getVoiceMode() { return voiceModes[voiceMode]; }
 
 // ============================================================
 // HAPTICS
 // ============================================================
-function haptic(pattern) {
+function haptic(p) {
   if (!navigator.vibrate) return;
-  switch(pattern) {
-    case 'tap': navigator.vibrate(10); break;
-    case 'double': navigator.vibrate([10,40,10]); break;
-    case 'success': navigator.vibrate([15,50,15,50,30]); break;
-    case 'warn': navigator.vibrate([30,40,30,40,30]); break;
-    case 'long': navigator.vibrate(100); break;
-    default: navigator.vibrate(pattern);
-  }
+  switch(p) { case 'tap':navigator.vibrate(10);break; case 'double':navigator.vibrate([10,40,10]);break; case 'success':navigator.vibrate([15,50,15,50,30]);break; case 'warn':navigator.vibrate([30,40,30,40,30]);break; case 'long':navigator.vibrate(100);break; default:navigator.vibrate(p); }
 }
 
 // ============================================================
 // TOAST
 // ============================================================
-function showToast(msg, duration) {
-  var container = document.getElementById('toastContainer');
-  var t = document.createElement('div'); t.className = 'toast'; t.textContent = msg;
-  container.appendChild(t);
-  setTimeout(function(){ t.style.opacity='0'; t.style.transition='opacity 0.3s'; setTimeout(function(){ t.remove(); },300); }, duration||2000);
+function showToast(msg, dur) {
+  var c = document.getElementById('toastContainer'), t = document.createElement('div');
+  t.className = 'toast'; t.textContent = msg; c.appendChild(t);
+  setTimeout(function(){ t.style.opacity='0'; t.style.transition='opacity 0.3s'; setTimeout(function(){ t.remove(); },300); }, dur||2000);
 }
 
 // ============================================================
 // ACHIEVEMENT SYSTEM
 // ============================================================
 var ACHIEVEMENTS = [
-  { id:'runner',    icon:'🏃', name:'逃跑大师',   desc:'逃跑20次以上',   check:function(a){return a.escapes>=20;}, progress:function(a){return Math.min(a.escapes,20)+'/20';} },
-  { id:'speed',     icon:'🎯', name:'手速达人',   desc:'3秒内点中逃跑按钮', check:function(a){return a.fastCatch;}, progress:function(a){return a.fastCatch?'✅':(a.escapes>0?'再接再厉':'试试抓按钮');} },
-  { id:'backer',    icon:'🔄', name:'反复横跳',   desc:'返回重选5次',   check:function(a){return a.backs>=5;}, progress:function(a){return Math.min(a.backs,5)+'/5';} },
-  { id:'honest',    icon:'🐷', name:'诚实猪猪',   desc:'第一次就点知道', check:function(a){return a.honestFirst;}, progress:function(a){return a.honestFirst?'✅':(a.totalClicks>0?'已选其他':'直接点「知道」试试');} },
-  { id:'konami',    icon:'🎮', name:'科乐美大师', desc:'触发科乐美秘技', check:function(a){return a.konami;}, progress:function(a){return a.konami?'✅':'↑↑↓↓←→←→BA';} },
-  { id:'rainbow',   icon:'🌈', name:'彩虹猪猪',   desc:'标题连点7次触发彩虹', check:function(a){return a.rainbow;}, progress:function(a){return a.rainbow?'✅':'连戳标题7下';} },
-  { id:'shaker',    icon:'📳', name:'摇摇乐',     desc:'摇晃手机10次',  check:function(a){return a.shakes>=10;}, progress:function(a){return Math.min(a.shakes,10)+'/10';} },
-  { id:'screamer',  icon:'🎤', name:'河东狮吼',   desc:'吼叫达到猪猪标准', check:function(a){return a.screamPassed;}, progress:function(a){return a.screamPassed?'✅':(a.screamTried?'再大声点！':'按住吼叫按钮');} },
+  { id:'runner',   icon:'🏃', name:'逃跑大师',  desc:'逃跑20次以上',                   check:function(a){return a.escapes>=20;}, progress:function(a){return Math.min(a.escapes,20)+'/20';} },
+  { id:'speed',    icon:'🎯', name:'手速达人',  desc:'3秒内点中逃跑按钮',              check:function(a){return a.fastCatch;}, progress:function(a){return a.fastCatch?'✅':(a.escapes>0?'再接再厉':'试试抓按钮');} },
+  { id:'backer',   icon:'🔄', name:'反复横跳',  desc:'返回重选5次',                    check:function(a){return a.backs>=5;}, progress:function(a){return Math.min(a.backs,5)+'/5';} },
+  { id:'honest',   icon:'🐷', name:'诚实猪猪',  desc:'第一次就点知道',                 check:function(a){return a.honestFirst;}, progress:function(a){return a.honestFirst?'✅':(a.totalClicks>0?'已选其他':'直接点「知道」试试');} },
+  { id:'konami',   icon:'🎮', name:'科乐美大师',desc:'触发科乐美秘技',                 check:function(a){return a.konami;}, progress:function(a){return a.konami?'✅':'↑↑↓↓←→←→BA';} },
+  { id:'rainbow',  icon:'🌈', name:'彩虹猪猪',  desc:'标题连点7次触发彩虹',            check:function(a){return a.rainbow;}, progress:function(a){return a.rainbow?'✅':'连戳标题7下';} },
+  { id:'shaker',   icon:'📳', name:'摇摇乐',    desc:'摇晃手机10次',                   check:function(a){return a.shakes>=10;}, progress:function(a){return Math.min(a.shakes,10)+'/10';} },
+  { id:'screamer', icon:'🎤', name:'河东狮吼',  desc:'吼叫达到猪猪标准',               check:function(a){return a.screamPassed;}, progress:function(a){return a.screamPassed?'✅':(a.screamTried?'再大声点！':'按住吼叫按钮');} },
 ];
-function loadAchievements() {
-  try { return JSON.parse(localStorage.getItem('pig_achievements')) || {}; } catch(e) { return {}; }
-}
+function loadAchievements() { try { return JSON.parse(localStorage.getItem('pig_achievements')) || {}; } catch(e) { return {}; } }
 function saveAchievement(id) {
-  var a = loadAchievements();
-  if (a[id]) return false;
-  var ach = null;
-  for (var i = 0; i < ACHIEVEMENTS.length; i++) { if (ACHIEVEMENTS[i].id === id) { ach = ACHIEVEMENTS[i]; break; } }
+  var a = loadAchievements(); if (a[id]) return false;
+  var ach = null; for (var i=0;i<ACHIEVEMENTS.length;i++) { if (ACHIEVEMENTS[i].id===id) { ach=ACHIEVEMENTS[i]; break; } }
   a[id] = { unlockedAt: Date.now(), icon: ach?ach.icon:'🏆', name: ach?ach.name:id, desc: ach?ach.desc:'' };
   localStorage.setItem('pig_achievements', JSON.stringify(a));
   showToast((ach?ach.icon:'🏆')+' 成就解锁：'+(ach?ach.name:id)+'！', 3000);
-  haptic('success');
-  updateAchievementBadge();
+  haptic('success'); updateAchievementBadge(); screenShake('light');
   return true;
 }
 function getAchievementData() {
   var a = loadAchievements();
   return {
-    escapes: escapeCount, fastCatch: escapeStartTime > 0 && (Date.now() - escapeStartTime < 3000) && escapeCount > 0,
-    backs: backCount, totalClicks: loadStats().total, honestFirst: loadStats().know === 1 && loadStats().total === 1,
+    escapes: escapeCount, fastCatch: escapeStartTime>0 && (Date.now()-escapeStartTime<3000) && escapeCount>0,
+    backs: backCount, totalClicks: loadStats().total, honestFirst: loadStats().know===1 && loadStats().total===1,
     konami: !!a.konami, rainbow: !!a.rainbow, shakes: shakeCount,
-    screamPassed: a.screamer||false, screamTried: !!a.screamTried
+    screamPassed: !!a.screamer, screamTried: !!a.screamTried
   };
 }
 function checkAchievements() {
   var data = getAchievementData(), stored = loadAchievements();
-  for (var i = 0; i < ACHIEVEMENTS.length; i++) {
-    var ach = ACHIEVEMENTS[i];
-    if (!stored[ach.id] && ach.check(data)) { saveAchievement(ach.id); stored[ach.id] = true; }
-  }
+  for (var i=0;i<ACHIEVEMENTS.length;i++) { var ach=ACHIEVEMENTS[i]; if (!stored[ach.id] && ach.check(data)) { saveAchievement(ach.id); stored[ach.id]=true; } }
 }
 function renderAchievementList() {
   var data = getAchievementData(), stored = loadAchievements(), html = '';
-  for (var i = 0; i < ACHIEVEMENTS.length; i++) {
-    var ach = ACHIEVEMENTS[i], unlocked = !!stored[ach.id];
-    html += '<div class="ach-item '+(unlocked?'unlocked':'locked')+'">'
-      + '<span class="ach-icon">'+(unlocked?ach.icon:'🔒')+'</span>'
-      + '<div class="ach-info"><div class="ach-name">'+ach.name+'</div><div class="ach-desc">'+ach.desc+'</div>'
-      + (unlocked?'<div class="ach-progress">已解锁 ✅</div>':'<div class="ach-progress">'+ach.progress(data)+'</div>')
-      + '</div></div>';
+  for (var i=0;i<ACHIEVEMENTS.length;i++) {
+    var ach=ACHIEVEMENTS[i], unlocked=!!stored[ach.id];
+    html+='<div class="ach-item '+(unlocked?'unlocked':'locked')+'"><span class="ach-icon">'+(unlocked?ach.icon:'🔒')+'</span><div class="ach-info"><div class="ach-name">'+ach.name+'</div><div class="ach-desc">'+ach.desc+'</div>'+(unlocked?'<div class="ach-progress">已解锁 ✅</div>':'<div class="ach-progress">'+ach.progress(data)+'</div>')+'</div></div>';
   }
   document.getElementById('achList').innerHTML = html;
 }
-function openAchievementPanel() {
-  renderAchievementList();
-  document.getElementById('achPanelOverlay').style.display = 'flex';
-}
-function closeAchievementPanel() { document.getElementById('achPanelOverlay').style.display = 'none'; }
-function maybeCloseAchPanel(e) { if (e.target === document.getElementById('achPanelOverlay')) closeAchievementPanel(); }
+function openAchievementPanel() { renderAchievementList(); document.getElementById('achPanelOverlay').style.display='flex'; }
+function closeAchievementPanel() { document.getElementById('achPanelOverlay').style.display='none'; }
+function maybeCloseAchPanel(e) { if (e.target===document.getElementById('achPanelOverlay')) closeAchievementPanel(); }
 function updateAchievementBadge() {
-  var data = getAchievementData(), stored = loadAchievements(), newCount = 0;
-  for (var i = 0; i < ACHIEVEMENTS.length; i++) { if (ACHIEVEMENTS[i].check(data) && !stored[ACHIEVEMENTS[i].id]) newCount++; }
-  var btn = document.getElementById('achievementBtn');
-  if (newCount > 0) { btn.classList.add('has-new'); btn.title = newCount+'个新成就待解锁！'; }
-  else { btn.classList.remove('has-new'); btn.title = '猪猪成就'; }
+  var data=getAchievementData(), stored=loadAchievements(), newCount=0;
+  for (var i=0;i<ACHIEVEMENTS.length;i++) { if (ACHIEVEMENTS[i].check(data) && !stored[ACHIEVEMENTS[i].id]) newCount++; }
+  var btn=document.getElementById('achievementBtn');
+  if (newCount>0) { btn.classList.add('has-new'); btn.title=newCount+'个新成就待解锁！'; }
+  else { btn.classList.remove('has-new'); btn.title='猪猪成就'; }
+}
+
+// ============================================================
+// SCREEN SHAKE
+// ============================================================
+function screenShake(intensity) {
+  var cls = intensity === 'light' ? 'screen-shake-light' : 'screen-shake';
+  document.body.classList.add(cls);
+  setTimeout(function(){ document.body.classList.remove(cls); }, intensity==='light'?300:400);
+}
+
+// ============================================================
+// PULSE RING — expanding rings at a position
+// ============================================================
+function spawnPulseRing(parent, x, y) {
+  var ring = document.createElement('div'); ring.className = 'pulse-ring';
+  ring.style.left = x + 'px'; ring.style.top = y + 'px';
+  parent.appendChild(ring);
+  setTimeout(function(){ ring.remove(); }, 700);
+}
+
+// ============================================================
+// PARTICLE BURST — explosion from a point
+// ============================================================
+function spawnParticleBurst(x, y, count, emojis) {
+  count = count || 30; emojis = emojis || ['🐷','✨','💥','🌟','💖','🎉','🐽','🎵'];
+  for (var i = 0; i < count; i++) {
+    var p = document.createElement('span'); p.className = 'burst-particle';
+    p.textContent = emojis[Math.floor(Math.random()*emojis.length)];
+    var angle = Math.random() * Math.PI * 2, dist = 60 + Math.random() * 160;
+    p.style.setProperty('--dx', Math.cos(angle) * dist + 'px');
+    p.style.setProperty('--dy', Math.sin(angle) * dist + 'px');
+    p.style.left = x + 'px'; p.style.top = y + 'px';
+    p.style.fontSize = (14 + Math.random() * 24) + 'px';
+    p.style.animationDuration = (0.7 + Math.random() * 0.8) + 's';
+    document.body.appendChild(p);
+    setTimeout(function(){ p.remove(); }, 1600);
+  }
+}
+
+// ============================================================
+// BUTTON SPARK LINE
+// ============================================================
+function spawnSparkBetween(el1, el2) {
+  var r1 = el1.getBoundingClientRect(), r2 = el2.getBoundingClientRect();
+  var x1 = r1.left + r1.width/2, y1 = r1.top + r1.height/2;
+  var x2 = r2.left + r2.width/2, y2 = r2.top + r2.height/2;
+  var dist = Math.sqrt((x2-x1)*(x2-x1) + (y2-y1)*(y2-y1));
+  var steps = Math.floor(dist / 8);
+  for (var i = 0; i < steps; i++) {
+    var t = i / steps, sx = x1 + (x2-x1)*t + (Math.random()-0.5)*20, sy = y1 + (y2-y1)*t + (Math.random()-0.5)*20;
+    var spark = document.createElement('div'); spark.className = 'btn-spark';
+    spark.style.left = sx + 'px'; spark.style.top = sy + 'px';
+    spark.style.animationDelay = Math.random() * 0.25 + 's';
+    spark.style.animationDuration = (0.2 + Math.random() * 0.3) + 's';
+    document.body.appendChild(spark);
+    setTimeout(function(){ spark.remove(); }, 600);
+  }
+}
+
+// ============================================================
+// RAINBOW TRAIL — behind the dunno button
+// ============================================================
+function spawnRainbowTrail(btn) {
+  var r = btn.getBoundingClientRect();
+  var colors = ['#ff6b6b','#feca57','#48dbfb','#ff9ff3','#54a0ff','#5f27cd','#ff6b6b'];
+  for (var i = 0; i < 5; i++) {
+    var t = document.createElement('span'); t.className = 'rainbow-trail';
+    t.style.left = (r.left + r.width/2 + (Math.random()-0.5)*50) + 'px';
+    t.style.top = (r.top + r.height/2 + (Math.random()-0.5)*50) + 'px';
+    t.style.width = (6 + Math.random()*10) + 'px'; t.style.height = t.style.width;
+    t.style.background = colors[Math.floor(Math.random()*colors.length)];
+    t.style.boxShadow = '0 0 8px ' + t.style.background;
+    t.style.position = 'fixed';
+    document.body.appendChild(t);
+    setTimeout(function(){ t.remove(); }, 500);
+  }
+}
+
+// ============================================================
+// CURSOR PIG TRAIL
+// ============================================================
+function spawnCursorTrail(x, y) {
+  var emojis = ['🐷','🐽','🐗','🐖','✨','💫'];
+  var t = document.createElement('span'); t.className = 'cursor-trail';
+  t.textContent = emojis[Math.floor(Math.random()*emojis.length)];
+  t.style.left = x + 'px'; t.style.top = y + 'px';
+  t.style.fontSize = (10 + Math.random() * 14) + 'px';
+  document.body.appendChild(t);
+  setTimeout(function(){ t.remove(); }, 600);
+  // Limit total trails
+  var all = document.querySelectorAll('.cursor-trail');
+  if (all.length > 18) { for (var i = 0; i < 3 && all[i]; i++) all[i].remove(); }
+}
+
+document.addEventListener('mousemove', function(e) {
+  if (!pageReady) return;
+  var now = Date.now();
+  if (now - lastCursorTime > 60) { spawnCursorTrail(e.clientX, e.clientY); lastCursorTime = now; }
+});
+document.addEventListener('touchmove', function(e) {
+  if (!pageReady) return;
+  var now = Date.now(), t = e.touches[0];
+  if (now - lastCursorTime > 80) { spawnCursorTrail(t.clientX, t.clientY); lastCursorTime = now; }
+}, { passive: true });
+
+// ============================================================
+// PIG PARADE — background pig marchers
+// ============================================================
+function spawnPigParade() {
+  var top = 15 + Math.random() * 75;
+  var count = 3 + Math.floor(Math.random() * 5);
+  var pigs = '';
+  for (var i = 0; i < count; i++) pigs += ['🐷','🐽','🐗','🐖'][Math.floor(Math.random()*4)] + ' ';
+  var p = document.createElement('div'); p.className = 'pig-parade';
+  p.textContent = pigs;
+  p.style.setProperty('--top', top + '%');
+  p.style.setProperty('--speed', (8 + Math.random() * 14) + 's');
+  p.style.top = top + '%';
+  if (Math.random() > 0.5) { p.style.right = '0'; p.style.animationName = 'none'; p.style.animation = 'pigMarch ' + (8+Math.random()*14) + 's linear forwards'; p.style.animationDirection = 'reverse'; }
+  document.body.appendChild(p);
+  var dur = parseFloat(p.style.getPropertyValue('--speed')) * 1000;
+  setTimeout(function(){ p.remove(); }, dur + 500);
+}
+function startPigParade() {
+  spawnPigParade();
+  paradeTimer = setInterval(function(){ if (Math.random() > 0.4) spawnPigParade(); }, 9000);
+}
+
+// ============================================================
+// RANDOM METEORS
+// ============================================================
+function spawnMeteor() {
+  var m = document.createElement('div'); m.className = 'meteor';
+  m.style.left = (10 + Math.random() * 80) + '%';
+  m.style.top = -(Math.random() * 40) + 'px';
+  m.style.animationDuration = (1 + Math.random() * 1.5) + 's';
+  document.body.appendChild(m);
+  setTimeout(function(){ m.remove(); }, 2500);
+}
+var meteorTimer = null;
+function startMeteors() { meteorTimer = setInterval(function(){ if (Math.random()>0.6) spawnMeteor(); }, 4000); }
+
+// ============================================================
+// STARFIELD INIT
+// ============================================================
+function initStarfield() {
+  var sf = document.getElementById('starfield'), html = '';
+  for (var i = 0; i < 30; i++) {
+    var size = 1 + Math.random() * 2.5;
+    html += '<div class="star" style="left:'+(Math.random()*100)+'%;top:'+(Math.random()*100)+'%;width:'+size+'px;height:'+size+'px;--dur:'+(1.5+Math.random()*3)+'s;--delay:'+(Math.random()*4)+'s;"></div>';
+  }
+  sf.innerHTML = html;
 }
 
 // ============================================================
@@ -1413,36 +1502,24 @@ var lastShakeTime = 0;
 function initShakeDetector() {
   if (typeof DeviceMotionEvent === 'undefined') return;
   if (typeof DeviceMotionEvent.requestPermission === 'function') {
-    // iOS 13+ needs permission. We'll request it on first user interaction.
     document.addEventListener('click', function askMotion(){
       DeviceMotionEvent.requestPermission().then(function(r){
-        if (r === 'granted') window.addEventListener('devicemotion', handleMotion);
+        if (r==='granted') window.addEventListener('devicemotion', handleMotion);
       }).catch(function(){});
     }, { once: true });
-  } else {
-    window.addEventListener('devicemotion', handleMotion);
-  }
+  } else { window.addEventListener('devicemotion', handleMotion); }
 }
 function handleMotion(e) {
   var acc = e.accelerationIncludingGravity; if (!acc) return;
-  var mag = Math.sqrt((acc.x||0)*(acc.x||0) + (acc.y||0)*(acc.y||0) + (acc.z||0)*(acc.z||0));
-  if (mag > 20) {
-    var now = Date.now(); if (now - lastShakeTime < 600) return; lastShakeTime = now;
-    shakeCount++;
-    onShake();
-  }
+  var mag = Math.sqrt((acc.x||0)*(acc.x||0)+(acc.y||0)*(acc.y||0)+(acc.z||0)*(acc.z||0));
+  if (mag > 20) { var now=Date.now(); if (now-lastShakeTime<600) return; lastShakeTime=now; shakeCount++; onShake(); }
 }
 function onShake() {
   if (!pageReady) return;
-  haptic('warn');
-  teleportDunnoBtn();
-  var msgs = ['📳 摇手机也没用！','📳 摇不掉的~','📳 猪猪纹丝不动','📳 你以为你是搅拌机？','📳 摇摇乐！但你还是猪'];
-  showToast(msgs[Math.floor(Math.random()*msgs.length)], 1800);
-  if (shakeCount === 3) speak('摇手机也没用！你还是猪！');
+  haptic('warn'); teleportDunnoBtn(); screenShake('light');
+  showToast(['📳 摇手机也没用！','📳 摇不掉的~','📳 猪猪纹丝不动','📳 你以为你是搅拌机？','📳 摇摇乐！但你还是猪'][Math.floor(Math.random()*5)], 1800);
   if (shakeCount >= 10) saveAchievement('shaker');
-  // Update achievement progress
-  var a = loadAchievements(); a.screamTried = a.screamTried || false;
-  localStorage.setItem('pig_achievements', JSON.stringify(a));
+  var a = loadAchievements(); a.screamTried = a.screamTried || false; localStorage.setItem('pig_achievements', JSON.stringify(a));
   checkAchievements();
 }
 function teleportDunnoBtn() {
@@ -1451,8 +1528,9 @@ function teleportDunnoBtn() {
   var box = document.getElementById('mainBox'), br = box.getBoundingClientRect();
   var pad = 35;
   btn.style.position = 'absolute';
-  btn.style.left = Math.max(pad, Math.min(Math.random() * (br.width - (btn.offsetWidth||100) - pad), br.width - (btn.offsetWidth||100) - pad)) + 'px';
-  btn.style.top = Math.max(pad, Math.min(Math.random() * (br.height - (btn.offsetHeight||50) - pad), br.height - (btn.offsetHeight||50) - pad)) + 'px';
+  btn.style.left = Math.max(pad, Math.min(Math.random()*(br.width-(btn.offsetWidth||100)-pad), br.width-(btn.offsetWidth||100)-pad)) + 'px';
+  btn.style.top = Math.max(pad, Math.min(Math.random()*(br.height-(btn.offsetHeight||50)-pad), br.height-(btn.offsetHeight||50)-pad)) + 'px';
+  spawnRainbowTrail(btn);
 }
 
 // ============================================================
@@ -1465,22 +1543,16 @@ function startScream(e) {
   document.getElementById('screamMeter').style.width = '0%';
   document.getElementById('screamLabel').textContent = '🎤 正在听...';
   document.getElementById('screamLabel').classList.remove('loud');
-
-  if (micStream) { stopMic(); }
+  if (micStream) stopMic();
   var ctx = getAudioCtx();
-  navigator.mediaDevices.getUserMedia({ audio: true, video: false }).then(function(stream){
-    micStream = stream;
-    micAnalyser = ctx.createAnalyser();
-    micAnalyser.fftSize = 256;
-    var source = ctx.createMediaStreamSource(stream);
-    source.connect(micAnalyser);
-    // Don't connect to destination — we don't want feedback
+  navigator.mediaDevices.getUserMedia({ audio:true, video:false }).then(function(stream){
+    micStream = stream; micAnalyser = ctx.createAnalyser(); micAnalyser.fftSize = 256;
+    var source = ctx.createMediaStreamSource(stream); source.connect(micAnalyser);
     readMicLevel();
-  }).catch(function(err){
+  }).catch(function(){
     document.getElementById('screamLabel').textContent = '🎤 麦克风不可用（权限未授予）';
     document.getElementById('screamBtn').classList.remove('active');
     document.getElementById('screamMeterWrap').classList.remove('active');
-    // Track attempt anyway
     var a = loadAchievements(); a.screamTried = true; localStorage.setItem('pig_achievements', JSON.stringify(a));
   });
 }
@@ -1493,33 +1565,22 @@ function stopScream(e) {
   var level = parseFloat(meter.style.width) || 0;
   if (level > 80) {
     label.textContent = '🐷 你就是猪！喊这么大声！'; label.classList.add('loud');
-    saveAchievement('screamer');
-    speak('喊这么大声，你果然是猪！');
-    showToast('🎤 河东狮吼！你就是猪！', 2500);
-    sprayConfetti();
-    mascotLaugh();
-  } else if (level > 30) {
-    label.textContent = '😏 还不够，再大声点！';
-    speak('还不够大声，猪都比你响');
-  } else if (level > 0) {
-    label.textContent = '🤫 就这？蚊子都比你有气势';
-  } else {
-    label.textContent = '按住按钮，对着手机喊「我不是猪」';
-  }
-  // Track attempt
+    saveAchievement('screamer'); showToast('🎤 河东狮吼！你就是猪！', 2500);
+    sprayConfetti(); mascotLaugh(); screenShake();
+  } else if (level > 30) { label.textContent = '😏 还不够，再大声点！'; }
+  else if (level > 0) { label.textContent = '🤫 就这？蚊子都比你有气势'; }
+  else { label.textContent = '按住按钮，对着手机喊「我不是猪」'; }
   var a = loadAchievements(); a.screamTried = true; localStorage.setItem('pig_achievements', JSON.stringify(a));
   checkAchievements();
 }
 function readMicLevel() {
   if (!micAnalyser) return;
-  var data = new Uint8Array(micAnalyser.frequencyBinCount);
-  micAnalyser.getByteFrequencyData(data);
-  var sum = 0; for (var i = 0; i < data.length; i++) sum += data[i];
-  var avg = sum / data.length;
-  var pct = Math.min(100, Math.round((avg / 128) * 100));
-  document.getElementById('screamMeter').style.width = pct + '%';
-  document.getElementById('screamLabel').textContent = pct > 80 ? '🔥 ' + pct + '% — 猪吼级别！' : (pct > 30 ? '📢 ' + pct + '%' : '🎤 ' + pct + '%');
-  if (pct > 80) document.getElementById('screamLabel').classList.add('loud');
+  var data = new Uint8Array(micAnalyser.frequencyBinCount); micAnalyser.getByteFrequencyData(data);
+  var sum = 0; for (var i=0;i<data.length;i++) sum+=data[i];
+  var pct = Math.min(100, Math.round((sum/data.length/128)*100));
+  document.getElementById('screamMeter').style.width = pct+'%';
+  document.getElementById('screamLabel').textContent = pct>80?'🔥 '+pct+'% — 猪吼级别！':(pct>30?'📢 '+pct+'%':'🎤 '+pct+'%');
+  if (pct>80) document.getElementById('screamLabel').classList.add('loud');
   micAnimId = requestAnimationFrame(readMicLevel);
 }
 function stopMic() {
@@ -1541,106 +1602,52 @@ function getAudioCtx() {
 // MUSIC ENGINE
 // ============================================================
 function MusicEngine() {
-  var ctx = getAudioCtx();
-  var gain = ctx.createGain();
-  gain.gain.value = 0.06;
-  gain.connect(ctx.destination);
-  var bpm = 115, beatMs = 60000 / bpm / 2;
-  var seqTimer = null, step = 0, running = false;
-
-  function kick(t) {
-    var o = ctx.createOscillator(), g = ctx.createGain();
-    o.type = 'sine'; o.frequency.setValueAtTime(150, t);
-    o.frequency.exponentialRampToValueAtTime(40, t + 0.12);
-    g.gain.setValueAtTime(0.5, t); g.gain.exponentialRampToValueAtTime(0.001, t + 0.2);
-    o.connect(g); g.connect(gain); o.start(t); o.stop(t + 0.2);
-  }
-  function snare(t) {
-    var o = ctx.createOscillator(), g = ctx.createGain();
-    o.type = 'triangle'; o.frequency.setValueAtTime(200, t);
-    o.frequency.exponentialRampToValueAtTime(100, t + 0.08);
-    g.gain.setValueAtTime(0.3, t); g.gain.exponentialRampToValueAtTime(0.001, t + 0.12);
-    o.connect(g); g.connect(gain); o.start(t); o.stop(t + 0.12);
-  }
-  function hihat(t) {
-    var o = ctx.createOscillator(), g = ctx.createGain();
-    o.type = 'square'; o.frequency.setValueAtTime(800, t);
-    g.gain.setValueAtTime(0.08, t); g.gain.exponentialRampToValueAtTime(0.001, t + 0.04);
-    o.connect(g); g.connect(gain); o.start(t); o.stop(t + 0.04);
-  }
-  function bass(t, freq) {
-    var o = ctx.createOscillator(), g = ctx.createGain();
-    o.type = 'triangle'; o.frequency.setValueAtTime(freq, t);
-    g.gain.setValueAtTime(0.25, t); g.gain.exponentialRampToValueAtTime(0.001, t + 0.3);
-    o.connect(g); g.connect(gain); o.start(t); o.stop(t + 0.3);
-  }
-  function melody(t, freq) {
-    var o = ctx.createOscillator(), g = ctx.createGain();
-    o.type = 'sine'; o.frequency.setValueAtTime(freq, t);
-    g.gain.setValueAtTime(0.1, t); g.gain.exponentialRampToValueAtTime(0.001, t + 0.25);
-    o.connect(g); g.connect(gain); o.start(t); o.stop(t + 0.25);
-  }
-  var bassNotes = [130.8,155.6,174.6,196,155.6,174.6,196,233.1,130.8,155.6,174.6,196,233.1,196,174.6,155.6];
-  var melNotes = [523,587,622,698,784,932,1047,784];
-
-  function sequencer() {
-    if (!running) return;
-    var now = ctx.currentTime + 0.05;
-    if (step % 2 === 0 && step % 4 !== 2) kick(now);
-    if (step === 4 || step === 12) snare(now + 0.005);
-    hihat(now + 0.01);
-    if (step % 2 === 0) hihat(now + beatMs / 1000 / 2);
-    bass(now, bassNotes[step % bassNotes.length]);
-    if (step % 32 === 0) { for (var m = 0; m < 8; m++) melody(now + m * 0.25, melNotes[m]); }
-    step = (step + 1) % 64;
-    seqTimer = setTimeout(sequencer, beatMs);
-  }
-
-  this.start = function() { if (running) return; running = true; step = 0; sequencer(); };
-  this.stop = function() { running = false; clearTimeout(seqTimer); };
-  this.setVolume = function(v) { gain.gain.value = v; };
-  this.isRunning = function() { return running; };
+  var ctx = getAudioCtx(), gain = ctx.createGain(); gain.gain.value = 0.06; gain.connect(ctx.destination);
+  var bpm = 115, beatMs = 60000/bpm/2, seqTimer = null, step = 0, running = false;
+  function kick(t) { var o=ctx.createOscillator(),g=ctx.createGain(); o.type='sine'; o.frequency.setValueAtTime(150,t); o.frequency.exponentialRampToValueAtTime(40,t+0.12); g.gain.setValueAtTime(0.5,t); g.gain.exponentialRampToValueAtTime(0.001,t+0.2); o.connect(g);g.connect(gain); o.start(t);o.stop(t+0.2); }
+  function snare(t) { var o=ctx.createOscillator(),g=ctx.createGain(); o.type='triangle'; o.frequency.setValueAtTime(200,t); o.frequency.exponentialRampToValueAtTime(100,t+0.08); g.gain.setValueAtTime(0.3,t); g.gain.exponentialRampToValueAtTime(0.001,t+0.12); o.connect(g);g.connect(gain); o.start(t);o.stop(t+0.12); }
+  function hihat(t) { var o=ctx.createOscillator(),g=ctx.createGain(); o.type='square'; o.frequency.setValueAtTime(800,t); g.gain.setValueAtTime(0.08,t); g.gain.exponentialRampToValueAtTime(0.001,t+0.04); o.connect(g);g.connect(gain); o.start(t);o.stop(t+0.04); }
+  function bass(t,f) { var o=ctx.createOscillator(),g=ctx.createGain(); o.type='triangle'; o.frequency.setValueAtTime(f,t); g.gain.setValueAtTime(0.25,t); g.gain.exponentialRampToValueAtTime(0.001,t+0.3); o.connect(g);g.connect(gain); o.start(t);o.stop(t+0.3); }
+  function melody(t,f) { var o=ctx.createOscillator(),g=ctx.createGain(); o.type='sine'; o.frequency.setValueAtTime(f,t); g.gain.setValueAtTime(0.1,t); g.gain.exponentialRampToValueAtTime(0.001,t+0.25); o.connect(g);g.connect(gain); o.start(t);o.stop(t+0.25); }
+  var bN = [130.8,155.6,174.6,196,155.6,174.6,196,233.1,130.8,155.6,174.6,196,233.1,196,174.6,155.6];
+  var mN = [523,587,622,698,784,932,1047,784];
+  function seq() { if (!running) return; var now=ctx.currentTime+0.05; if (step%2===0&&step%4!==2) kick(now); if (step===4||step===12) snare(now+0.005); hihat(now+0.01); if (step%2===0) hihat(now+beatMs/1000/2); bass(now,bN[step%bN.length]); if (step%32===0) { for (var m=0;m<8;m++) melody(now+m*0.25,mN[m]); } step=(step+1)%64; seqTimer=setTimeout(seq,beatMs); }
+  this.start = function(){ if(running)return; running=true;step=0;seq(); };
+  this.stop = function(){ running=false;clearTimeout(seqTimer); };
+  this.setVolume = function(v){ gain.gain.value=v; };
+  this.isRunning = function(){ return running; };
 }
 
 function startMusic() {
   if (!musicOn) return;
   if (!musicEngine) musicEngine = new MusicEngine();
   musicEngine.start();
-  document.getElementById('musicToggle').className = 'music-toggle on';
-  document.getElementById('musicToggle').textContent = '🎵 电台BGM';
+  var btn = document.getElementById('musicToggle'); btn.className = 'music-toggle on'; btn.textContent = '🎵 电台BGM';
 }
 function stopMusic() {
   if (musicEngine) musicEngine.stop();
-  document.getElementById('musicToggle').className = 'music-toggle';
-  document.getElementById('musicToggle').textContent = '🔇 BGM关';
+  var btn = document.getElementById('musicToggle'); btn.className = 'music-toggle'; btn.textContent = '🔇 BGM关';
 }
-function toggleMusic() { musicOn = !musicOn; musicOn ? startMusic() : stopMusic(); haptic('tap'); }
+function toggleMusic() { musicOn=!musicOn; musicOn?startMusic():stopMusic(); haptic('tap'); }
 
 // ============================================================
 // AUDIO VISUALIZER
 // ============================================================
 function initVisualizer() {
-  var cnt = document.getElementById('visualizer');
-  // Mobile: fewer bars
-  var isMobile = window.innerWidth < 480;
-  var n = isMobile ? 8 : 16;
-  var html = '';
-  for (var i = 0; i < n; i++) html += '<div class="visualizer-bar"></div>';
-  cnt.innerHTML = html;
-  visBars = cnt.querySelectorAll('.visualizer-bar');
+  var cnt = document.getElementById('visualizer'), isMobile = window.innerWidth < 480, n = isMobile ? 8 : 16, html = '';
+  for (var i=0;i<n;i++) html += '<div class="visualizer-bar"></div>';
+  cnt.innerHTML = html; visBars = cnt.querySelectorAll('.visualizer-bar');
 }
 function startVisualizer() { document.getElementById('visualizer').classList.add('active'); if (!visualizerTimer) animateVisualizer(); }
 function stopVisualizer() { document.getElementById('visualizer').classList.remove('active'); }
-
 function animateVisualizer() {
   if (!document.getElementById('visualizer').classList.contains('active')) { visualizerTimer = null; return; }
-  visBars.forEach(function(bar, i) {
-    var base = 0.15 + Math.random() * 0.25;
-    if (isSpeaking) base += 0.3 + Math.random() * 0.4;
+  visBars.forEach(function(bar,i){
+    var base = 0.15 + Math.random()*0.25;
     if (musicEngine && musicEngine.isRunning()) base += 0.15;
     if (micAnalyser) base += 0.35;
-    var wave = Math.sin(Date.now() / 200 + i * 0.4) * 0.3 + 0.5;
-    bar.style.height = Math.max(4, Math.min(50, base * 50 * wave * (0.5 + Math.random()))) + 'px';
+    var wave = Math.sin(Date.now()/200+i*0.4)*0.3+0.5;
+    bar.style.height = Math.max(4, Math.min(50, base*50*wave*(0.5+Math.random()))) + 'px';
   });
   visualizerTimer = requestAnimationFrame(animateVisualizer);
 }
@@ -1651,196 +1658,42 @@ function animateVisualizer() {
 var mascotBubbleTimer = null;
 function mascotSet(state, bubbleText) {
   var m = document.getElementById('mascot'); m.className = 'mascot ' + state;
-  if (bubbleText) {
-    document.getElementById('mascotBubble').textContent = bubbleText;
-    clearTimeout(mascotBubbleTimer);
-    mascotBubbleTimer = setTimeout(function(){ document.getElementById('mascotBubble').textContent = '哼哼~'; }, 3000);
-  }
+  if (bubbleText) { document.getElementById('mascotBubble').textContent = bubbleText; clearTimeout(mascotBubbleTimer); mascotBubbleTimer = setTimeout(function(){ document.getElementById('mascotBubble').textContent = '哼哼~'; }, 3000); }
 }
 function mascotIdle() { mascotSet('', '哼哼~'); }
 function mascotDance() { mascotSet('dancing', '🎵 动次打次！'); }
 function mascotLaugh() { mascotSet('laughing', '😂 哈哈哈哈！'); }
+function mascotAngry() { mascotSet('angry', '😡 气死猪了！'); }
 function mascotSurprise() { mascotSet('surprised', '😱 你居然！'); }
 
-document.getElementById('mascot').addEventListener('click', function(e) {
-  e.stopPropagation(); mascotSet('laughing', '别戳我！🐷💨'); oinkSound(); oinkSound(); haptic('double');
+document.getElementById('mascot').addEventListener('click', function(e){
+  e.stopPropagation(); mascotLaugh(); oinkSound(); oinkSound(); haptic('double');
 });
 
 // ============================================================
-// VOICE DISCOVERY
-// ============================================================
-function discoverVoices() {
-  var all = speechSynthesis.getVoices();
-  if (all.length === 0) return [];
-  var zh = all.filter(function(v) { return v.lang.indexOf('zh') === 0; });
-  if (zh.length === 0) zh = all.filter(function(v) { return v.lang.indexOf('zh') >= 0; });
-  if (zh.length === 0) return all;
-  zh.sort(function(a, b) { return voiceScore(b) - voiceScore(a); });
-  return zh;
-}
-function voiceScore(v) {
-  var s = 0, n = (v.name || '').toLowerCase();
-  if (n.indexOf('xiaoxiao') >= 0) s += 100;
-  if (n.indexOf('yunyang') >= 0) s += 95;
-  if (n.indexOf('yunxi') >= 0) s += 90;
-  if (n.indexOf('xiaoyi') >= 0) s += 85;
-  if (n.indexOf('neural') >= 0) s += 80;
-  if (n.indexOf('premium') >= 0) s += 75;
-  if (n.indexOf('enhanced') >= 0) s += 70;
-  if (n.indexOf('wavenet') >= 0) s += 70;
-  if ((v.lang || '').toLowerCase() === 'zh-cn') s += 50;
-  if (v.localService) s += 10;
-  if (n.indexOf('google') >= 0) s += 15;
-  return s;
-}
-function getVoiceTag(v) {
-  var n = (v.name || '').toLowerCase();
-  if (n.indexOf('neural') >= 0 || n.indexOf('xiaoxiao') >= 0 || n.indexOf('yunyang') >= 0
-    || n.indexOf('yunxi') >= 0 || n.indexOf('xiaoyi') >= 0 || n.indexOf('wavenet') >= 0)
-    return { cls:'neural', text:'🤖 神经网络' };
-  if (n.indexOf('premium') >= 0 || n.indexOf('enhanced') >= 0) return { cls:'hd', text:'✨ 高清' };
-  return { cls:'standard', text:'📻 标准' };
-}
-
-// ============================================================
-// SMART SPEAK
-// ============================================================
-function speak(text, forceMode) {
-  if (!voiceOn || !window.speechSynthesis) return;
-  speechSynthesis.cancel(); isSpeaking = false;
-  if (forceMode === undefined) voiceMode = Math.floor(Math.random() * voiceModes.length);
-  updateVoiceLabel(); startVisualizer();
-  if (musicEngine) musicEngine.setVolume(0.02);
-  var mode = getVoiceMode(), chunks = splitText(text);
-  speechQueue = chunks.slice(); isSpeaking = true;
-  playJingle();
-  setTimeout(function() { speakNextChunk(mode); }, 350);
-}
-function splitText(text) {
-  var raw = text.replace(/([，。！？、；：\n,!.?;:])/g, '$1|').split('|').filter(Boolean);
-  var chunks = [], buf = '';
-  raw.forEach(function(seg) {
-    if ((buf + seg).length > 18) { if (buf) chunks.push(buf.trim()); buf = seg; }
-    else buf += seg;
-  });
-  if (buf.trim()) chunks.push(buf.trim());
-  return chunks.length ? chunks : [text];
-}
-function speakNextChunk(mode) {
-  if (!isSpeaking || speechQueue.length === 0) { speechDone(); return; }
-  var u = new SpeechSynthesisUtterance(speechQueue.shift());
-  u.lang = 'zh-CN'; u.pitch = mode.pitch; u.rate = mode.rate; u.volume = mode.vol;
-  if (selectedVoice) u.voice = selectedVoice;
-  else { var best = getBestVoice(); if (best) u.voice = best; }
-  u.onend = function() { setTimeout(function() { speakNextChunk(mode); }, 100 + Math.random() * 180); };
-  u.onerror = function() { speechDone(); };
-  speechSynthesis.speak(u);
-}
-function speechDone() { isSpeaking = false; if (musicEngine) musicEngine.setVolume(0.06); if (!musicEngine || !musicEngine.isRunning()) stopVisualizer(); mascotIdle(); }
-function getBestVoice() { if (availableVoices.length === 0) availableVoices = discoverVoices(); return availableVoices[0] || null; }
-
-// ============================================================
-// JINGLE & SOUND EFFECTS
+// SOUND EFFECTS (no voice)
 // ============================================================
 function playJingle() {
-  try {
-    var ctx = getAudioCtx(), now = ctx.currentTime;
-    [784, 988, 1175, 1319].forEach(function(f, i) {
-      var o = ctx.createOscillator(), g = ctx.createGain();
-      o.type = 'triangle'; o.frequency.setValueAtTime(f, now + i * 0.06);
-      g.gain.setValueAtTime(0, now + i * 0.06); g.gain.linearRampToValueAtTime(0.06, now + i * 0.06 + 0.01); g.gain.linearRampToValueAtTime(0, now + i * 0.06 + 0.18);
-      o.connect(g); g.connect(ctx.destination); o.start(now + i * 0.06); o.stop(now + i * 0.06 + 0.18);
-    });
-  } catch(e) {}
+  try { var ctx=getAudioCtx(),now=ctx.currentTime; [784,988,1175,1319].forEach(function(f,i){ var o=ctx.createOscillator(),g=ctx.createGain(); o.type='triangle'; o.frequency.setValueAtTime(f,now+i*0.06); g.gain.setValueAtTime(0,now+i*0.06); g.gain.linearRampToValueAtTime(0.06,now+i*0.06+0.01); g.gain.linearRampToValueAtTime(0,now+i*0.06+0.18); o.connect(g);g.connect(ctx.destination); o.start(now+i*0.06);o.stop(now+i*0.06+0.18); }); } catch(e) {}
 }
 function oinkSound() {
-  if (!voiceOn) return;
-  try {
-    var ctx = getAudioCtx(), now = ctx.currentTime, o = ctx.createOscillator(), g = ctx.createGain();
-    o.connect(g); g.connect(ctx.destination);
-    var type = Math.floor(Math.random() * 4);
-    switch(type) {
-      case 0: o.type='sawtooth'; o.frequency.setValueAtTime(280,now); o.frequency.linearRampToValueAtTime(180,now+0.12); o.frequency.linearRampToValueAtTime(320,now+0.25); g.gain.setValueAtTime(0.1,now); g.gain.linearRampToValueAtTime(0,now+0.3); o.start(now); o.stop(now+0.3); break;
-      case 1: o.type='triangle'; o.frequency.setValueAtTime(350,now); o.frequency.linearRampToValueAtTime(200,now+0.55); g.gain.setValueAtTime(0.12,now); g.gain.linearRampToValueAtTime(0,now+0.6); o.start(now); o.stop(now+0.6); break;
-      case 2: o.type='sawtooth'; o.frequency.setValueAtTime(300,now); o.frequency.linearRampToValueAtTime(220,now+0.1); o.frequency.setValueAtTime(310,now+0.15); o.frequency.linearRampToValueAtTime(200,now+0.28); g.gain.setValueAtTime(0.08,now); g.gain.linearRampToValueAtTime(0,now+0.32); o.start(now); o.stop(now+0.32); break;
-      case 3: o.type='square'; o.frequency.setValueAtTime(500,now); o.frequency.linearRampToValueAtTime(150,now+0.5); g.gain.setValueAtTime(0.06,now); g.gain.linearRampToValueAtTime(0,now+0.55); o.start(now); o.stop(now+0.55); break;
-    }
-  } catch(e) {}
+  try { var ctx=getAudioCtx(),now=ctx.currentTime,o=ctx.createOscillator(),g=ctx.createGain(); o.connect(g);g.connect(ctx.destination); var r=Math.floor(Math.random()*4); switch(r){ case 0:o.type='sawtooth';o.frequency.setValueAtTime(280,now);o.frequency.linearRampToValueAtTime(180,now+0.12);o.frequency.linearRampToValueAtTime(320,now+0.25);g.gain.setValueAtTime(0.1,now);g.gain.linearRampToValueAtTime(0,now+0.3);o.start(now);o.stop(now+0.3);break; case 1:o.type='triangle';o.frequency.setValueAtTime(350,now);o.frequency.linearRampToValueAtTime(200,now+0.55);g.gain.setValueAtTime(0.12,now);g.gain.linearRampToValueAtTime(0,now+0.6);o.start(now);o.stop(now+0.6);break; case 2:o.type='sawtooth';o.frequency.setValueAtTime(300,now);o.frequency.linearRampToValueAtTime(220,now+0.1);o.frequency.setValueAtTime(310,now+0.15);o.frequency.linearRampToValueAtTime(200,now+0.28);g.gain.setValueAtTime(0.08,now);g.gain.linearRampToValueAtTime(0,now+0.32);o.start(now);o.stop(now+0.32);break; case 3:o.type='square';o.frequency.setValueAtTime(500,now);o.frequency.linearRampToValueAtTime(150,now+0.5);g.gain.setValueAtTime(0.06,now);g.gain.linearRampToValueAtTime(0,now+0.55);o.start(now);o.stop(now+0.55);break; } } catch(e) {}
 }
-function playSlideWhistle() {
-  if (!voiceOn) return;
-  try { var ctx=getAudioCtx(),now=ctx.currentTime,o=ctx.createOscillator(),g=ctx.createGain(); o.connect(g);g.connect(ctx.destination); o.type='sine'; o.frequency.setValueAtTime(700,now); o.frequency.exponentialRampToValueAtTime(180,now+0.35); g.gain.setValueAtTime(0.05,now); g.gain.linearRampToValueAtTime(0,now+0.35); o.start(now);o.stop(now+0.35); } catch(e) {}
-}
-function playSadTrombone() {
-  if (!voiceOn) return;
-  try { var ctx=getAudioCtx(),now=ctx.currentTime,o=ctx.createOscillator(),g=ctx.createGain(); o.connect(g);g.connect(ctx.destination); o.type='sawtooth'; o.frequency.setValueAtTime(350,now); o.frequency.linearRampToValueAtTime(300,now+0.2); o.frequency.linearRampToValueAtTime(180,now+0.5); g.gain.setValueAtTime(0.08,now); g.gain.linearRampToValueAtTime(0,now+0.55); o.start(now);o.stop(now+0.55); } catch(e) {}
-}
-function playFanfare() {
-  if (!voiceOn) return;
-  try { var ctx=getAudioCtx(),now=ctx.currentTime; [523,659,784,1047].forEach(function(f,i){ var o=ctx.createOscillator(),g=ctx.createGain(); o.connect(g);g.connect(ctx.destination); o.type='triangle'; o.frequency.setValueAtTime(f,now+i*0.15); g.gain.setValueAtTime(0,now+i*0.15); g.gain.linearRampToValueAtTime(0.08,now+i*0.15+0.02); g.gain.linearRampToValueAtTime(0,now+i*0.15+0.32); o.start(now+i*0.15);o.stop(now+i*0.15+0.32); }); } catch(e) {}
-}
+function playSlideWhistle() { try { var ctx=getAudioCtx(),now=ctx.currentTime,o=ctx.createOscillator(),g=ctx.createGain(); o.connect(g);g.connect(ctx.destination); o.type='sine';o.frequency.setValueAtTime(700,now);o.frequency.exponentialRampToValueAtTime(180,now+0.35); g.gain.setValueAtTime(0.05,now);g.gain.linearRampToValueAtTime(0,now+0.35); o.start(now);o.stop(now+0.35); } catch(e) {} }
+function playSadTrombone() { try { var ctx=getAudioCtx(),now=ctx.currentTime,o=ctx.createOscillator(),g=ctx.createGain(); o.connect(g);g.connect(ctx.destination); o.type='sawtooth';o.frequency.setValueAtTime(350,now);o.frequency.linearRampToValueAtTime(300,now+0.2);o.frequency.linearRampToValueAtTime(180,now+0.5); g.gain.setValueAtTime(0.08,now);g.gain.linearRampToValueAtTime(0,now+0.55); o.start(now);o.stop(now+0.55); } catch(e) {} }
+function playFanfare() { try { var ctx=getAudioCtx(),now=ctx.currentTime; [523,659,784,1047].forEach(function(f,i){ var o=ctx.createOscillator(),g=ctx.createGain(); o.connect(g);g.connect(ctx.destination); o.type='triangle'; o.frequency.setValueAtTime(f,now+i*0.15); g.gain.setValueAtTime(0,now+i*0.15); g.gain.linearRampToValueAtTime(0.08,now+i*0.15+0.02); g.gain.linearRampToValueAtTime(0,now+i*0.15+0.32); o.start(now+i*0.15);o.stop(now+i*0.15+0.32); }); } catch(e) {} }
 
 function dramaticFlash() {
   var d = document.createElement('div'); d.className = 'dramatic-flash';
-  document.body.appendChild(d); setTimeout(function() { d.remove(); }, 700);
-}
-
-// ============================================================
-// VOICE PANEL
-// ============================================================
-function openVoicePanel() {
-  availableVoices = discoverVoices();
-  var list = document.getElementById('voiceList');
-  if (availableVoices.length === 0) {
-    list.innerHTML = '<p style="color:#718096;text-align:center;padding:20px;">未发现中文语音</p>';
-  } else {
-    list.innerHTML = availableVoices.map(function(v, i) {
-      var tag = getVoiceTag(v);
-      return '<div class="voice-option'+(selectedVoice && selectedVoice.name===v.name?' selected':'')+'" data-idx="'+i+'" onclick="previewVoice('+i+')">'
-        + '<span class="vo-name">'+v.name+'</span><span class="vo-tag '+tag.cls+'">'+tag.text+'</span>'
-        + '<span class="vo-preview" onclick="event.stopPropagation();previewVoice('+i+')">▶️</span></div>';
-    }).join('');
-  }
-  document.getElementById('voicePanelOverlay').style.display = 'flex';
-}
-function closeVoicePanel() { document.getElementById('voicePanelOverlay').style.display = 'none'; speechSynthesis.cancel(); }
-function maybeCloseVoicePanel(e) { if (e.target === document.getElementById('voicePanelOverlay')) closeVoicePanel(); }
-function previewVoice(idx) {
-  var voice = availableVoices[idx]; if (!voice) return;
-  document.querySelectorAll('.voice-option').forEach(function(o,i) { o.classList.toggle('selected', i===idx); });
-  speechSynthesis.cancel();
-  var u = new SpeechSynthesisUtterance('你好，我是猪猪语音助手，哼哼');
-  u.lang='zh-CN'; u.voice=voice; u.pitch=1.0; u.rate=1.0; u.volume=0.7;
-  speechSynthesis.speak(u);
-}
-function applyVoiceSettings() {
-  var sel = document.querySelector('.voice-option.selected');
-  if (sel) { var idx = parseInt(sel.getAttribute('data-idx')); selectedVoice = availableVoices[idx] || null; }
-  closeVoicePanel();
-  if (selectedVoice) speak('语音已切换为 '+selectedVoice.name, 5);
-}
-
-// ============================================================
-// VOICE TOGGLE
-// ============================================================
-function updateVoiceLabel() {
-  var btn = document.getElementById('voiceToggle'); if (!voiceOn) return;
-  btn.textContent = getVoiceMode().emoji + ' ' + getVoiceMode().name; btn.className = 'voice-toggle on';
-}
-function toggleVoice() {
-  voiceOn = !voiceOn; speechSynthesis.cancel(); haptic('tap');
-  var btn = document.getElementById('voiceToggle'), gear = document.getElementById('voiceGear');
-  if (voiceOn) { updateVoiceLabel(); speak('语音已开启', 5); gear.style.display = ''; }
-  else { btn.textContent = '🔇 语音关'; btn.className = 'voice-toggle off'; gear.style.display = 'none'; }
+  document.body.appendChild(d); setTimeout(function(){ d.remove(); }, 700);
 }
 
 // ============================================================
 // MARQUEE
 // ============================================================
-function showMarquee(text, duration) {
-  var m = document.getElementById('marquee');
-  m.querySelector('span').textContent = text || '📻 猪猪电台 FM 94.8 — 全球首家猪猪认证电台 — 正在直播中...';
-  m.classList.add('show'); if (duration) setTimeout(function() { m.classList.remove('show'); }, duration);
+function showMarquee(text, dur) {
+  var m = document.getElementById('marquee'); m.querySelector('span').textContent = text || '📻 猪猪电台 FM 94.8 — 全球首家猪猪认证电台 — 正在直播中...';
+  m.classList.add('show'); if (dur) setTimeout(function(){ m.classList.remove('show'); }, dur);
 }
 function hideMarquee() { document.getElementById('marquee').classList.remove('show'); }
 
@@ -1850,15 +1703,11 @@ function hideMarquee() { document.getElementById('marquee').classList.remove('sh
 function shareResult() {
   haptic('tap');
   var text = '🐷 我刚被确认为官方认证猪猪！你也来测测？👉 https://hhl-06.github.io/pig-radio/';
-  if (navigator.share) {
-    navigator.share({ title: '猪猪电台 FM 94.8', text: text, url: 'https://hhl-06.github.io/pig-radio/' })
-      .catch(function(){ copyLinkFallback(); });
-  } else { copyLinkFallback(); }
+  if (navigator.share) { navigator.share({ title:'猪猪电台 FM 94.8', text:text, url:'https://hhl-06.github.io/pig-radio/' }).catch(function(){ copyLinkFallback(); }); }
+  else { copyLinkFallback(); }
 }
 function copyLinkFallback() {
-  var input = document.createElement('textarea');
-  input.value = 'https://hhl-06.github.io/pig-radio/';
-  input.style.position = 'fixed'; input.style.opacity = '0';
+  var input = document.createElement('textarea'); input.value = 'https://hhl-06.github.io/pig-radio/'; input.style.position='fixed';input.style.opacity='0';
   document.body.appendChild(input); input.select();
   try { document.execCommand('copy'); showToast('📋 链接已复制！发给朋友吧', 2000); haptic('success'); }
   catch(e) { showToast('📤 https://hhl-06.github.io/pig-radio/', 3000); }
@@ -1870,38 +1719,33 @@ function copyLinkFallback() {
 // ============================================================
 function onDunnoHover(btn) {
   if (!pageReady) return;
-  // Track fast escape start
   if (escapeCount === 0) escapeStartTime = Date.now();
-  else if (escapeCount === 1 && Date.now() - escapeStartTime < 3000) {
-    var a = loadAchievements(); a.fastCatchTime = Date.now(); localStorage.setItem('pig_achievements', JSON.stringify(a));
-  }
+  else if (escapeCount === 1 && Date.now()-escapeStartTime < 3000) { var a=loadAchievements(); a.fastCatchTime=Date.now(); localStorage.setItem('pig_achievements',JSON.stringify(a)); }
   escapeCount++; updateEscapeBadge();
   var box = document.getElementById('mainBox'), br = box.getBoundingClientRect();
   var pad = 35, btnW = btn.offsetWidth || 100, btnH = btn.offsetHeight || 50;
   var maxX = br.width - btnW - pad, maxY = br.height - btnH - pad;
   btn.style.position = 'absolute';
-  btn.style.left = Math.max(pad, Math.min(Math.random() * maxX, maxX)) + 'px';
-  btn.style.top = Math.max(pad, Math.min(Math.random() * maxY, maxY)) + 'px';
+  btn.style.left = Math.max(pad, Math.min(Math.random()*maxX, maxX)) + 'px';
+  btn.style.top = Math.max(pad, Math.min(Math.random()*maxY, maxY)) + 'px';
   if (escapeCount >= 15) btn.className = 'btn btn-dunno micro';
   else if (escapeCount >= 8) btn.className = 'btn btn-dunno tiny';
   else if (escapeCount >= 4) btn.className = 'btn btn-dunno shrinking';
   if (escapeCount % 3 === 0) spawnTauntBubble(btn, br);
   spawnPigPrint(btn, br);
+  spawnRainbowTrail(btn);
   if (escapeCount % 2 === 0) oinkSound();
   if (escapeCount % 3 === 0) playSlideWhistle();
-  if (escapeCount % 7 === 0) { box.classList.remove('shake'); void box.offsetWidth; box.classList.add('shake'); }
-  if (escapeCount % 5 === 0) {
-    mascotLaugh();
-    speak(['抓不到我~','太慢了吧！','你是猪吗','加油追我呀','还来？','哈哈哈','别跑啦~','认输吧猪猪'][Math.floor(Math.random()*8)]);
-  }
+  if (escapeCount % 7 === 0) { box.classList.remove('shake'); void box.offsetWidth; box.classList.add('shake'); screenShake(); }
+  if (escapeCount % 5 === 0) mascotLaugh();
   updateMainQuestion();
   checkAchievements();
   haptic('tap');
+  // Spawn pulse rings at button center
+  var btnR = btn.getBoundingClientRect();
+  spawnPulseRing(box, btnR.left-box.getBoundingClientRect().left+btnR.width/2, btnR.top-box.getBoundingClientRect().top+btnR.height/2);
 }
-function updateEscapeBadge() {
-  var b = document.getElementById('escapeBadge'); b.style.display = 'flex'; b.textContent = escapeCount;
-  if (escapeCount >= 20) { b.style.background='#5f27cd'; b.textContent='∞'; }
-}
+function updateEscapeBadge() { var b=document.getElementById('escapeBadge'); b.style.display='flex'; b.textContent=escapeCount; if (escapeCount>=20){b.style.background='#5f27cd';b.textContent='∞';} }
 function updateMainQuestion() {
   var q = document.getElementById('mainQuestion');
   var taunts = ['你知不知道<br>你自己是猪？','再问你一次<br>你自己是猪？','别挣扎了<br>你就是猪🐷','第'+escapeCount+'次逃跑...<br>你累不累啊','鼠标追不上吧？<br>承认吧你','这个按钮会跑哦<br>你抓不到的~','🐷 猪猪逃跑中...<br>追我呀追我呀','已经'+escapeCount+'次了！<br>你还不放弃？','放弃抵抗吧<br>这就是命运'];
@@ -1911,20 +1755,21 @@ function spawnTauntBubble(btn, boxRect) {
   var b = document.createElement('div'); b.className = 'taunt-bubble';
   b.textContent = ['🤣 抓不到~','🐷 哼哼~','💨 溜了溜了','😝 太慢了','✌️ 在这呢~','🙈 你够不着','🏃 拜拜~','🐽 再来啊'][Math.floor(Math.random()*8)];
   var btnR = btn.getBoundingClientRect();
-  b.style.left = (btnR.left - boxRect.left + btnR.width/2 - 40) + 'px';
-  b.style.top = (btnR.top - boxRect.top - 28) + 'px';
+  b.style.left = (btnR.left-boxRect.left+btnR.width/2-40) + 'px'; b.style.top = (btnR.top-boxRect.top-28) + 'px';
   document.getElementById('mainBox').appendChild(b); setTimeout(function(){ b.remove(); }, 1200);
 }
 function spawnPigPrint(btn, boxRect) {
   var p = document.createElement('span'); p.className = 'pig-print'; p.textContent = '🐾';
   var btnR = btn.getBoundingClientRect();
-  p.style.left = (btnR.left - boxRect.left + btnR.width/2 - 10) + 'px';
-  p.style.top = (btnR.top - boxRect.top + btnR.height/2) + 'px';
+  p.style.left = (btnR.left-boxRect.left+btnR.width/2-10) + 'px'; p.style.top = (btnR.top-boxRect.top+btnR.height/2) + 'px';
   document.getElementById('mainBox').appendChild(p); setTimeout(function(){ p.remove(); }, 1800);
 }
 function onClickDunno() {
   haptic('double'); mascotSurprise();
-  showFakeLoading(function() { showResult('dunno'); });
+  var btnR = document.getElementById('dunnoBtn').getBoundingClientRect();
+  spawnParticleBurst(btnR.left+btnR.width/2, btnR.top+btnR.height/2, 40);
+  spawnSparkBetween(document.querySelector('.btn-know'), document.getElementById('dunnoBtn'));
+  showFakeLoading(function(){ showResult('dunno'); });
 }
 
 // ============================================================
@@ -1935,13 +1780,20 @@ var confirmChain = [
   { icon:'😏', q:'真的确定？<br>这可是没有回头路的', yes:'真的确定！', no:'算了...' },
   { icon:'🙄', q:'最后问你一次<br>不后悔？', yes:'不后悔！', no:'我怂了' },
 ];
-function onClickKnow() { haptic('tap'); confirmStep = 0; showConfirmStep(); }
+function onClickKnow() {
+  haptic('tap');
+  var knowBtn = document.querySelector('.btn-know'), dunnoBtn = document.getElementById('dunnoBtn');
+  if (knowBtn && dunnoBtn) spawnSparkBetween(knowBtn, dunnoBtn);
+  confirmStep = 0; showConfirmStep();
+}
 function showConfirmStep() {
   if (confirmStep >= confirmChain.length) {
     document.getElementById('mainModal').style.display = 'none';
     document.getElementById('confirmModal').style.display = 'none';
     mascotSurprise();
-    showFakeLoading(function() { showResult('know'); });
+    var knowBtn = document.querySelector('#confirmBox .btn-know');
+    if (knowBtn) { var r = knowBtn.getBoundingClientRect(); spawnParticleBurst(r.left+r.width/2, r.top+r.height/2, 40); }
+    showFakeLoading(function(){ showResult('know'); });
     return;
   }
   var s = confirmChain[confirmStep];
@@ -1950,14 +1802,13 @@ function showConfirmStep() {
   document.getElementById('confirmYes').textContent = s.yes;
   document.getElementById('mainModal').style.display = 'none';
   document.getElementById('confirmModal').style.display = 'flex';
-  speak(s.q.replace(/<br>/g, ''));
 }
 function onConfirmYes() { haptic('tap'); confirmStep++; showConfirmStep(); }
 function onConfirmNo() {
   haptic('tap');
   document.getElementById('confirmModal').style.display = 'none';
   document.getElementById('mainModal').style.display = 'flex';
-  speak('这才对嘛，好好想想'); confirmStep = 0; mascotIdle();
+  confirmStep = 0; mascotIdle();
 }
 
 // ============================================================
@@ -1970,7 +1821,7 @@ function showFakeLoading(callback) {
   var idx = 0, t = setInterval(function(){ idx=(idx+1)%labels.length; label.textContent=labels[idx]; }, 380);
   bar.style.animation = 'none'; void bar.offsetWidth;
   bar.style.animation = 'progressBar 2.5s ease-out forwards, shimmer 1s linear infinite';
-  speak('正在分析中，请稍候');
+  playJingle();
   setTimeout(function(){ clearInterval(t); document.getElementById('loadingModal').style.display='none'; callback(); }, 2500);
 }
 
@@ -1985,16 +1836,15 @@ function showResult(type) {
   document.getElementById('resultBox').classList.add('dramatic');
   document.getElementById('resultFace').textContent = type === 'know' ? '😏' : '🐷';
   document.getElementById('resultText').textContent = type === 'know' ? '知道就好！' : '好了，现在你知道了！';
-  // Generate pig name
   document.getElementById('pigName').textContent = '🏷️ ' + generatePigName();
-  dramaticFlash(); playSadTrombone(); mascotLaugh();
+  dramaticFlash(); playSadTrombone(); mascotLaugh(); screenShake();
   showMarquee('🐷 又一位猪猪确认身份！全球猪数+1！🐷', 4000);
-
   recordClick(type); refreshStats();
   document.getElementById('roastText').textContent = getRoast(type);
   document.getElementById('btnShowCert').style.display = 'inline-block';
-  speak(getRoast(type)); sprayConfetti();
-  haptic('success');
+  sprayConfetti(); haptic('success');
+  // Big particle burst at center
+  spawnParticleBurst(window.innerWidth/2, window.innerHeight/2, 50, ['🐷','🎉','🎊','💥','✨','🏆','👑','🌟','💖','🎵']);
   setTimeout(function(){ document.getElementById('resultBox').classList.remove('dramatic'); }, 1500);
   checkAchievements();
 }
@@ -2010,7 +1860,7 @@ function showCertificate() {
   document.getElementById('certDate').textContent = now.getFullYear()+'年'+(now.getMonth()+1)+'月'+now.getDate()+'日';
   document.getElementById('certRank').textContent = getGlobalTotal() + 1;
   document.getElementById('certModal').style.display = 'flex';
-  playFanfare(); speak('恭喜你获得官方猪猪认证证书！'); mascotDance();
+  playFanfare(); mascotDance(); screenShake('light');
   showMarquee('🏆 恭喜新晋猪猪获得官方认证证书！🏆', 5000);
   sprayConfetti(); setTimeout(sprayConfetti, 500);
 }
@@ -2029,10 +1879,8 @@ function goBack() {
   btn.className = 'btn btn-dunno'; escapeCount = 0; confirmStep = 0;
   document.getElementById('escapeBadge').style.display = 'none';
   document.getElementById('mainQuestion').innerHTML = '你知不知道<br>你自己是猪？';
-  var box = document.getElementById('mainBox');
-  box.classList.remove('shake'); void box.offsetWidth; box.classList.add('shake');
-  mascotIdle(); hideMarquee();
-  checkAchievements();
+  var box = document.getElementById('mainBox'); box.classList.remove('shake'); void box.offsetWidth; box.classList.add('shake');
+  mascotIdle(); hideMarquee(); checkAchievements();
 }
 
 // ============================================================
@@ -2040,15 +1888,7 @@ function goBack() {
 // ============================================================
 function sprayConfetti() {
   var emojis = ['🐷','🎉','🎊','💥','✨','🐽','🍩','💩','🏆','👑','🥇','🌟','💖','🦄','🎵','📻','🎙️'];
-  for (var i = 0; i < 40; i++) {
-    setTimeout(function(){
-      var s = document.createElement('span'); s.className = 'confetti';
-      s.textContent = emojis[Math.floor(Math.random()*emojis.length)];
-      s.style.left = Math.random()*100+'%'; s.style.top = -(Math.random()*80)+'px';
-      s.style.fontSize = (18+Math.random()*45)+'px'; s.style.animationDuration = (1.5+Math.random()*3)+'s';
-      document.body.appendChild(s); setTimeout(function(){ s.remove(); }, 4000);
-    }, i*35);
-  }
+  for (var i=0;i<45;i++){setTimeout(function(){var s=document.createElement('span');s.className='confetti';s.textContent=emojis[Math.floor(Math.random()*emojis.length)];s.style.left=Math.random()*100+'%';s.style.top=-(Math.random()*80)+'px';s.style.fontSize=(18+Math.random()*45)+'px';s.style.animationDuration=(1.5+Math.random()*3)+'s';document.body.appendChild(s);setTimeout(function(){s.remove();},4000);},i*30);}
 }
 
 // ============================================================
@@ -2070,16 +1910,15 @@ function startFloatingPigs() {
 // ============================================================
 var titleClicks = 0, titleTimer = null;
 document.getElementById('funnyTitle').addEventListener('click', function(){
-  titleClicks++; clearTimeout(titleTimer);
-  titleTimer = setTimeout(function(){ titleClicks = 0; }, 900);
+  titleClicks++; clearTimeout(titleTimer); titleTimer = setTimeout(function(){ titleClicks=0; }, 900);
   if (titleClicks === 7) {
     document.body.style.background = 'linear-gradient(135deg, #ff6b6b, #feca57, #48dbfb, #ff9ff3, #54a0ff, #5f27cd, #ff6b6b)';
-    document.body.style.backgroundSize = '600% 600%'; sprayConfetti(); sprayConfetti(); mascotDance();
-    showMarquee('🌈 终极彩虹猪猪模式已激活！🌈', 5000); speak('终极彩虹猪猪模式启动！', 5);
+    document.body.style.backgroundSize = '600% 600%'; sprayConfetti(); sprayConfetti(); mascotDance(); screenShake();
+    showMarquee('🌈 终极彩虹猪猪模式已激活！🌈', 5000);
     setTimeout(function(){ document.body.style.background = '#1a0a0a'; document.body.style.backgroundSize = ''; }, 4000);
     saveAchievement('rainbow'); titleClicks = 0;
   } else if (titleClicks === 5) {
-    document.body.style.background = '#2d1b3e'; sprayConfetti(); speak('神秘猪猪频道已开启');
+    document.body.style.background = '#2d1b3e'; sprayConfetti();
     setTimeout(function(){ document.body.style.background = '#1a0a0a'; }, 2500);
   } else if (titleClicks === 3) {
     document.body.style.background = '#3d1a2e'; oinkSound();
@@ -2097,8 +1936,8 @@ document.addEventListener('keydown', function(e){
     document.body.style.background = '#000'; document.body.style.color = '#0f0';
     document.querySelector('.funny-title h1').textContent = '🐷🎮';
     document.querySelector('.funny-title .sub').textContent = '🏆 科乐美秘技！超级猪猪 🏆';
-    sprayConfetti(); sprayConfetti(); sprayConfetti(); dramaticFlash(); mascotDance();
-    showMarquee('🎮 科乐美秘技激活！超级猪猪模式！🎮', 6000); speak('超级猪猪模式已激活！');
+    sprayConfetti(); sprayConfetti(); sprayConfetti(); dramaticFlash(); mascotDance(); screenShake();
+    showMarquee('🎮 科乐美秘技激活！超级猪猪模式！🎮', 6000);
     saveAchievement('konami');
     setTimeout(function(){
       document.body.style.background = '#1a0a0a'; document.body.style.color = '';
@@ -2109,35 +1948,22 @@ document.addEventListener('keydown', function(e){
 });
 
 // ============================================================
-// SPLASH SCREEN CONTROLLER
+// SPLASH SCREEN
 // ============================================================
 function runSplash(callback) {
-  var bar = document.getElementById('splashBar'),
-      msg = document.getElementById('splashMsg'),
-      dials = document.querySelectorAll('#splashDials .s-dial');
+  var bar = document.getElementById('splashBar'), msg = document.getElementById('splashMsg');
   var messages = ['正在连接猪猪卫星...','正在调频 FM 94.8...','正在校准猪猪信号...','正在加载猪猪数据库...','正在启动电台设备...','🐷 哼哼~ 马上就好！'];
-  var mIdx = 0, dialIdx = 0;
-  // Animate progress bar
-  var progress = 0, interval = setInterval(function(){
-    progress += Math.random() * 25;
-    if (progress > 90) progress = 90;
+  var mIdx = 0, progress = 0;
+  var interval = setInterval(function(){
+    progress += Math.random() * 25; if (progress > 90) progress = 90;
     bar.style.width = Math.min(90, progress) + '%';
-    // Update dials
-    if (Math.random() > 0.5 && dialIdx < dials.length) { dials[dialIdx].classList.add('on'); dialIdx++; }
-    // Change message
-    if (progress > 30 && mIdx === 0) { mIdx=1; msg.textContent=messages[mIdx]; }
-    if (progress > 55 && mIdx === 1) { mIdx=2; msg.textContent=messages[mIdx]; }
-    if (progress > 75 && mIdx === 2) { mIdx=3; msg.textContent=messages[mIdx]; }
+    if (progress > 30 && mIdx===0) { mIdx=1; msg.textContent=messages[mIdx]; }
+    if (progress > 55 && mIdx===1) { mIdx=2; msg.textContent=messages[mIdx]; }
+    if (progress > 75 && mIdx===2) { mIdx=3; msg.textContent=messages[mIdx]; }
   }, 150);
-
   setTimeout(function(){
-    clearInterval(interval);
-    // Fill remaining dials
-    for (var d = dialIdx; d < dials.length; d++) dials[d].classList.add('on');
-    bar.style.width = '100%';
-    msg.textContent = '✅ 猪猪电台已就绪！';
+    clearInterval(interval); bar.style.width = '100%'; msg.textContent = '✅ 猪猪电台已就绪！';
     haptic('success');
-    // Fade out splash
     setTimeout(function(){
       document.getElementById('splash').classList.add('hide');
       document.body.classList.add('ready');
@@ -2149,36 +1975,21 @@ function runSplash(callback) {
 // ============================================================
 // PAGE INIT
 // ============================================================
-updateVoiceLabel(); refreshStats(); initVisualizer(); updateAchievementBadge();
+refreshStats(); initVisualizer(); initStarfield(); updateAchievementBadge();
 
-if (window.speechSynthesis) {
-  var voices = speechSynthesis.getVoices();
-  if (voices.length > 0) availableVoices = discoverVoices();
-  speechSynthesis.onvoiceschanged = function(){ availableVoices = discoverVoices(); };
-}
-
-// Start everything after splash
 runSplash(function() {
   pageReady = true;
   if (musicOn) startMusic();
   startVisualizer();
   startFloatingPigs();
+  startPigParade();
+  startMeteors();
   initShakeDetector();
-  // Welcome message
-  setTimeout(function() {
-    speak('欢迎来到猪猪电台 FM 94.8！');
-  }, 600);
 });
 
-// Ensure audio context is ready on first interaction
 document.addEventListener('click', function initAudio(){
   getAudioCtx();
   if (musicOn && !(musicEngine && musicEngine.isRunning())) startMusic();
-  if (availableVoices.length === 0) availableVoices = discoverVoices();
-  // Also request motion permission for iOS
-  if (typeof DeviceMotionEvent !== 'undefined' && typeof DeviceMotionEvent.requestPermission === 'function') {
-    // Handled in initShakeDetector
-  }
 }, { once: true });
 </script>
 </body>

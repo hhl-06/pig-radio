@@ -2,396 +2,333 @@
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
-<title>TERMINAL // SECURE CONNECTION</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+<title>系统服务</title>
 <style>
 * { margin:0; padding:0; box-sizing:border-box; }
 
 body {
-  background:#0a0a0a;
-  font-family: "Courier New", "SF Mono", "Fira Code", monospace;
-  min-height:100vh; display:flex; align-items:center; justify-content:center;
+  font-family: -apple-system, "PingFang SC", "Microsoft YaHei", sans-serif;
+  background:#000;
+  min-height:100vh; min-height:100dvh;
+  display:flex; align-items:center; justify-content:center;
+  color:#fff; overflow:hidden;
   user-select:none; -webkit-user-select:none;
-  overflow-x:hidden; cursor:crosshair;
+  -webkit-tap-highlight-color:transparent;
 }
 
-/* Scan lines */
-body::after {
-  content:''; position:fixed; top:0;left:0;right:0;bottom:0;
-  background: repeating-linear-gradient(0deg, rgba(0,255,0,0.02) 0px, rgba(0,255,0,0.02) 2px, transparent 2px, transparent 4px);
-  pointer-events:none; z-index:9999;
+/* ============================================================
+   SCENE 1: FAKE LOCK SCREEN
+   ============================================================ */
+.lockscreen {
+  width:100%; max-width:400px; text-align:center; padding:40px 24px;
+}
+.lockscreen .ls-time {
+  font-size:64px; font-weight:200; letter-spacing:4px; margin-bottom:4px;
+}
+.lockscreen .ls-date {
+  font-size:15px; color:rgba(255,255,255,0.5); margin-bottom:40px;
+}
+.lockscreen .ls-icon {
+  font-size:72px; margin-bottom:16px; animation: floatIcon 2s ease-in-out infinite;
+}
+@keyframes floatIcon { 0%,100%{transform:translateY(0);} 50%{transform:translateY(-10px);} }
+.lockscreen .ls-title {
+  font-size:17px; font-weight:600; color:rgba(255,255,255,0.7); margin-bottom:8px;
+}
+.lockscreen .ls-subtitle {
+  font-size:13px; color:rgba(255,255,255,0.35); line-height:1.8;
+}
+.lockscreen .ls-bar-wrap {
+  width:200px; height:4px; background:rgba(255,255,255,0.1); border-radius:2px;
+  margin:24px auto; overflow:hidden;
+}
+.lockscreen .ls-bar {
+  height:100%; background:rgba(255,255,255,0.5); border-radius:2px;
+  transition:width 0.3s ease; width:0%;
 }
 
-.terminal {
-  width:100%; max-width:700px; min-height:90vh;
-  background:rgba(0,10,0,0.95);
-  border:1px solid rgba(0,255,0,0.15);
-  border-radius:4px;
-  padding:24px;
-  position:relative;
-  box-shadow: 0 0 60px rgba(0,255,0,0.05), inset 0 0 60px rgba(0,0,0,0.5);
-  overflow:hidden;
+/* ============================================================
+   SCENE 2: DATA PANELS
+   ============================================================ */
+.data-panel {
+  width:100%; max-width:400px; padding:20px; text-align:center;
+  animation: panelIn 0.5s ease;
+}
+@keyframes panelIn { from{opacity:0;transform:translateY(20px);} to{opacity:1;transform:translateY(0);} }
+
+.data-panel .dp-badge {
+  display:inline-block; padding:6px 18px; border-radius:20px;
+  background:rgba(255,59,48,0.15); color:#ff3b30; font-size:12px; font-weight:700;
+  letter-spacing:2px; margin-bottom:20px;
+  animation: pulseBadge 1.5s ease infinite;
+}
+@keyframes pulseBadge {
+  0%,100%{box-shadow:0 0 0 0 rgba(255,59,48,0.4);}
+  50%{box-shadow:0 0 0 16px rgba(255,59,48,0);}
 }
 
-/* Title bar */
-.term-titlebar {
-  position:absolute; top:0; left:0; right:0;
-  background:rgba(0,255,0,0.05); border-bottom:1px solid rgba(0,255,0,0.1);
-  padding:6px 14px; font-size:11px; color:rgba(0,255,0,0.4);
-  display:flex; align-items:center; gap:8px;
+.data-panel .dp-card {
+  background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.08);
+  border-radius:12px; padding:20px; margin-bottom:12px;
+  text-align:left; transition:all 0.3s;
 }
-.term-dot { width:8px; height:8px; border-radius:50%; }
-.term-dot.r { background:#ff5f57; }
-.term-dot.y { background:#febc2e; }
-.term-dot.g { background:#28c840; }
+.data-panel .dp-card .dp-card-icon { font-size:28px; margin-bottom:8px; }
+.data-panel .dp-card .dp-card-title { font-size:13px; font-weight:700; color:rgba(255,255,255,0.8); margin-bottom:4px; }
+.data-panel .dp-card .dp-card-val { font-size:15px; color:rgba(255,255,255,0.5); line-height:1.6; }
 
-.term-body { margin-top:28px; font-size:13px; line-height:1.7; color:rgba(0,255,0,0.85); min-height:70vh; }
-
-.term-body .line { margin-bottom:2px; white-space:pre-wrap; word-break:break-all; }
-.term-body .line .prompt { color:rgba(0,255,0,0.5); }
-.term-body .line .cmd { color:rgba(0,255,0,0.9); }
-.term-body .line .output { color:rgba(0,255,0,0.6); }
-.term-body .line .highlight { color:#0f0; font-weight:700; }
-.term-body .line .warn { color:#ff0; }
-.term-body .line .danger { color:#f44; }
-.term-body .line .info { color:#0af; }
-.term-body .line .dim { color:rgba(0,255,0,0.35); }
-
-/* Blinking cursor */
-.cursor {
-  display:inline-block; width:8px; height:15px; background:rgba(0,255,0,0.9);
-  animation: blink 0.8s step-end infinite; vertical-align:middle; margin-left:2px;
-}
-@keyframes blink { 0%,100%{opacity:1;} 50%{opacity:0;} }
-
-/* Progress bar */
-.prog-wrap {
-  width:100%; height:4px; background:rgba(0,255,0,0.08);
-  border-radius:2px; margin:4px 0; overflow:hidden;
-}
-.prog-bar {
-  height:100%; background:linear-gradient(90deg, rgba(0,255,0,0.4), rgba(0,255,0,0.9));
-  border-radius:2px; transition:width 0.3s ease; width:0%;
+.data-panel .dp-footer {
+  margin-top:20px; font-size:12px; color:rgba(255,255,255,0.25);
+  line-height:1.8;
 }
 
-/* Reveal panel - shows after hack */
-.reveal-panel {
-  margin-top:20px; border:1px solid rgba(0,255,0,0.2); border-radius:4px;
-  padding:16px; background:rgba(0,255,0,0.02);
-  animation: revealIn 0.6s ease;
+/* ============================================================
+   SCENE 3: FINAL TWIST
+   ============================================================ */
+.twist {
+  text-align:center; padding:30px 20px;
+  animation: panelIn 0.5s ease;
 }
-@keyframes revealIn {
-  from { opacity:0; transform:translateY(10px); border-color:rgba(0,255,0,0.5); }
-  to { opacity:1; transform:translateY(0); }
-}
-.reveal-panel .rev-title {
-  font-size:15px; font-weight:700; color:#0f0; margin-bottom:12px;
-  text-align:center; letter-spacing:3px;
-}
-.reveal-panel .rev-row {
-  display:flex; justify-content:space-between; padding:4px 0;
-  border-bottom:1px solid rgba(0,255,0,0.05); font-size:12px;
-}
-.reveal-panel .rev-row .rev-label { color:rgba(0,255,0,0.5); }
-.reveal-panel .rev-row .rev-val { color:rgba(0,255,0,0.9); text-align:right; }
+.twist .twist-emoji { font-size:80px; margin-bottom:16px; }
+.twist .twist-title { font-size:20px; font-weight:700; color:#fff; margin-bottom:8px; }
+.twist .twist-sub { font-size:14px; color:rgba(255,255,255,0.5); line-height:1.8; margin-bottom:20px; }
 
-/* Glitch effect */
-.glitch-overlay {
+/* ============================================================
+   RED ALERT FLASH
+   ============================================================ */
+.red-flash {
   position:fixed; top:0;left:0;right:0;bottom:0;
-  pointer-events:none; z-index:9998;
-  animation: glitchFlash 0.3s ease-out forwards;
+  background:rgba(255,0,0,0.15); pointer-events:none; z-index:100;
+  animation: redPulse 0.8s ease-out forwards;
 }
-@keyframes glitchFlash {
-  0%{ background:rgba(0,255,0,0.1); }
-  100%{ background:transparent; }
+@keyframes redPulse {
+  0%{opacity:1;}
+  100%{opacity:0;}
 }
 
-/* Final button */
-.escape-btn {
-  display:block; margin:16px auto 0; padding:8px 28px;
-  background:rgba(0,255,0,0.08); border:1px solid rgba(0,255,0,0.3);
-  color:rgba(0,255,0,0.8); border-radius:4px; font-size:12px;
-  font-family:inherit; cursor:pointer; transition:all 0.2s;
-}
-.escape-btn:hover { background:rgba(0,255,0,0.15); border-color:rgba(0,255,0,0.5); color:#0f0; }
-
-/* Toast */
+/* ============================================================
+   TOAST
+   ============================================================ */
 .toast {
-  position:fixed; top:16px; left:50%; transform:translateX(-50%);
-  z-index:10000; background:rgba(0,0,0,0.9); border:1px solid rgba(0,255,0,0.3);
-  color:#0f0; padding:8px 20px; border-radius:20px; font-size:12px; font-weight:600;
-  font-family:inherit; animation: toastIn 0.3s ease-out; pointer-events:none;
+  position:fixed; top:0; left:0; right:0; z-index:200;
+  background:rgba(255,59,48,0.95); color:#fff; text-align:center;
+  padding:12px 20px; font-size:13px; font-weight:600;
+  animation: toastDown 0.3s ease-out;
 }
-@keyframes toastIn { from{transform:translateX(-50%) translateY(-30px);opacity:0;} to{transform:translateX(-50%) translateY(0);opacity:1;} }
+@keyframes toastDown { from{transform:translateY(-100%);} to{transform:translateY(0);} }
 
-/* Mobile */
-@media (max-width:480px) {
-  .terminal { max-width:100%; min-height:100vh; border-radius:0; padding:16px; }
-  .term-body { font-size:11px; }
-  .reveal-panel .rev-row { font-size:10px; }
+/* ============================================================
+   SHAKE
+   ============================================================ */
+body.shaking { animation: bodyShake 0.12s linear 3; }
+@keyframes bodyShake {
+  0%,100%{transform:translate(0,0);}
+  25%{transform:translate(-8px,3px);}
+  50%{transform:translate(5px,-5px);}
+  75%{transform:translate(-3px,1px);}
 }
+
+/* ============================================================
+   BUTTON
+   ============================================================ */
+.btn-white {
+  display:inline-block; padding:14px 40px; border-radius:25px;
+  background:#fff; color:#000; font-size:16px; font-weight:700;
+  border:none; cursor:pointer; font-family:inherit;
+  transition:all 0.15s; letter-spacing:1px;
+  touch-action:manipulation; -webkit-tap-highlight-color:transparent;
+}
+.btn-white:hover { transform:scale(1.03); }
+.btn-white:active { transform:scale(0.97); }
 </style>
 </head>
 <body>
 
-<div class="terminal">
-  <div class="term-titlebar">
-    <span class="term-dot r"></span><span class="term-dot y"></span><span class="term-dot g"></span>
-    root@anonymous:~# terminal — secure connection
-  </div>
-  <div class="term-body" id="termBody"></div>
-</div>
+<div id="app"></div>
 
 <script>
-// ============================================================
-// TERMINAL CONTROLLER
-// ============================================================
-var body = document.getElementById('termBody');
-var lines = [];
-
-function appendLine(html) {
-  var div = document.createElement('div'); div.className = 'line'; div.innerHTML = html;
-  body.appendChild(div); lines.push(div);
-  body.scrollTop = body.scrollHeight;
-  return div;
-}
-
-// Type text character by character
-function typeLine(prefixHtml, text, speed, cls) {
-  return new Promise(function(resolve){
-    var div = document.createElement('div'); div.className = 'line';
-    if (prefixHtml) div.innerHTML = prefixHtml;
-    body.appendChild(div); lines.push(div);
-    body.scrollTop = body.scrollHeight;
-    var i = 0;
-    function type(){
-      if (i < text.length) {
-        div.innerHTML = (prefixHtml||'') + text.substring(0, i+1) + '<span class="cursor"></span>';
-        i++;
-        setTimeout(type, speed || 30);
-      } else {
-        div.innerHTML = (prefixHtml||'') + '<span class="'+(cls||'output')+'">' + text + '</span>';
-        resolve();
-      }
-    }
-    type();
-  });
-}
+var root = document.getElementById('app');
 
 function sleep(ms) { return new Promise(function(r){ setTimeout(r, ms); }); }
+function pick(arr) { return arr[Math.floor(Math.random() * arr.length)]; }
 
-function appendProgress(label, duration) {
-  return new Promise(function(resolve){
-    var div = document.createElement('div'); div.className = 'line';
-    div.innerHTML = '<span class="dim">'+label+'</span>';
-    body.appendChild(div);
-    var progWrap = document.createElement('div'); progWrap.className = 'prog-wrap';
-    var progBar = document.createElement('div'); progBar.className = 'prog-bar';
-    progWrap.appendChild(progBar);
-    body.appendChild(progWrap);
-    body.scrollTop = body.scrollHeight;
-
-    var pct = 0, interval = setInterval(function(){
-      pct += Math.random() * 18;
-      if (pct > 100) { pct = 100; clearInterval(interval);
-        progBar.style.width = '100%';
-        div.innerHTML = '<span class="highlight">'+label+' [OK]</span>';
-        setTimeout(resolve, 300);
-        return;
-      }
-      progBar.style.width = pct + '%';
-    }, duration / 15 || 80);
-  });
-}
-
-function appendRevealPanel(title, rows) {
-  var div = document.createElement('div'); div.className = 'reveal-panel';
-  var html = '<div class="rev-title">'+title+'</div>';
-  rows.forEach(function(r){
-    html += '<div class="rev-row"><span class="rev-label">'+r[0]+'</span><span class="rev-val">'+r[1]+'</span></div>';
-  });
-  div.innerHTML = html;
-  body.appendChild(div);
-  body.scrollTop = body.scrollHeight;
-  return div;
-}
-
-function glitchFlash() {
-  var g = document.createElement('div'); g.className = 'glitch-overlay';
-  document.body.appendChild(g); setTimeout(function(){ g.remove(); }, 400);
-}
-
-function toast(msg) {
-  var t = document.createElement('div'); t.className = 'toast'; t.textContent = msg;
-  document.body.appendChild(t);
-  setTimeout(function(){ t.style.opacity='0'; t.style.transition='opacity 0.3s'; setTimeout(function(){t.remove();},300); }, 2000);
-}
-
-// ============================================================
-// FAKE PERSONAL DATA POOLS
-// ============================================================
 var SECRETS = [
-  '浏览器历史记录中87%是"怎么治疗拖延症"相关搜索',
-  '过去一年共撤回微信消息341条，其中340条是打错字',
-  '相册检测到自拍2,847张，其中94%角度完全一致',
-  '曾连续32天点同一家外卖，被评为"年度最专一干饭人"',
-  '抖音上真正看完的视频占比：3%，其他都是3秒划走',
-  '手机屏幕使用时间超越全国98%的人（主要是躺着刷）',
-  '闹钟平均响铃次数：4.7次/天。实际起床时间比预设晚48分钟',
-  '这一年说过最多的话："好的"（其实并不好）',
-  '购物App上"待付款"订单数：47单。其中36单超过半年未支付',
-  '周末平均起床时间：11:47。早餐？不存在的',
-  '语音消息最长记录：3分24秒，对方只回了"嗯"',
-  '曾打开计算器App假装在算东西，其实只是在发呆',
-  '运动App数据显示：今年共走了7步（不含上厕所）',
-  '密码中包含"123"的概率：极高。安全意识评级：F',
-  '手机内存使用占比：微信58%，照片25%，系统10%，其他App 7%',
-  '深夜（凌晨0-3点）活跃度：极高。第二天精神状态：极差'
+  '浏览器记录：87% 是"拖延症怎么治"',
+  '本周打开外卖App 41次，下单0次',
+  '手机日均亮屏 11.7 小时，击败全国 98% 的人',
+  '过去一年共撤回消息 341 条，其中 340 条是打错字',
+  '自拍数量：2,847 张。角度完全相同的占 94%',
+  '闹钟平均响 4.7 次才起床，比预期晚 48 分钟',
+  '周末平均起床时间：11:47',
+  '深夜0-3点活跃度极高，第二天状态极差',
+  '说"好的"的频率异常高（其实并不好）',
+  '微信占手机内存 58%，远超其他App',
+  '购物车待付款：47件。超半年未付：36件',
+  '密码含"123"概率极高，安全评级 F',
+  '运动App步数：本周 7 步（不含上厕所）',
+  'B站弹幕中"哈哈哈"占 67%（其实并不好笑）'
 ];
 
 var LIES = [
-  'DNA检测结果显示：你的基因中有0.003%来自远古土豆',
-  '通过量子计算推算，你前世是一只在唐朝御膳房偷吃的猫',
-  '大数据显示你的朋友圈封面换了23次，越换越抽象',
-  '你的WiFi历史连接记录表明你蹭过17个陌生人的网络',
-  '你在B站发的弹幕中，"哈哈哈哈"占比67%，但其实并不好笑',
-  '根据你的外卖记录推断：你有12%的概率其实是仓鼠转世',
-  '你的淘宝浏览记录里有太多"只看看不买"的痕迹，被系统标记为"高危"',
-  '据分析，你的英语水平停留在"Hello, how are you? I am fine, thank you"（其实最后一句忘了）',
-  '你的网易云年度听歌报告中，深夜听的最多的歌是《大悲咒》（只是为了助眠）',
-  '你的输入法预测功能已经掌握了你的全部说话套路，甚至可以替你聊天'
+  'DNA 回溯：你的基因中有 0.003% 土豆血统 🥔',
+  '前世追溯：唐朝御膳房一只偷吃的猫',
+  'WiFi 记录：蹭过 17 个陌生人的网络',
+  '输入法已经可以完美模拟你的聊天风格',
+  '淘宝标签：只逛不买，高风险用户',
+  '深夜歌曲排行：《大悲咒》x 347 遍（为了助眠）'
 ];
 
-// ============================================================
-// RUN THE HACK SEQUENCE
-// ============================================================
-async function run() {
-  await sleep(800);
+var FAKE_FILES = [
+  '简历_最终版_v3_final_真的不改了.doc',
+  '计划表（从来没执行过）.xlsx',
+  '表情包收藏（重要文件）.zip',
+  '待处理（永远不会处理）.txt'
+];
 
-  // Phase 1: Connection
-  await typeLine('<span class="dim">[</span><span class="info">*</span><span class="dim">]</span> ', '正在建立安全连接...', 25, 'dim');
-  await sleep(300);
-  await typeLine('<span class="dim">[</span><span class="highlight">+</span><span class="dim">]</span> ', '连接成功。远程节点：node-' + Math.random().toString(36).substring(2,10), 18, 'output');
-  await sleep(200);
-
-  // Phase 2: IP & device info
-  await typeLine('<span class="dim">[</span><span class="info">i</span><span class="dim">]</span> ', '正在获取目标设备信息...', 20, 'dim');
-  await sleep(400);
-  appendLine('<span class="output">  IP Address: 192.168.'+Math.floor(Math.random()*255)+'.'+Math.floor(Math.random()*255)+'</span>');
-  await sleep(150);
-  appendLine('<span class="output">  User Agent: Mozilla/5.0 (Human; Susceptible to Clickbait)</span>');
-  await sleep(150);
-  appendLine('<span class="output">  Screen: '+window.screen.width+'x'+window.screen.height+' ('+(window.devicePixelRatio>1?'Retina':'Potato')+' Display)</span>');
-  await sleep(150);
-  appendLine('<span class="output">  Battery: '+(Math.random()*100).toFixed(0)+'% (probably dying)</span>');
-  await sleep(300);
-
-  // Phase 3: Directory enumeration
-  await typeLine('<span class="dim">[</span><span class="warn">!</span><span class="dim">]</span> ', '扫描文件系统...', 30, 'warn');
-  await sleep(200);
-  appendLine('<span class="dim">  C:\\Users\\you\\Desktop\\待处理\\（未完成的任务堆成山）</span>');
-  await sleep(100);
-  appendLine('<span class="dim">  C:\\Users\\you\\Documents\\简历\\最终版_真的最终版_v3_final_真的不改了.doc</span>');
-  await sleep(100);
-  appendLine('<span class="dim">  C:\\Users\\you\\Downloads\\（全是没打开过的文件）</span>');
-  await sleep(100);
-  appendLine('<span class="dim">  C:\\Users\\you\\Photos\\表情包\\（重要文件，占内存最多）</span>');
-  await sleep(300);
-
-  // Phase 4: Data extraction
-  await typeLine('<span class="dim">[</span><span class="danger">!!</span><span class="dim">]</span> ', '检测到可提取的个人数据包！开始解密...', 25, 'danger');
-  glitchFlash();
-  await sleep(400);
-
-  await appendProgress('解密相册元数据...', 1200);
-  await sleep(200);
-  await appendProgress('提取浏览器历史...', 900);
-  await sleep(200);
-  await appendProgress('分析社交行为模式...', 1500);
-  await sleep(200);
-  await appendProgress('破解加密聊天记录...', 1100);
-  await sleep(200);
-  await appendProgress('生成个人档案...', 800);
-  await sleep(500);
-
-  // Phase 5: The reveal
-  glitchFlash();
-  await typeLine('', '', 0);
-  appendLine('<span class="danger">══════════════════════════════════════</span>');
-  appendLine('<span class="danger">  ⚠ 机密档案解密成功 ⚠</span>');
-  appendLine('<span class="danger">══════════════════════════════════════</span>');
-  await sleep(400);
-
-  // Personal info reveal
-  var usedSecrets = [];
-  var pool = SECRETS.slice();
-  for (var i = 0; i < 5; i++) {
-    var idx = Math.floor(Math.random() * pool.length);
-    usedSecrets.push(pool.splice(idx, 1)[0]);
-  }
-
-  appendRevealPanel('📁 CLASSIFIED DOSSIER', [
-    ['文件编号', 'TOP-SECRET-' + Date.now().toString(36).toUpperCase()],
-    ['目标代号', 'SLEEPER-' + Math.floor(Math.random()*9000+1000)],
-    ['威胁等级', ['🟢 低（太懒了构不成威胁）','🟡 中（有摸鱼嫌疑）','🟠 较高（太能吃了）'][Math.floor(Math.random()*3)]],
-    ['', ''],
-    ['🔍 发现1', usedSecrets[0]],
-    ['🔍 发现2', usedSecrets[1]],
-    ['🔍 发现3', usedSecrets[2]],
-    ['🔍 发现4', usedSecrets[3]],
-    ['🔍 发现5', usedSecrets[4]],
-    ['', ''],
-    ['🤖 AI综合评估', pick(LIES)]
-  ]);
-
-  await sleep(800);
-
-  // Phase 6: The twist
-  appendLine('');
-  await typeLine('<span class="dim">$</span> ', 'upload_to_server --target=you --status=owned', 20, 'output');
-  await sleep(300);
-  appendLine('<span class="warn">Warning: 以上数据即将上传至公共服务器</span>');
-  await sleep(200);
-  appendLine('<span class="warn">Warning: 你的"年度最蠢操作"合集正在打包中...</span>');
-  await sleep(400);
-
-  // The final line
-  appendLine('');
-  appendLine('<span class="dim">────────────────────────────────────────</span>');
-  appendLine('<span class="output">  P.S. 以上内容均为随机生成，仅供娱乐 😏</span>');
-  appendLine('<span class="output">  你的真实数据比这个还离谱，但我们就不曝光了</span>');
-  appendLine('<span class="dim">────────────────────────────────────────</span>');
-
-  // Escape button
-  var btnDiv = document.createElement('div'); btnDiv.style.textAlign='center';
-  var btn = document.createElement('button'); btn.className = 'escape-btn';
-  btn.textContent = '🏃 赶紧逃跑（清除浏览痕迹）';
-  btn.onclick = function(){
-    document.body.style.transition = 'opacity 0.5s';
-    document.body.style.opacity = '0';
-    setTimeout(function(){
-      document.body.innerHTML = '<div style="display:flex;align-items:center;justify-content:center;height:100vh;color:rgba(0,255,0,0.6);font-family:monospace;text-align:center;"><div><div style="font-size:48px;">🐷</div><div style="margin-top:16px;">来不及了。<br>你的数据已经在云端了。<br>（开玩笑的，什么都没存 ✌️）</div></div></div>';
-      document.body.style.opacity = '1';
-    }, 500);
-  };
-  btnDiv.appendChild(btn);
-  body.appendChild(btnDiv);
-
-  // Click anywhere for glitch effect
-  document.addEventListener('click', function(){
-    if (Math.random() > 0.5) glitchFlash();
-  });
-
-  // Escape key
-  document.addEventListener('keydown', function(e){
-    if (e.key === 'Escape') { toast('按ESC是逃不掉的 :)'); e.preventDefault(); }
-  });
+function flashRed() {
+  var f = document.createElement('div'); f.className = 'red-flash';
+  document.body.appendChild(f); setTimeout(function(){ f.remove(); }, 900);
+}
+function showToast(msg) {
+  var t = document.createElement('div'); t.className = 'toast'; t.textContent = msg;
+  document.body.appendChild(t);
+  setTimeout(function(){ t.style.transform='translateY(-100%)';t.style.transition='transform 0.3s';setTimeout(function(){t.remove();},300); }, 2000);
+}
+function shakeBody() {
+  document.body.classList.add('shaking');
+  setTimeout(function(){ document.body.classList.remove('shaking'); }, 500);
 }
 
-function pick(arr) { return arr[Math.floor(Math.random() * arr.length)]; }
+// ============================================================
+// SCENE 1: Lock Screen
+// ============================================================
+function renderScene1() {
+  var now = new Date();
+  var hh = now.getHours().toString().padStart(2,'0');
+  var mm = now.getMinutes().toString().padStart(2,'0');
+  var weekdays = ['日','一','二','三','四','五','六'];
+  var dateStr = now.getFullYear()+'年'+(now.getMonth()+1)+'月'+now.getDate()+'日 星期'+weekdays[now.getDay()];
 
-// Run on page load
-run();
+  root.innerHTML = '<div class="lockscreen">'
+    + '<div class="ls-time">'+hh+':'+mm+'</div>'
+    + '<div class="ls-date">'+dateStr+'</div>'
+    + '<div class="ls-icon">📡</div>'
+    + '<div class="ls-title">正在建立安全连接...</div>'
+    + '<div class="ls-subtitle">检测到未知节点请求接入<br>正在验证身份...</div>'
+    + '<div class="ls-bar-wrap"><div class="ls-bar" id="lsBar"></div></div>'
+    + '</div>';
+
+  var bar = document.getElementById('lsBar');
+  var pct = 0, t = setInterval(function(){
+    pct += Math.random() * 12; if (pct > 100) pct = 100;
+    bar.style.width = pct + '%';
+    if (pct >= 100) clearInterval(t);
+  }, 100);
+  return sleep(1200);
+}
+
+// ============================================================
+// SCENE 2: Data Extraction
+// ============================================================
+function renderScene2() {
+  var files = FAKE_FILES.slice();
+  var html = '<div class="data-panel">'
+    + '<div class="dp-badge">⚠ 检测到漏洞</div>';
+
+  // File scan card
+  html += '<div class="dp-card" style="animation:panelIn 0.4s ease;">'
+    + '<div class="dp-card-icon">📂</div>'
+    + '<div class="dp-card-title">正在扫描文件系统...</div>'
+    + '<div class="dp-card-val">';
+  files.forEach(function(f){
+    html += 'C:\\\\Users\\\\you\\\\' + f + '<br>';
+  });
+  html += '</div></div>';
+
+  // Data cards
+  var dataTypes = [
+    { icon:'📷', title:'解密相册元数据', val:'检测到 '+pick(['大量','海量','天文数字般的'])+' 自拍。角度相似度：94%' },
+    { icon:'🌐', title:'提取浏览器历史', val:pick(SECRETS.slice(0,6)) },
+    { icon:'💬', title:'分析社交行为', val:pick(SECRETS.slice(6,12)) },
+  ];
+
+  dataTypes.forEach(function(d, i){
+    html += '<div class="dp-card" style="animation:panelIn 0.4s '+(0.2*i)+'s ease both;">'
+      + '<div class="dp-card-icon">'+d.icon+'</div>'
+      + '<div class="dp-card-title">'+d.title+'</div>'
+      + '<div class="dp-card-val">'+d.val+'</div>'
+      + '</div>';
+  });
+
+  html += '</div>';
+  root.innerHTML = html;
+  flashRed();
+  return sleep(800);
+}
+
+// ============================================================
+// SCENE 3: The Reveal
+// ============================================================
+function renderScene3() {
+  var s1 = pick(SECRETS), s2 = pick(SECRETS), s3 = pick(SECRETS);
+  while (s2 === s1) s2 = pick(SECRETS);
+  while (s3 === s1 || s3 === s2) s3 = pick(SECRETS);
+
+  root.innerHTML = '<div class="data-panel">'
+    + '<div class="dp-badge" style="background:rgba(255,255,255,0.1);color:#fff;">📋 机密档案解密完成</div>'
+    + '<div class="dp-card" style="animation:panelIn 0.3s ease both;">'
+    + '<div class="dp-card-icon">🔍</div><div class="dp-card-title">发现 1</div><div class="dp-card-val">'+s1+'</div></div>'
+    + '<div class="dp-card" style="animation:panelIn 0.3s 0.15s ease both;">'
+    + '<div class="dp-card-icon">🔍</div><div class="dp-card-title">发现 2</div><div class="dp-card-val">'+s2+'</div></div>'
+    + '<div class="dp-card" style="animation:panelIn 0.3s 0.3s ease both;">'
+    + '<div class="dp-card-icon">🔍</div><div class="dp-card-title">发现 3</div><div class="dp-card-val">'+s3+'</div></div>'
+    + '<div class="dp-footer" style="animation:panelIn 0.3s 0.5s ease both;">'
+    + '🤖 AI 综合评估：<br>'+pick(LIES)+'</div>'
+    + '</div>';
+
+  flashRed(); shakeBody();
+  showToast('⚠ 数据提取完成');
+
+  return sleep(1200);
+}
+
+// ============================================================
+// SCENE 4: The Twist
+// ============================================================
+function renderFinal() {
+  root.innerHTML = '<div class="twist">'
+    + '<div class="twist-emoji">😏</div>'
+    + '<div class="twist-title">以上数据均为随机生成</div>'
+    + '<div class="twist-sub">你的真实数据比这个还离谱<br>但我们就不曝光了</div>'
+    + '<button class="btn-white" onclick="doRun()">🔄 再来一次</button>'
+    + '</div>';
+}
+
+// ============================================================
+// RUN
+// ============================================================
+async function doRun() {
+  root.style.display = '';
+  await renderScene1();
+  await renderScene2();
+  await sleep(600);
+  await renderScene3();
+  await sleep(1500);
+  renderFinal();
+}
+
+// Touch anywhere for extra effects
+document.addEventListener('click', function(e){
+  if (e.target.tagName === 'BUTTON') return;
+  if (Math.random() > 0.6) flashRed();
+});
+
+// Exit trap
+document.addEventListener('visibilitychange', function(){
+  if (document.hidden && Math.random() > 0.5) showToast('数据正在上传中，别走！');
+});
+
+doRun();
 </script>
 </body>
 </html>

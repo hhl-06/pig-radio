@@ -9,516 +9,577 @@
 
 body {
   font-family: -apple-system, "PingFang SC", "Microsoft YaHei", sans-serif;
-  background:#000;
-  min-height:100vh; min-height:100dvh;
+  background:#000; min-height:100vh; min-height:100dvh;
   display:flex; align-items:center; justify-content:center;
-  color:#fff; overflow-x:hidden;
+  color:#fff; overflow:hidden;
   user-select:none; -webkit-user-select:none;
   -webkit-tap-highlight-color:transparent;
 }
 
-/* Scan line overlay */
+/* Ambient scan lines */
 body::after {
   content:''; position:fixed; top:0;left:0;right:0;bottom:0;
-  background: repeating-linear-gradient(0deg, rgba(255,255,255,0.015) 0px, rgba(255,255,255,0.015) 2px, transparent 2px, transparent 4px);
-  pointer-events:none; z-index:999;
+  background: repeating-linear-gradient(0deg, rgba(255,255,255,0.012) 0px, rgba(255,255,255,0.012) 2px, transparent 2px, transparent 4px);
+  pointer-events:none; z-index:1000;
 }
 
 /* ============================================================
-   SCENE 0: BIOMETRIC SCAN
+   SCENE: BOOT
    ============================================================ */
-.bio-scan {
-  width:100%; max-width:400px; text-align:center; padding:40px 24px;
-}
-.bio-scan .bio-ring {
-  width:160px; height:160px; border-radius:50%; margin:0 auto 24px;
-  position:relative; display:flex; align-items:center; justify-content:center;
-  background: radial-gradient(circle, rgba(255,255,255,0.04) 0%, transparent 70%);
-  border:2px solid rgba(255,255,255,0.1);
-  animation: bioPulse 1.5s ease-in-out infinite;
-}
-@keyframes bioPulse {
-  0%,100%{ border-color:rgba(255,255,255,0.1); box-shadow:0 0 0 0 rgba(255,255,255,0.05); }
-  50%{ border-color:rgba(255,255,255,0.3); box-shadow:0 0 40px rgba(255,255,255,0.1); }
-}
-.bio-scan .bio-ring .bio-face { font-size:64px; }
-.bio-scan .bio-ring .bio-progress {
-  position:absolute; top:-2px; left:-2px; right:-2px; bottom:-2px;
-  border-radius:50%; border:2px solid transparent;
-  border-top-color:rgba(255,255,255,0.6);
-  animation: bioSpin 1.5s linear infinite;
-}
-@keyframes bioSpin { to{transform:rotate(360deg);} }
-.bio-scan .bio-title {
-  font-size:18px; font-weight:600; color:rgba(255,255,255,0.8); margin-bottom:6px;
-}
-.bio-scan .bio-sub {
-  font-size:13px; color:rgba(255,255,255,0.35); line-height:1.8;
-}
+.boot { width:100%; max-width:400px; padding:30px; text-align:center; }
+.boot .boot-logo { font-size:56px; margin-bottom:16px; }
+.boot .boot-title { font-size:12px; color:rgba(255,255,255,0.4); letter-spacing:4px; margin-bottom:20px; }
+.boot .boot-log { text-align:left; font:11px/2 "SF Mono","Courier New",monospace; color:rgba(255,255,255,0.25); max-width:300px; margin:0 auto; transition:color 0.2s; }
+.boot .boot-log .done { color:rgba(50,215,75,0.6); }
 
 /* ============================================================
-   SCENE 1: CONNECTION
+   SCENE: TARGET
    ============================================================ */
-.connect-screen {
-  width:100%; max-width:400px; text-align:center; padding:40px 24px;
+.target { width:100%; max-width:400px; padding:30px; text-align:center; }
+.target .tgt-radar {
+  width:180px; height:180px; border-radius:50%; margin:0 auto 20px;
+  border:2px solid rgba(255,255,255,0.08);
+  position:relative; overflow:hidden;
+  background: radial-gradient(circle at center, rgba(255,59,48,0.08) 0%, transparent 60%);
 }
-.connect-screen .cs-time {
-  font-size:60px; font-weight:200; letter-spacing:4px; margin-bottom:4px;
+.target .tgt-radar .tgt-sweep {
+  position:absolute; top:50%; left:50%; width:50%; height:1px;
+  background: linear-gradient(90deg, rgba(255,255,255,0.3), transparent);
+  transform-origin:0 0; animation: radarSweep 2s linear infinite;
 }
-.connect-screen .cs-date {
-  font-size:14px; color:rgba(255,255,255,0.4); margin-bottom:36px;
+@keyframes radarSweep { from{transform:rotate(0deg);} to{transform:rotate(360deg);} }
+.target .tgt-radar .tgt-dot {
+  position:absolute; width:8px; height:8px; background:#ff3b30; border-radius:50%;
+  box-shadow:0 0 8px #ff3b30; animation: dotBlink 0.8s ease infinite;
 }
-.connect-screen .cs-icon { font-size:56px; margin-bottom:12px; }
-.connect-screen .cs-title { font-size:16px; font-weight:600; color:rgba(255,255,255,0.7); margin-bottom:6px; }
-.connect-screen .cs-sub { font-size:13px; color:rgba(255,255,255,0.3); margin-bottom:20px; }
-.connect-screen .cs-log {
-  text-align:left; font-family:"SF Mono","Courier New",monospace; font-size:11px;
-  color:rgba(255,255,255,0.2); line-height:2; max-width:300px; margin:0 auto;
-}
+@keyframes dotBlink { 0%,100%{opacity:0.4;} 50%{opacity:1;} }
+.target .tgt-title { font-size:16px; font-weight:600; color:rgba(255,255,255,0.7); margin-bottom:6px; }
+.target .tgt-sub { font-size:13px; color:rgba(255,255,255,0.3); line-height:1.8; }
 
 /* ============================================================
-   SCENE 2+: DATA PANELS
+   SCENE: BREACH
    ============================================================ */
-.data-scene {
-  width:100%; max-width:400px; padding:16px; text-align:center;
-}
-.data-scene .ds-badge {
+.breach { width:100%; max-width:400px; padding:24px; text-align:center; }
+.breach .br-badge {
   display:inline-block; padding:6px 18px; border-radius:20px;
-  font-size:12px; font-weight:700; letter-spacing:2px; margin-bottom:18px;
+  background:rgba(255,200,0,0.1); color:#fc0; font-size:12px; font-weight:700;
+  letter-spacing:2px; margin-bottom:16px;
 }
-.ds-badge.red { background:rgba(255,59,48,0.15); color:#ff3b30; animation:badgePulse 1.5s ease infinite; }
-.ds-badge.yellow { background:rgba(255,200,0,0.12); color:#ffcc00; }
-.ds-badge.green { background:rgba(50,215,75,0.12); color:#32d74b; }
-@keyframes badgePulse {
-  0%,100%{box-shadow:0 0 0 0 rgba(255,59,48,0.3);}
-  50%{box-shadow:0 0 0 20px rgba(255,59,48,0);}
-}
-
-.ds-card {
-  background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.06);
-  border-radius:12px; padding:18px; margin-bottom:10px; text-align:left;
-  animation: cardIn 0.4s ease both;
-}
-@keyframes cardIn { from{opacity:0;transform:translateY(16px);} to{opacity:1;transform:translateY(0);} }
-
-.ds-card .card-icon { font-size:26px; margin-bottom:6px; }
-.ds-card .card-title { font-size:13px; font-weight:700; color:rgba(255,255,255,0.7); margin-bottom:4px; }
-.ds-card .card-val { font-size:14px; color:rgba(255,255,255,0.45); line-height:1.7; }
-.ds-card .card-prog {
-  height:3px; background:rgba(255,255,255,0.06); border-radius:2px; margin-top:8px;
-  overflow:hidden;
-}
-.ds-card .card-prog .card-prog-bar {
-  height:100%; background:rgba(255,255,255,0.3); border-radius:2px;
-  transition:width 0.4s ease; width:0%;
-}
-
-.ds-footer {
-  margin-top:16px; font-size:12px; color:rgba(255,255,255,0.2); line-height:1.8;
-}
+.breach .br-list { text-align:left; font:12px/2.2 "SF Mono","Courier New",monospace; max-width:300px; margin:0 auto; }
+.breach .br-list .pass-try { color:rgba(255,255,255,0.2); }
+.breach .br-list .pass-fail { color:rgba(255,59,48,0.5); }
+.breach .br-list .pass-ok { color:rgba(50,215,75,0.7); }
+.breach .br-result { margin-top:20px; padding:14px; background:rgba(255,59,48,0.06); border:1px solid rgba(255,59,48,0.15); border-radius:8px; }
+.breach .br-result .br-ip { font:10px/1.8 "SF Mono",monospace; color:rgba(255,255,255,0.3); }
+.breach .br-result .br-head { font-size:14px; font-weight:700; color:#ff3b30; margin:6px 0; }
 
 /* ============================================================
-   NATIVE DIALOG FAKE
+   SCENE: DATA CARDS
    ============================================================ */
-.native-dialog {
-  position:fixed; top:0;left:0;right:0;bottom:0;
-  background:rgba(0,0,0,0.75); z-index:500;
-  display:flex; align-items:center; justify-content:center;
-  animation: fadeIn 0.2s ease;
+.datacards { width:100%; max-width:400px; padding:16px; }
+.datacards .dc-badge {
+  display:inline-block; padding:5px 16px; border-radius:20px;
+  font-size:12px; font-weight:700; letter-spacing:2px; margin-bottom:14px;
 }
-@keyframes fadeIn { from{opacity:0;} to{opacity:1;} }
-.native-dialog .nd-box {
-  background:#1c1c1e; border-radius:14px; max-width:300px; width:90%;
-  overflow:hidden; animation: popIn 0.3s cubic-bezier(0.175,0.885,0.32,1.275);
+.dc-badge.warn { background:rgba(255,59,48,0.12); color:#ff3b30; animation:badgePulse 1.5s ease infinite; }
+.dc-badge.info { background:rgba(255,200,0,0.1); color:#fc0; }
+@keyframes badgePulse { 0%,100%{box-shadow:0 0 0 0 rgba(255,59,48,0.3);} 50%{box-shadow:0 0 0 24px rgba(255,59,48,0);} }
+
+.dc-card {
+  background:rgba(255,255,255,0.025); border:1px solid rgba(255,255,255,0.05);
+  border-radius:10px; padding:16px; margin-bottom:8px; text-align:left;
+  animation: cardSlide 0.35s ease both;
 }
-@keyframes popIn { from{transform:scale(0.8);opacity:0;} to{transform:scale(1);opacity:1;} }
-.native-dialog .nd-header {
-  padding:20px 20px 0; text-align:center;
-}
-.native-dialog .nd-title { font-size:17px; font-weight:600; margin-bottom:4px; }
-.native-dialog .nd-body { padding:4px 20px 16px; text-align:center; font-size:13px; color:rgba(255,255,255,0.5); line-height:1.6; }
-.native-dialog .nd-btns { border-top:1px solid rgba(255,255,255,0.08); display:flex; }
-.native-dialog .nd-btn {
-  flex:1; padding:12px; text-align:center; font-size:17px; font-weight:500;
-  color:#0a84ff; cursor:pointer; border:none; background:none; font-family:inherit;
-  border-right:1px solid rgba(255,255,255,0.08);
-  touch-action:manipulation; -webkit-tap-highlight-color:transparent;
-}
-.native-dialog .nd-btn:last-child { border-right:none; }
-.native-dialog .nd-btn:active { background:rgba(255,255,255,0.05); }
+@keyframes cardSlide { from{opacity:0;transform:translateY(14px);} to{opacity:1;transform:translateY(0);} }
+.dc-card .dc-icon { font-size:22px; margin-bottom:4px; }
+.dc-card .dc-title { font-size:12px; font-weight:600; color:rgba(255,255,255,0.5); margin-bottom:4px; }
+.dc-card .dc-val { font-size:14px; color:rgba(255,255,255,0.7); line-height:1.7; }
+
+.dc-footer { text-align:center; margin-top:14px; font-size:12px; color:rgba(255,255,255,0.18); line-height:1.8; }
 
 /* ============================================================
-   SELF DESTRUCT COUNTDOWN
+   SCENE: COUNTDOWN
    ============================================================ */
 .countdown-overlay {
-  position:fixed; top:0;left:0;right:0;bottom:0;
-  background:rgba(0,0,0,0.95); z-index:600;
-  display:flex; flex-direction:column; align-items:center; justify-content:center;
+  position:fixed; top:0;left:0;right:0;bottom:0; background:rgba(0,0,0,0.95);
+  z-index:500; display:flex; flex-direction:column; align-items:center; justify-content:center;
   animation: fadeIn 0.3s ease;
 }
+@keyframes fadeIn { from{opacity:0;} to{opacity:1;} }
 .countdown-overlay .cd-num {
-  font-size:120px; font-weight:200; color:#ff3b30;
-  transition: transform 0.1s ease;
-  font-family:"SF Mono","Courier New",monospace;
+  font:200 120px "SF Mono","Courier New",monospace;
+  color:#ff3b30; transition:transform 0.15s ease, color 0.15s ease;
 }
-.countdown-overlay .cd-num.pulse { transform:scale(1.2); color:#fff; }
-.countdown-overlay .cd-label {
-  font-size:14px; color:rgba(255,255,255,0.4); margin-top:8px;
-  letter-spacing:4px;
-}
+.countdown-overlay .cd-num.boom { transform:scale(1.15); color:#fff; }
+.countdown-overlay .cd-label { font-size:13px; color:rgba(255,255,255,0.3); margin-top:8px; letter-spacing:4px; }
 
 /* ============================================================
-   FINAL SCENE
+   SCENE: FINAL
    ============================================================ */
-.final-scene {
-  text-align:center; padding:30px 20px;
-  animation: cardIn 0.5s ease;
+.final { text-align:center; padding:30px 20px; animation: cardSlide 0.5s ease; }
+.final .fn-emoji { font-size:64px; margin-bottom:12px; }
+.final .fn-title { font-size:19px; font-weight:700; color:#fff; margin-bottom:8px; }
+.final .fn-sub { font-size:14px; color:rgba(255,255,255,0.4); line-height:1.8; margin-bottom:18px; }
+.final .fn-btn {
+  display:inline-block; padding:13px 36px; border-radius:24px; background:#fff; color:#000;
+  font-size:15px; font-weight:700; border:none; cursor:pointer; font-family:inherit;
+  letter-spacing:1px; touch-action:manipulation; -webkit-tap-highlight-color:transparent;
 }
-.final-scene .fs-emoji { font-size:72px; margin-bottom:14px; }
-.final-scene .fs-title { font-size:20px; font-weight:700; color:#fff; margin-bottom:8px; }
-.final-scene .fs-sub { font-size:14px; color:rgba(255,255,255,0.45); line-height:1.8; margin-bottom:20px; }
+.final .fn-btn:active { transform:scale(0.96); }
 
 /* ============================================================
    EFFECTS
    ============================================================ */
-.red-flash {
-  position:fixed; top:0;left:0;right:0;bottom:0;
-  background:rgba(255,0,0,0.12); pointer-events:none; z-index:400;
-  animation: redPulse 0.7s ease-out forwards;
-}
-@keyframes redPulse { 0%{opacity:1;} 100%{opacity:0;} }
+.red-flash { position:fixed; top:0;left:0;right:0;bottom:0; background:rgba(255,0,0,0.12); pointer-events:none; z-index:400; animation:flashOut 0.7s ease-out forwards; }
+.white-flash { position:fixed; top:0;left:0;right:0;bottom:0; background:rgba(255,255,255,0.08); pointer-events:none; z-index:400; animation:flashOut 0.5s ease-out forwards; }
+@keyframes flashOut { 0%{opacity:1;} 100%{opacity:0;} }
 
-body.shaking { animation: bodyShake 0.1s linear 4; }
-@keyframes bodyShake {
-  0%,100%{transform:translate(0,0);}
-  25%{transform:translate(-6px,3px);}
-  50%{transform:translate(5px,-4px);}
-  75%{transform:translate(-2px,1px);}
-}
+body.shake { animation: bShake 0.1s linear 4; }
+@keyframes bShake { 0%,100%{transform:translate(0,0);} 25%{transform:translate(-6px,3px);} 50%{transform:translate(5px,-4px);} 75%{transform:translate(-2px,1px);} }
 
-body.glitching { animation: glitchSkew 0.15s linear 3; }
-@keyframes glitchSkew {
-  0%,100%{filter:none;transform:none;}
-  33%{filter:hue-rotate(90deg);transform:skewX(2deg);}
-  66%{filter:hue-rotate(-60deg);transform:skewX(-1deg);}
-}
+body.glitch { animation: bGlitch 0.12s linear 3; }
+@keyframes bGlitch { 0%,100%{filter:none;transform:none;} 33%{filter:hue-rotate(90deg);transform:skewX(2deg);} 66%{filter:hue-rotate(-60deg);transform:skewX(-1deg);} }
 
 .toast {
-  position:fixed; top:0; left:0; right:0; z-index:500;
-  background:rgba(255,59,48,0.95); color:#fff; text-align:center;
-  padding:12px 20px; font-size:13px; font-weight:600;
-  animation: toastDown 0.3s ease-out;
+  position:fixed; top:0; left:0; right:0; z-index:600; padding:12px 20px;
+  text-align:center; font-size:13px; font-weight:600;
+  animation: toastIn 0.3s ease-out;
 }
-@keyframes toastDown { from{transform:translateY(-100%);} to{transform:translateY(0);} }
+.toast.red { background:rgba(255,59,48,0.95); color:#fff; }
+.toast.green { background:rgba(50,215,75,0.9); color:#000; }
+.toast.white { background:rgba(255,255,255,0.9); color:#000; }
+@keyframes toastIn { from{transform:translateY(-100%);} to{transform:translateY(0);} }
 
-/* ============================================================
-   BUTTONS
-   ============================================================ */
-.btn-white {
-  display:inline-block; padding:14px 40px; border-radius:25px;
-  background:#fff; color:#000; font-size:16px; font-weight:700;
-  border:none; cursor:pointer; font-family:inherit; letter-spacing:1px;
-  touch-action:manipulation; -webkit-tap-highlight-color:transparent;
+/* Matrix rain */
+.matrix-rain { position:fixed; top:0;left:0;right:0;bottom:0; pointer-events:none; z-index:300; }
+.matrix-char { position:absolute; color:rgba(0,255,0,0.3); font:12px monospace; animation: matrixFall linear forwards; }
+@keyframes matrixFall { 0%{transform:translateY(-20px);opacity:1;} 100%{transform:translateY(105vh);opacity:0;} }
+
+/* Crack overlay */
+.crack-overlay { position:fixed; top:0;left:0;right:0;bottom:0; pointer-events:none; z-index:450; }
+.crack-overlay .crack-line {
+  position:absolute; background:rgba(255,255,255,0.6); transform-origin:0 0;
+  animation: crackAppear 0.3s ease-out forwards;
 }
-.btn-white:hover { transform:scale(1.03); }
-.btn-white:active { transform:scale(0.97); }
+@keyframes crackAppear { from{transform:scaleX(0);} to{transform:scaleX(1);} }
+
+/* Dialog */
+.dialog-overlay {
+  position:fixed; top:0;left:0;right:0;bottom:0; background:rgba(0,0,0,0.8);
+  z-index:500; display:flex; align-items:center; justify-content:center;
+  animation: fadeIn 0.2s ease;
+}
+.dialog-box { background:#1c1c1e; border-radius:14px; max-width:290px; width:90%; overflow:hidden; animation: popIn 0.3s cubic-bezier(0.175,0.885,0.32,1.275); }
+@keyframes popIn { from{transform:scale(0.85);opacity:0;} to{transform:scale(1);opacity:1;} }
+.dialog-box .dlg-header { padding:24px 20px 0; text-align:center; }
+.dialog-box .dlg-header .dlg-icon { font-size:44px; margin-bottom:8px; }
+.dialog-box .dlg-header .dlg-title { font-size:17px; font-weight:600; }
+.dialog-box .dlg-body { padding:8px 20px 18px; text-align:center; font-size:13px; color:rgba(255,255,255,0.5); line-height:1.6; }
+.dialog-box .dlg-btns { border-top:1px solid rgba(255,255,255,0.08); display:flex; }
+.dialog-box .dlg-btn { flex:1; padding:12px; text-align:center; font-size:17px; font-weight:500; color:#0a84ff; cursor:pointer; border:none; background:none; font-family:inherit; border-right:1px solid rgba(255,255,255,0.08); touch-action:manipulation; }
+.dialog-box .dlg-btn:last-child { border-right:none; }
+.dialog-box .dlg-btn:active { background:rgba(255,255,255,0.05); }
+
+@media (max-width:380px) {
+  .target .tgt-radar { width:150px;height:150px; }
+  .dc-card { padding:14px; }
+  .dc-card .dc-val { font-size:13px; }
+}
 </style>
 </head>
 <body>
-
 <div id="app"></div>
 
 <script>
+// ============================================================
+// ENGINE
+// ============================================================
 var root = document.getElementById('app');
 var audioCtx = null;
 
-function getCtx() {
+function ctx() {
   if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
   if (audioCtx.state === 'suspended') audioCtx.resume();
   return audioCtx;
 }
-function beep(freq, dur) {
-  try { var ctx=getCtx(),o=ctx.createOscillator(),g=ctx.createGain(); o.type='sine'; o.frequency.value=freq; g.gain.setValueAtTime(0.03,ctx.currentTime); g.gain.exponentialRampToValueAtTime(0.001,ctx.currentTime+dur); o.connect(g);g.connect(ctx.destination); o.start();o.stop(ctx.currentTime+dur); } catch(e) {}
+function beep(f,d,v) {
+  try { var c=ctx(),o=c.createOscillator(),g=c.createGain(); o.type='sine'; o.frequency.value=f; g.gain.setValueAtTime(v||0.03,c.currentTime); g.gain.exponentialRampToValueAtTime(0.001,c.currentTime+d); o.connect(g);g.connect(c.destination); o.start();o.stop(c.currentTime+d); } catch(e) {}
 }
-function beepHigh() { beep(880,0.08); }
-function beepLow() { beep(220,0.15); }
-function beepAlert() { beep(440,0.1); setTimeout(function(){ beep(880,0.12); },100); }
+function beepHi(){beep(880,0.06,0.03);} function beepLo(){beep(180,0.12,0.04);}
+function beepDouble(){beep(440,0.08,0.03);beep(880,0.1,0.03);}
+function beepAlert(){beep(330,0.12,0.04);setTimeout(function(){beep(660,0.1,0.04);},120);setTimeout(function(){beep(990,0.08,0.03);},240);}
+function sleep(ms){return new Promise(function(r){setTimeout(r,ms);});}
+function pick(a){return a[Math.floor(Math.random()*a.length)];}
+function rng(mn,mx){return Math.floor(Math.random()*(mx-mn+1))+mn;}
 
-function sleep(ms) { return new Promise(function(r){ setTimeout(r, ms); }); }
-function pick(arr) { return arr[Math.floor(Math.random() * arr.length)]; }
-function rng(min,max) { return Math.floor(Math.random()*(max-min+1))+min; }
+// Effects
+function flash(color){var f=document.createElement('div');f.className=color==='white'?'white-flash':'red-flash';document.body.appendChild(f);setTimeout(function(){f.remove();},800);}
+function shake(){document.body.classList.add('shake');setTimeout(function(){document.body.classList.remove('shake');},500);}
+function glitch(){document.body.classList.add('glitch');setTimeout(function(){document.body.classList.remove('glitch');},600);}
+function vibrate(p){if(navigator.vibrate)navigator.vibrate(p);}
 
-var SECRETS = [
-  '浏览器记录：87% 是"拖延症怎么治"（搜索了347次，一次没看）',
-  '本周打开外卖App 41次，实际下单0次——你是靠闻菜单活下来的？',
-  '手机日均亮屏 11.7 小时，击败全国 98% 的资本',
-  '过去一年共撤回微信消息 341 条，其中 340 条是打错字',
-  '自拍数量：2,847 张。角度完全相同的占 94%，换个角度吧求你了',
-  '闹钟平均响 4.7 次才起床。实际起床时间比预设晚 48 分钟——数据不会撒谎',
-  '周末平均起床时间：11:47。早餐？那是午餐',
-  '深夜0-3点活跃度极高，次日精神状态极差——两者相关性 99.8%',
-  '说"好的"的频率异常高（但内心活动：不好）',
-  '微信占手机内存 58%，其中聊天记录80%是"好的""收到""哈哈哈"',
-  '购物车待付款：47件。超半年未付：36件——商家已经放弃你了',
-  '密码中含"123"概率极高。安全评级：F——黑客狂喜',
-  '运动App本周步数：7 步（不含上厕所）——接近植物人水平',
-  'B站弹幕中"哈哈哈哈"占 67%（实际上一条都没笑出来）',
-  '收藏夹里"稍后再看"的视频：289个。实际看了：3个',
-  '手机相册截图数量：1,245张。其中 89% 截完就忘，再也没打开过'
-];
-
-var LIES = [
-  'DNA 回溯：你的基因中有 0.003% 来自远古土豆，这解释了为什么你爱躺平 🥔',
-  '前世追溯：唐朝御膳房一只偷吃的猫——与现世行为高度吻合',
-  'WiFi 记录：你蹭过 17 个陌生人的网络，其中 3 个密码是 12345678',
-  '你的输入法已经可以完美模拟你的聊天风格，甚至比你本人回复更快',
-  '淘宝标签：「只逛不买」——已被系统标记为高风险白嫖用户',
-  '深夜歌曲排行：《大悲咒》x 347 遍（只是助眠，没有出家计划）',
-  '根据点赞数据推算：你的审美标准为——只要是猫就点赞',
-  '美团数据显示你最喜欢的食物是：随便。其次是：都行'
-];
-
-var FAKE_FILES = [
-  '简历_最终版_v3_final_真的不改了_FINAL.doc',
-  '健身计划（从来没打开过）.xlsx',
-  '表情包收藏（人生最重要文件）.zip',
-  '待办事项（永远不会做）.txt',
-  '自拍合集（同一个角度 x 500）.jpg'
-];
-
-var NATIVE_DIALOGS = [
-  { title:'允许"系统服务"访问您的数据？', body:'此操作将允许远程节点读取您的设备信息、文件列表和使用数据。此权限无法撤回。', ok:'允许', cancel:'拒绝' },
-  { title:'检测到安全漏洞', body:'您的设备存在严重安全漏洞，建议立即修复。是否继续？', ok:'立即修复', cancel:'忽略风险' },
-  { title:'是否信任此连接？', body:'远程节点声称来自"合法机构"。验证失败：证书已过期 847 天。是否继续信任？', ok:'盲目信任', cancel:'谨慎拒绝' },
-];
-
-function flashRed() { var f=document.createElement('div');f.className='red-flash';document.body.appendChild(f);setTimeout(function(){f.remove();},800); }
-function shakeBody() { document.body.classList.add('shaking');setTimeout(function(){document.body.classList.remove('shaking');},500); }
-function glitchBody() { document.body.classList.add('glitching');setTimeout(function(){document.body.classList.remove('glitching');},600); }
-function showToast(msg) {
-  var t=document.createElement('div');t.className='toast';t.textContent=msg;document.body.appendChild(t);
-  setTimeout(function(){t.style.transform='translateY(-100%)';t.style.transition='transform 0.3s';setTimeout(function(){t.remove();},300);},2000);
+function toast(msg,color){
+  var t=document.createElement('div');t.className='toast '+(color||'red');t.textContent=msg;
+  document.body.appendChild(t);
+  setTimeout(function(){t.style.transform='translateY(-100%)';t.style.transition='transform 0.3s';setTimeout(function(){t.remove();},300);},1800);
 }
-function vibrate(p) { if(navigator.vibrate) navigator.vibrate(p); }
 
-// Fake native iOS-style dialog
-function showDialog(dialog) {
+function matrixRain(dur){
+  var container=document.createElement('div');container.className='matrix-rain';
+  var chars='01アイウエオカキクケコサシスセソタチツテト';
+  var w=window.innerWidth;
+  for(var i=0;i<40;i++){
+    var s=document.createElement('span');s.className='matrix-char';
+    s.textContent=chars[Math.floor(Math.random()*chars.length)];
+    s.style.left=Math.random()*w+'px';
+    s.style.animationDuration=(1.5+Math.random()*3)+'s';
+    s.style.animationDelay=Math.random()*0.8+'s';
+    container.appendChild(s);
+  }
+  document.body.appendChild(container);
+  setTimeout(function(){container.remove();},dur||3000);
+}
+
+function crackScreen(){
+  var c=document.createElement('div');c.className='crack-overlay';
+  for(var i=0;i<6;i++){
+    var line=document.createElement('div');line.className='crack-line';
+    var x=Math.random()*window.innerWidth,y=Math.random()*window.innerHeight;
+    line.style.left=x+'px';line.style.top=y+'px';
+    line.style.width=(40+Math.random()*120)+'px';line.style.height=(1+Math.random()*2)+'px';
+    line.style.transform='rotate('+((Math.random()-0.5)*90)+'deg)';
+    line.style.animationDelay=Math.random()*0.2+'s';
+    c.appendChild(line);
+  }
+  document.body.appendChild(c);
+  setTimeout(function(){c.remove();},600);
+}
+
+function showDialog(icon,title,body,cancelText,okText){
   return new Promise(function(resolve){
-    var overlay = document.createElement('div'); overlay.className = 'native-dialog';
-    overlay.innerHTML = '<div class="nd-box">'
-      + '<div class="nd-header"><span style="font-size:40px;">'+dialog.icon+'</span></div>'
-      + '<div class="nd-body" style="padding-top:12px;"><div class="nd-title">'+dialog.title+'</div>'+dialog.body+'</div>'
-      + '<div class="nd-btns"><button class="nd-btn" id="ndCancel">'+dialog.cancel+'</button><button class="nd-btn" id="ndOk" style="font-weight:600;">'+dialog.ok+'</button></div>'
-      + '</div>';
+    var overlay=document.createElement('div');overlay.className='dialog-overlay';
+    overlay.innerHTML='<div class="dialog-box"><div class="dlg-header"><div class="dlg-icon">'+icon+'</div><div class="dlg-title">'+title+'</div></div><div class="dlg-body">'+body+'</div><div class="dlg-btns"><button class="dlg-btn" id="dc">'+cancelText+'</button><button class="dlg-btn" id="do" style="font-weight:600;">'+okText+'</button></div></div>';
     document.body.appendChild(overlay);
-    document.getElementById('ndOk').onclick = function(){ overlay.remove(); resolve(true); };
-    document.getElementById('ndCancel').onclick = function(){ overlay.remove(); resolve(false); };
+    document.getElementById('dc').onclick=function(){overlay.remove();resolve(false);};
+    document.getElementById('do').onclick=function(){overlay.remove();resolve(true);};
   });
 }
 
 // ============================================================
-// SCENE 0: Biometric scan
+// CONTENT POOLS (30+ each for variety)
 // ============================================================
-async function sceneBio() {
-  root.innerHTML = '<div class="bio-scan">'
-    + '<div class="bio-ring"><span class="bio-face">😐</span><div class="bio-progress"></div></div>'
-    + '<div class="bio-title">正在验证身份...</div>'
-    + '<div class="bio-sub">请保持面部在扫描区域内</div></div>';
+var SECRETS_POOL = [
+  '浏览器记录："拖延症怎么治"搜索了 347 次，一次都没点开',
+  '本周外卖App打开41次，实际下单0次——靠光合作用活着？',
+  '手机日均亮屏 11.7 小时，击败全国 98% 的人',
+  '撤回消息 341 条，其中 340 条是打错字，1条是发错人',
+  '自拍 2,847 张，94% 角度完全一致——换个角度吧',
+  '闹钟平均响 4.7 次才起床，比预设晚 48 分钟',
+  '周末平均起床时间 11:47，早餐=午餐=下午茶',
+  '深夜0-3点活跃度极高，与次日精神萎靡相关性 99.8%',
+  '聊天中说"好的"频率异常高（内心活动：不好）',
+  '微信占内存 58%，80%聊天内容是"好的""收到""哈哈哈"',
+  '购物车 47 件待付款，超半年未付 36 件——商家放弃你了',
+  '密码含"123"概率极高，安全评级 F——黑客狂喜',
+  '运动App本周步数 7 步（不含厕所），接近植物人水平',
+  'B站"哈哈哈"弹幕占 67%（实际一条没笑）',
+  '收藏夹"稍后再看"289个，实际看了 3 个',
+  '截图 1,245 张，89% 截完就忘',
+  '连续点同一家外卖 32 天，被评为年度最专一干饭人',
+  '语音消息最长 3分24秒，对方只回了"嗯"',
+  '打开计算器假装算账，其实在发呆——频率：每日3次',
+  '输入法已学会你的全部说话套路，可完美冒充你聊天',
+  '深夜听歌排行：《大悲咒》x347（助眠，不是出家）',
+  '朋友圈封面换了 23 次，一张比一张抽象',
+  '淘宝记录标签：只逛不买——被系统标记为白嫖惯犯',
+  '美团数据：你最喜欢的口味是"随便"',
+  '看视频真正看完的占 3%，其他都是 3 秒划走',
+  'WiFi 记录：蹭过 17 个陌生网络，3 个密码是 12345678',
+  '抖音使用时间：日均 4.2 小时，刷完完全不记得刷了什么',
+  '记账App用了 3 天就放弃，第4天花了什么都不记得',
+  '年度最常用emoji：😂（但真正笑出来的次数为0）',
+  '手机里存了 47 个备忘录，其中 46 个是"明天要做"（从未执行）'
+];
 
-  for (var i = 0; i < 3; i++) {
-    await sleep(700);
-    beepHigh();
-    document.querySelector('.bio-ring').style.borderColor = 'rgba(255,255,255,0.4)';
-    document.querySelector('.bio-face').textContent = ['😐','🙂','😗'][i];
-    await sleep(200);
-    document.querySelector('.bio-ring').style.borderColor = 'rgba(255,255,255,0.1)';
+var AI_ASSESSMENTS = [
+  'DNA回溯：基因中有 0.003% 远古土豆血统——这解释了你的躺平天赋 🥔',
+  '前世追溯：唐朝御膳房一只偷吃的猫——与现世行为高度吻合',
+  '综合评分：你的懒惰指数超过全国 97% 的人口，恭喜夺冠',
+  '行为模型：你属于"嘴上说努力，身体很诚实"型人格',
+  '人格分类：ISTP（I=爱睡觉 S=随便 T=拖延 P=屁事不干）',
+  'MBTI重新定义：你的类型是 ZZZZ——以睡眠为主要活动',
+  '根据点赞数据：只要是猫你就点赞，审美=猫，无其他标准',
+  '你的聊天AI模拟器已训练完成，准确率99%，比本人回复更快',
+  '决策模式分析：大事犹豫不决，小事随便都行',
+  '消费画像：钱主要花在外卖和快递上，偶尔买点"可能会用到"的东西（永远不会用）',
+  '你的手机使用习惯已被收入《人类迷惑行为大赏》候选名单',
+  '经AI检测，你的自拍姿势只有3种，建议扩充曲库'
+];
+
+var FAKE_PASSWORDS = [
+  '123456','password','admin','iloveyou','woaishangban','mimamima',
+  'niconiconi','bietaihaowo','1234567890','qwerty','superman','batman',
+  'wozuishuai','suibian','gongzuoshiwo','tiaoguoshiwo','woyaoxiuxi'
+];
+
+var FAKE_FILES = [
+  '简历_最终版_v3_FINAL_真的不改了_再改是狗.doc',
+  '年度计划（从未执行过）.xlsx',
+  '表情包收藏_人生最重要文件.zip',
+  '待办事项_永远不会做.txt',
+  '自拍合集_同一角度x500.jpg',
+  '网上收藏的菜谱_从来没做过.pdf',
+  '英语学习资料_abandon之后就再也没打开过.ppt',
+  '减肥计划_明天开始.docx'
+];
+
+// ============================================================
+// SCENE 0: BOOT
+// ============================================================
+async function sceneBoot(){
+  root.innerHTML='<div class="boot"><div class="boot-logo">🔐</div><div class="boot-title">SECURE TERMINAL</div><div class="boot-log" id="blog"></div></div>';
+  var log=document.getElementById('blog');
+  var lines=[
+    'Initializing secure channel...',
+    'Handshake with node-'+Math.random().toString(36).substring(2,8)+'...',
+    'TLS 1.3 established.',
+    'Loading exploit kit...',
+    'Target identified: '+navigator.platform||'Unknown',
+    'Screen: '+window.screen.width+'x'+window.screen.height,
+    'Battery: '+rng(8,92)+'%',
+    'User agent fingerprint captured.',
+    '',
+    'ACCESS GRANTED.',
+  ];
+  for(var i=0;i<lines.length;i++){
+    log.innerHTML+=lines[i]+'<br>';
+    if(i===lines.length-3) matrixRain(2000);
+    if(i===lines.length-1){ log.innerHTML+='<span class="done">SYSTEM COMPROMISED.</span><br>'; beepAlert(); flash('red'); }
+    else beepLo();
+    await sleep(rng(120,300));
   }
-  await sleep(400);
-  beepAlert();
-  document.querySelector('.bio-face').textContent = '✅';
-  document.querySelector('.bio-title').textContent = '身份验证通过';
-  document.querySelector('.bio-sub').textContent = '但这不是你的设备...正在追踪来源';
-  await sleep(1500);
+  await sleep(600);
 }
 
 // ============================================================
-// SCENE 1: Connection log
+// SCENE 1: TARGET ACQUISITION
 // ============================================================
-async function sceneConnect() {
-  var now = new Date();
-  var hh = now.getHours().toString().padStart(2,'0'), mm = now.getMinutes().toString().padStart(2,'0');
-  var weekdays = ['日','一','二','三','四','五','六'];
-  var dateStr = now.getFullYear()+'年'+(now.getMonth()+1)+'月'+now.getDate()+'日 星期'+weekdays[now.getDay()];
+async function sceneTarget(){
+  var dotTop=rng(20,70), dotLeft=rng(25,65);
+  root.innerHTML='<div class="target">'
+    +'<div class="tgt-radar"><div class="tgt-sweep"></div><div class="tgt-dot" style="top:'+dotTop+'%;left:'+dotLeft+'%;" id="tdot"></div></div>'
+    +'<div class="tgt-title">正在定位目标设备...</div>'
+    +'<div class="tgt-sub" id="tsub">扫描附近信号源...</div></div>';
 
-  root.innerHTML = '<div class="connect-screen">'
-    + '<div class="cs-time">'+hh+':'+mm+'</div>'
-    + '<div class="cs-date">'+dateStr+'</div>'
-    + '<div class="cs-icon">📡</div>'
-    + '<div class="cs-title">远程节点已接入</div>'
-    + '<div class="cs-sub">正在枚举设备信息...</div>'
-    + '<div class="cs-log" id="csLog"></div></div>';
-
-  var log = document.getElementById('csLog');
-  var lines = [
-    '[OK] 建立加密隧道...',
-    '[OK] 获取设备标识符: '+Math.random().toString(36).substring(2,10).toUpperCase(),
-    '[OK] IP: 192.168.'+rng(1,254)+'.'+rng(1,254),
-    '[OK] 屏幕: '+window.screen.width+'x'+window.screen.height+' @ '+(window.devicePixelRatio||1)+'x',
-    '[OK] 电池: '+rng(5,95)+'% (够用了)',
-    '[OK] 系统版本: PotatoOS 24H2',
-  ];
-
-  for (var i = 0; i < lines.length; i++) {
-    log.innerHTML += lines[i] + '<br>';
-    beepLow();
-    await sleep(rng(150,350));
+  // Animate the dot blinking
+  for(var i=0;i<4;i++){
+    document.getElementById('tdot').style.opacity=i%2?'1':'0.3';
+    beepHi();
+    await sleep(500);
   }
 
-  await sleep(300);
-  flashRed();
-  vibrate([20,50,20]);
-  showToast('⚠ 检测到异常数据包');
+  document.getElementById('tdot').style.background='#32d74b';
+  document.getElementById('tdot').style.boxShadow='0 0 12px #32d74b';
+  document.getElementById('tdot').style.opacity='1';
+  document.getElementById('tgt-title').textContent='目标已锁定';
+  document.getElementById('tsub').textContent='IP: 192.168.'+rng(1,254)+'.'+rng(1,254)+'\n设备型号：Potato Phone Pro Max Ultra';
+  beepAlert(); flash('red'); vibrate([20,30,20]);
+  toast('📍 设备位置已确认','red');
+  await sleep(1800);
+}
 
-  // Fake dialog
-  var dlg = pick(NATIVE_DIALOGS);
-  dlg.icon = '⚠️';
-  await showDialog(dlg);
-  // Regardless of choice, continue
-  showToast('选择无效，系统已自动授权');
+// ============================================================
+// SCENE 2: BREACH
+// ============================================================
+async function sceneBreach(){
+  root.innerHTML='<div class="breach"><div class="br-badge">🔑 正在破解...</div><div class="br-list" id="brlist"></div></div>';
+  var list=document.getElementById('brlist');
+
+  // Try passwords
+  var tries=pick(FAKE_PASSWORDS);
+  for(var i=0;i<4;i++){
+    var pw=pick(FAKE_PASSWORDS);
+    list.innerHTML+='<span class="pass-try">尝试: '+pw+'</span> <span class="pass-fail">✗</span><br>';
+    beep(150+(i+1)*40,0.08,0.02);
+    await sleep(rng(200,400));
+  }
+  await sleep(300);
+  list.innerHTML+='<span class="pass-try">启用AI暴力破解...</span><br>';
+  await sleep(600);
+  for(var i=0;i<8;i++){
+    list.innerHTML+='<span class="pass-try">'+Math.random().toString(36).substring(2,14)+'</span> <span class="pass-fail">✗</span><br>';
+    beep(300+i*50,0.05,0.015);
+    await sleep(rng(60,150));
+  }
+  await sleep(200);
+  list.innerHTML+='<span class="pass-ok">✓ 密码已破解: hunter2</span><br>';
+  beepDouble();
+
+  // Access result
+  var div=document.createElement('div');div.className='br-result';
+  div.innerHTML='<div class="br-ip">root@'+Math.random().toString(36).substring(2,8)+':~# whoami<br>you<br><br>root@server:~# cat /etc/shadow<br>（密码哈希已获取）</div><div class="br-head">⚠ 系统已入侵</div>';
+  root.querySelector('.breach').appendChild(div);
+
+  flash('red');shake();vibrate([15,25,15,25,15]);
+  toast('🔓 密码验证已绕过','red');
+  await sleep(500);
+
+  var dlg=await showDialog('⚠️','检测到入侵行为','远程节点正在尝试访问您的文件系统。是否允许？<br><br>（无论选哪个都会继续）','拒绝访问','允许（推荐）');
+  toast('选择无效，系统已自动授权','white');
   await sleep(800);
 }
 
 // ============================================================
-// SCENE 2: File scan
+// SCENE 3: FILE SCAN
 // ============================================================
-async function sceneFiles() {
-  root.innerHTML = '<div class="data-scene">'
-    + '<div class="ds-badge red">⚠ 漏洞已确认</div>';
+async function sceneFiles(){
+  root.innerHTML='<div class="datacards"><div class="dc-badge warn">📂 正在扫描文件系统...</div></div>';
+  var container=root.querySelector('.datacards');
 
-  var html = '';
-  FAKE_FILES.forEach(function(f, i){
-    html += '<div class="ds-card" style="animation-delay:'+(i*0.12)+'s">'
-      + '<div class="card-icon">📄</div>'
-      + '<div class="card-title">发现文件</div>'
-      + '<div class="card-val">C:\\\\Users\\\\you\\\\'+f+'</div>'
-      + '<div class="card-prog"><div class="card-prog-bar" id="fp'+i+'"></div></div>'
-      + '</div>';
-  });
-  html += '</div>';
-  root.innerHTML = html;
-
-  for (var i = 0; i < FAKE_FILES.length; i++) {
-    var bar = document.getElementById('fp'+i);
-    if (bar) { bar.style.width = '100%'; beepLow(); }
-    await sleep(250);
+  for(var i=0;i<FAKE_FILES.length;i++){
+    var card=document.createElement('div');card.className='dc-card';
+    card.style.animationDelay=i*0.1+'s';
+    card.innerHTML='<div class="dc-icon">📄</div><div class="dc-title">发现文件 '+(i+1)+'/'+FAKE_FILES.length+'</div><div class="dc-val">C:\\\\Users\\\\you\\\\'+FAKE_FILES[i]+'</div>';
+    container.appendChild(card);
+    beepLo();
+    await sleep(rng(180,350));
   }
-  await sleep(300);
-  flashRed(); vibrate([30,30,30]);
-  showToast('📂 文件系统已被读取');
+
+  flash('red'); vibrate([20,25,20]);
+  toast('📂 '+FAKE_FILES.length+' 个文件已被索引','red');
+  await sleep(600);
 }
 
 // ============================================================
-// SCENE 3: Data extraction
+// SCENE 4: DATA EXTRACTION
 // ============================================================
-async function sceneData() {
-  var s1 = pick(SECRETS), s2 = pick(SECRETS), s3 = pick(SECRETS);
-  while (s2===s1) s2=pick(SECRETS);
-  while (s3===s1||s3===s2) s3=pick(SECRETS);
+async function sceneData(){
+  root.innerHTML='<div class="datacards"><div class="dc-badge info">🔓 解密隐私数据...</div></div>';
+  var container=root.querySelector('.datacards');
 
-  root.innerHTML = '<div class="data-scene">'
-    + '<div class="ds-badge yellow">🔓 正在解密...</div>';
-
-  var cards = [
-    { icon:'📷', title:'相册数据分析', val:s1 },
-    { icon:'🌐', title:'浏览器历史', val:s2 },
-    { icon:'💬', title:'社交行为模式', val:s3 },
-    { icon:'🧠', title:'AI综合评估', val:pick(LIES) },
+  var used=[];
+  var pool=SECRETS_POOL.slice();
+  var cards=[
+    {icon:'📷',title:'相册元数据分析'},
+    {icon:'🌐',title:'浏览器历史记录'},
+    {icon:'💬',title:'社交行为模式'},
+    {icon:'🎵',title:'深夜听歌报告'},
+    {icon:'🛒',title:'消费行为画像'},
   ];
 
-  cards.forEach(function(c, i){
-    var div = document.createElement('div'); div.className = 'ds-card';
-    div.style.animationDelay = (i*0.2)+'s';
-    div.innerHTML = '<div class="card-icon">'+c.icon+'</div>'
-      + '<div class="card-title">'+c.title+'</div>'
-      + '<div class="card-val">'+c.val+'</div>';
-    root.querySelector('.data-scene').appendChild(div);
-  });
+  for(var i=0;i<cards.length;i++){
+    var c=cards[i];
+    var idx=Math.floor(Math.random()*pool.length);
+    var secret=pool.splice(idx,1)[0];
 
-  // Add footer
-  var footer = document.createElement('div'); footer.className = 'ds-footer';
-  footer.style.animationDelay = '0.9s';
-  footer.innerHTML = '数据来源：你<br>真实性：毋庸置疑';
-  root.querySelector('.data-scene').appendChild(footer);
+    var card=document.createElement('div');card.className='dc-card';
+    card.style.animationDelay=i*0.15+'s';
+    card.innerHTML='<div class="dc-icon">'+c.icon+'</div><div class="dc-title">'+c.title+'</div><div class="dc-val">'+secret+'</div>';
+    container.appendChild(card);
+    beep(400+i*80,0.06,0.02);
+    await sleep(rng(300,500));
+  }
 
-  await sleep(600);
-  flashRed(); glitchBody(); vibrate([10,20,10,20,10]);
-  showToast('🔓 解密完成，数据已打包');
-  await sleep(1200);
+  // AI assessment
+  await sleep(200);
+  var aiCard=document.createElement('div');aiCard.className='dc-card';
+  aiCard.style.animationDelay='0.8s';
+  aiCard.innerHTML='<div class="dc-icon">🤖</div><div class="dc-title">AI 综合评估</div><div class="dc-val">'+pick(AI_ASSESSMENTS)+'</div>';
+  container.appendChild(aiCard);
+
+  // Footer
+  var footer=document.createElement('div');footer.className='dc-footer';
+  footer.style.animationDelay='1s';
+  footer.innerHTML='数据来源：你的手机<br>真实性：千真万确（大概）';
+  container.appendChild(footer);
+
+  await sleep(400);
+  glitch();flash('white');vibrate([10,15,10,15,10,15,10]);
+  toast('📋 个人档案生成完毕','green');
+  await sleep(1400);
 }
 
 // ============================================================
-// SCENE 4: Self-destruct fake
+// SCENE 5: COUNTDOWN + CRACK
 // ============================================================
-async function sceneDestruct() {
-  var overlay = document.createElement('div'); overlay.className = 'countdown-overlay';
-  overlay.innerHTML = '<div class="cd-num" id="cdNum">5</div><div class="cd-label">数据即将上传至公共网络</div>';
+async function sceneCountdown(){
+  var overlay=document.createElement('div');overlay.className='countdown-overlay';
+  overlay.innerHTML='<div class="cd-num" id="cdn">5</div><div class="cd-label">⚠ 数据即将上传至公共网络 ⚠</div>';
   document.body.appendChild(overlay);
 
-  for (var i = 5; i >= 1; i--) {
-    document.getElementById('cdNum').textContent = i;
-    document.getElementById('cdNum').classList.add('pulse');
-    beep(220 + (5-i)*150, 0.2);
-    vibrate(80);
-    await sleep(400);
-    document.getElementById('cdNum').classList.remove('pulse');
-    await sleep(600);
+  for(var i=5;i>=1;i--){
+    document.getElementById('cdn').textContent=i;
+    document.getElementById('cdn').classList.add('boom');
+    beep(220+(5-i)*150,0.2,0.06);
+    vibrate([10,10,10]);
+    await sleep(300);
+    document.getElementById('cdn').classList.remove('boom');
+    await sleep(700);
   }
 
-  overlay.innerHTML = '<div class="cd-num" style="color:#fff;font-size:48px;">😏</div><div class="cd-label">开玩笑的</div>';
-  await sleep(1500);
+  // Fake crash
+  crackScreen();shake();glitch();flash('white');
+  overlay.innerHTML='<div class="cd-num" style="color:#fff;font-size:48px;">😏</div><div class="cd-label">骗你的</div>';
+  toast('上传已取消','white');
+  await sleep(2000);
   overlay.remove();
 }
 
 // ============================================================
-// SCENE 5: Final reveal
+// SCENE 6: FINAL
 // ============================================================
-function sceneFinal() {
-  root.innerHTML = '<div class="final-scene">'
-    + '<div class="fs-emoji">😏</div>'
-    + '<div class="fs-title">以上数据均为随机生成</div>'
-    + '<div class="fs-sub">你的真实数据<br>比这个还离谱<br>但我们就不曝光了</div>'
-    + '<button class="btn-white" onclick="run()">🔄 再被黑一次</button></div>';
+function sceneFinal(){
+  root.innerHTML='<div class="final">'
+    +'<div class="fn-emoji">😏</div>'
+    +'<div class="fn-title">以上所有数据均为随机生成</div>'
+    +'<div class="fn-sub">你的真实数据比这个还离谱<br>但我们选择不曝光<br><br>毕竟——谁还没点小秘密呢</div>'
+    +'<button class="fn-btn" onclick="run()">🔄 再被黑一次</button></div>';
 }
 
 // ============================================================
 // RUN
 // ============================================================
-async function run() {
-  root.style.display = '';
-  // Wake audio on first user interaction
-  document.addEventListener('click', function initAudio(){ getCtx(); }, {once:true});
+async function run(){
+  root.style.display='';
+  document.addEventListener('click',function a(){ctx();document.removeEventListener('click',a);},{once:true});
 
-  await sceneBio();
-  await sceneConnect();
+  await sceneBoot();
+  await sceneTarget();
+  await sceneBreach();
   await sceneFiles();
   await sceneData();
-  await sceneDestruct();
+  await sceneCountdown();
   sceneFinal();
 }
 
-// Touch anywhere for random glitch
-document.addEventListener('click', function(e){
-  if (e.target.tagName==='BUTTON') return;
-  if (Math.random()>0.5) { flashRed(); beep(rng(200,600),0.05); }
+// ============================================================
+// AMBIENT INTERACTIONS
+// ============================================================
+document.addEventListener('click',function(e){
+  if(e.target.tagName==='BUTTON')return;
+  if(Math.random()>0.4){flash('red');beep(rng(300,700),0.04,0.015);}
 });
 
-// Context menu trap
-document.addEventListener('contextmenu', function(e){ e.preventDefault(); showToast('右键已禁用 🔒'); });
+document.addEventListener('contextmenu',function(e){e.preventDefault();toast('🔒 右键已被封印','red');});
 
-// Exit trap
-document.addEventListener('visibilitychange', function(){
-  if (document.hidden && Math.random()>0.4) showToast('别走！你的数据还在上传...');
+document.addEventListener('visibilitychange',function(){
+  if(document.hidden&&Math.random()>0.4)toast('数据传输未完成，请勿离开','red');
 });
+
+// Escape key
+document.addEventListener('keydown',function(e){
+  if(e.key==='Escape'){e.preventDefault();toast('按 ESC 也无法逃脱','white');}
+});
+
+// Shake detection
+var lastShake=0;
+if(typeof DeviceMotionEvent!=='undefined'){
+  window.addEventListener('devicemotion',function(e){
+    var a=e.accelerationIncludingGravity;if(!a)return;
+    var m=Math.sqrt((a.x||0)**2+(a.y||0)**2+(a.z||0)**2);
+    if(m>20){var n=Date.now();if(n-lastShake<800)return;lastShake=n;shake();flash('red');toast('📳 摇晃无法中断入侵','red');}
+  });
+}
 
 run();
 </script>

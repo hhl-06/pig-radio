@@ -12,105 +12,199 @@ body {
   background:#000;
   min-height:100vh; min-height:100dvh;
   display:flex; align-items:center; justify-content:center;
-  color:#fff; overflow:hidden;
+  color:#fff; overflow-x:hidden;
   user-select:none; -webkit-user-select:none;
   -webkit-tap-highlight-color:transparent;
 }
 
+/* Scan line overlay */
+body::after {
+  content:''; position:fixed; top:0;left:0;right:0;bottom:0;
+  background: repeating-linear-gradient(0deg, rgba(255,255,255,0.015) 0px, rgba(255,255,255,0.015) 2px, transparent 2px, transparent 4px);
+  pointer-events:none; z-index:999;
+}
+
 /* ============================================================
-   SCENE 1: FAKE LOCK SCREEN
+   SCENE 0: BIOMETRIC SCAN
    ============================================================ */
-.lockscreen {
+.bio-scan {
   width:100%; max-width:400px; text-align:center; padding:40px 24px;
 }
-.lockscreen .ls-time {
-  font-size:64px; font-weight:200; letter-spacing:4px; margin-bottom:4px;
+.bio-scan .bio-ring {
+  width:160px; height:160px; border-radius:50%; margin:0 auto 24px;
+  position:relative; display:flex; align-items:center; justify-content:center;
+  background: radial-gradient(circle, rgba(255,255,255,0.04) 0%, transparent 70%);
+  border:2px solid rgba(255,255,255,0.1);
+  animation: bioPulse 1.5s ease-in-out infinite;
 }
-.lockscreen .ls-date {
-  font-size:15px; color:rgba(255,255,255,0.5); margin-bottom:40px;
+@keyframes bioPulse {
+  0%,100%{ border-color:rgba(255,255,255,0.1); box-shadow:0 0 0 0 rgba(255,255,255,0.05); }
+  50%{ border-color:rgba(255,255,255,0.3); box-shadow:0 0 40px rgba(255,255,255,0.1); }
 }
-.lockscreen .ls-icon {
-  font-size:72px; margin-bottom:16px; animation: floatIcon 2s ease-in-out infinite;
+.bio-scan .bio-ring .bio-face { font-size:64px; }
+.bio-scan .bio-ring .bio-progress {
+  position:absolute; top:-2px; left:-2px; right:-2px; bottom:-2px;
+  border-radius:50%; border:2px solid transparent;
+  border-top-color:rgba(255,255,255,0.6);
+  animation: bioSpin 1.5s linear infinite;
 }
-@keyframes floatIcon { 0%,100%{transform:translateY(0);} 50%{transform:translateY(-10px);} }
-.lockscreen .ls-title {
-  font-size:17px; font-weight:600; color:rgba(255,255,255,0.7); margin-bottom:8px;
+@keyframes bioSpin { to{transform:rotate(360deg);} }
+.bio-scan .bio-title {
+  font-size:18px; font-weight:600; color:rgba(255,255,255,0.8); margin-bottom:6px;
 }
-.lockscreen .ls-subtitle {
+.bio-scan .bio-sub {
   font-size:13px; color:rgba(255,255,255,0.35); line-height:1.8;
 }
-.lockscreen .ls-bar-wrap {
-  width:200px; height:4px; background:rgba(255,255,255,0.1); border-radius:2px;
-  margin:24px auto; overflow:hidden;
+
+/* ============================================================
+   SCENE 1: CONNECTION
+   ============================================================ */
+.connect-screen {
+  width:100%; max-width:400px; text-align:center; padding:40px 24px;
 }
-.lockscreen .ls-bar {
-  height:100%; background:rgba(255,255,255,0.5); border-radius:2px;
-  transition:width 0.3s ease; width:0%;
+.connect-screen .cs-time {
+  font-size:60px; font-weight:200; letter-spacing:4px; margin-bottom:4px;
+}
+.connect-screen .cs-date {
+  font-size:14px; color:rgba(255,255,255,0.4); margin-bottom:36px;
+}
+.connect-screen .cs-icon { font-size:56px; margin-bottom:12px; }
+.connect-screen .cs-title { font-size:16px; font-weight:600; color:rgba(255,255,255,0.7); margin-bottom:6px; }
+.connect-screen .cs-sub { font-size:13px; color:rgba(255,255,255,0.3); margin-bottom:20px; }
+.connect-screen .cs-log {
+  text-align:left; font-family:"SF Mono","Courier New",monospace; font-size:11px;
+  color:rgba(255,255,255,0.2); line-height:2; max-width:300px; margin:0 auto;
 }
 
 /* ============================================================
-   SCENE 2: DATA PANELS
+   SCENE 2+: DATA PANELS
    ============================================================ */
-.data-panel {
-  width:100%; max-width:400px; padding:20px; text-align:center;
-  animation: panelIn 0.5s ease;
+.data-scene {
+  width:100%; max-width:400px; padding:16px; text-align:center;
 }
-@keyframes panelIn { from{opacity:0;transform:translateY(20px);} to{opacity:1;transform:translateY(0);} }
-
-.data-panel .dp-badge {
+.data-scene .ds-badge {
   display:inline-block; padding:6px 18px; border-radius:20px;
-  background:rgba(255,59,48,0.15); color:#ff3b30; font-size:12px; font-weight:700;
-  letter-spacing:2px; margin-bottom:20px;
-  animation: pulseBadge 1.5s ease infinite;
+  font-size:12px; font-weight:700; letter-spacing:2px; margin-bottom:18px;
 }
-@keyframes pulseBadge {
-  0%,100%{box-shadow:0 0 0 0 rgba(255,59,48,0.4);}
-  50%{box-shadow:0 0 0 16px rgba(255,59,48,0);}
+.ds-badge.red { background:rgba(255,59,48,0.15); color:#ff3b30; animation:badgePulse 1.5s ease infinite; }
+.ds-badge.yellow { background:rgba(255,200,0,0.12); color:#ffcc00; }
+.ds-badge.green { background:rgba(50,215,75,0.12); color:#32d74b; }
+@keyframes badgePulse {
+  0%,100%{box-shadow:0 0 0 0 rgba(255,59,48,0.3);}
+  50%{box-shadow:0 0 0 20px rgba(255,59,48,0);}
 }
 
-.data-panel .dp-card {
-  background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.08);
-  border-radius:12px; padding:20px; margin-bottom:12px;
-  text-align:left; transition:all 0.3s;
+.ds-card {
+  background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.06);
+  border-radius:12px; padding:18px; margin-bottom:10px; text-align:left;
+  animation: cardIn 0.4s ease both;
 }
-.data-panel .dp-card .dp-card-icon { font-size:28px; margin-bottom:8px; }
-.data-panel .dp-card .dp-card-title { font-size:13px; font-weight:700; color:rgba(255,255,255,0.8); margin-bottom:4px; }
-.data-panel .dp-card .dp-card-val { font-size:15px; color:rgba(255,255,255,0.5); line-height:1.6; }
+@keyframes cardIn { from{opacity:0;transform:translateY(16px);} to{opacity:1;transform:translateY(0);} }
 
-.data-panel .dp-footer {
-  margin-top:20px; font-size:12px; color:rgba(255,255,255,0.25);
-  line-height:1.8;
+.ds-card .card-icon { font-size:26px; margin-bottom:6px; }
+.ds-card .card-title { font-size:13px; font-weight:700; color:rgba(255,255,255,0.7); margin-bottom:4px; }
+.ds-card .card-val { font-size:14px; color:rgba(255,255,255,0.45); line-height:1.7; }
+.ds-card .card-prog {
+  height:3px; background:rgba(255,255,255,0.06); border-radius:2px; margin-top:8px;
+  overflow:hidden;
+}
+.ds-card .card-prog .card-prog-bar {
+  height:100%; background:rgba(255,255,255,0.3); border-radius:2px;
+  transition:width 0.4s ease; width:0%;
+}
+
+.ds-footer {
+  margin-top:16px; font-size:12px; color:rgba(255,255,255,0.2); line-height:1.8;
 }
 
 /* ============================================================
-   SCENE 3: FINAL TWIST
+   NATIVE DIALOG FAKE
    ============================================================ */
-.twist {
-  text-align:center; padding:30px 20px;
-  animation: panelIn 0.5s ease;
+.native-dialog {
+  position:fixed; top:0;left:0;right:0;bottom:0;
+  background:rgba(0,0,0,0.75); z-index:500;
+  display:flex; align-items:center; justify-content:center;
+  animation: fadeIn 0.2s ease;
 }
-.twist .twist-emoji { font-size:80px; margin-bottom:16px; }
-.twist .twist-title { font-size:20px; font-weight:700; color:#fff; margin-bottom:8px; }
-.twist .twist-sub { font-size:14px; color:rgba(255,255,255,0.5); line-height:1.8; margin-bottom:20px; }
+@keyframes fadeIn { from{opacity:0;} to{opacity:1;} }
+.native-dialog .nd-box {
+  background:#1c1c1e; border-radius:14px; max-width:300px; width:90%;
+  overflow:hidden; animation: popIn 0.3s cubic-bezier(0.175,0.885,0.32,1.275);
+}
+@keyframes popIn { from{transform:scale(0.8);opacity:0;} to{transform:scale(1);opacity:1;} }
+.native-dialog .nd-header {
+  padding:20px 20px 0; text-align:center;
+}
+.native-dialog .nd-title { font-size:17px; font-weight:600; margin-bottom:4px; }
+.native-dialog .nd-body { padding:4px 20px 16px; text-align:center; font-size:13px; color:rgba(255,255,255,0.5); line-height:1.6; }
+.native-dialog .nd-btns { border-top:1px solid rgba(255,255,255,0.08); display:flex; }
+.native-dialog .nd-btn {
+  flex:1; padding:12px; text-align:center; font-size:17px; font-weight:500;
+  color:#0a84ff; cursor:pointer; border:none; background:none; font-family:inherit;
+  border-right:1px solid rgba(255,255,255,0.08);
+  touch-action:manipulation; -webkit-tap-highlight-color:transparent;
+}
+.native-dialog .nd-btn:last-child { border-right:none; }
+.native-dialog .nd-btn:active { background:rgba(255,255,255,0.05); }
 
 /* ============================================================
-   RED ALERT FLASH
+   SELF DESTRUCT COUNTDOWN
+   ============================================================ */
+.countdown-overlay {
+  position:fixed; top:0;left:0;right:0;bottom:0;
+  background:rgba(0,0,0,0.95); z-index:600;
+  display:flex; flex-direction:column; align-items:center; justify-content:center;
+  animation: fadeIn 0.3s ease;
+}
+.countdown-overlay .cd-num {
+  font-size:120px; font-weight:200; color:#ff3b30;
+  transition: transform 0.1s ease;
+  font-family:"SF Mono","Courier New",monospace;
+}
+.countdown-overlay .cd-num.pulse { transform:scale(1.2); color:#fff; }
+.countdown-overlay .cd-label {
+  font-size:14px; color:rgba(255,255,255,0.4); margin-top:8px;
+  letter-spacing:4px;
+}
+
+/* ============================================================
+   FINAL SCENE
+   ============================================================ */
+.final-scene {
+  text-align:center; padding:30px 20px;
+  animation: cardIn 0.5s ease;
+}
+.final-scene .fs-emoji { font-size:72px; margin-bottom:14px; }
+.final-scene .fs-title { font-size:20px; font-weight:700; color:#fff; margin-bottom:8px; }
+.final-scene .fs-sub { font-size:14px; color:rgba(255,255,255,0.45); line-height:1.8; margin-bottom:20px; }
+
+/* ============================================================
+   EFFECTS
    ============================================================ */
 .red-flash {
   position:fixed; top:0;left:0;right:0;bottom:0;
-  background:rgba(255,0,0,0.15); pointer-events:none; z-index:100;
-  animation: redPulse 0.8s ease-out forwards;
+  background:rgba(255,0,0,0.12); pointer-events:none; z-index:400;
+  animation: redPulse 0.7s ease-out forwards;
 }
-@keyframes redPulse {
-  0%{opacity:1;}
-  100%{opacity:0;}
+@keyframes redPulse { 0%{opacity:1;} 100%{opacity:0;} }
+
+body.shaking { animation: bodyShake 0.1s linear 4; }
+@keyframes bodyShake {
+  0%,100%{transform:translate(0,0);}
+  25%{transform:translate(-6px,3px);}
+  50%{transform:translate(5px,-4px);}
+  75%{transform:translate(-2px,1px);}
 }
 
-/* ============================================================
-   TOAST
-   ============================================================ */
+body.glitching { animation: glitchSkew 0.15s linear 3; }
+@keyframes glitchSkew {
+  0%,100%{filter:none;transform:none;}
+  33%{filter:hue-rotate(90deg);transform:skewX(2deg);}
+  66%{filter:hue-rotate(-60deg);transform:skewX(-1deg);}
+}
+
 .toast {
-  position:fixed; top:0; left:0; right:0; z-index:200;
+  position:fixed; top:0; left:0; right:0; z-index:500;
   background:rgba(255,59,48,0.95); color:#fff; text-align:center;
   padding:12px 20px; font-size:13px; font-weight:600;
   animation: toastDown 0.3s ease-out;
@@ -118,24 +212,12 @@ body {
 @keyframes toastDown { from{transform:translateY(-100%);} to{transform:translateY(0);} }
 
 /* ============================================================
-   SHAKE
-   ============================================================ */
-body.shaking { animation: bodyShake 0.12s linear 3; }
-@keyframes bodyShake {
-  0%,100%{transform:translate(0,0);}
-  25%{transform:translate(-8px,3px);}
-  50%{transform:translate(5px,-5px);}
-  75%{transform:translate(-3px,1px);}
-}
-
-/* ============================================================
-   BUTTON
+   BUTTONS
    ============================================================ */
 .btn-white {
   display:inline-block; padding:14px 40px; border-radius:25px;
   background:#fff; color:#000; font-size:16px; font-weight:700;
-  border:none; cursor:pointer; font-family:inherit;
-  transition:all 0.15s; letter-spacing:1px;
+  border:none; cursor:pointer; font-family:inherit; letter-spacing:1px;
   touch-action:manipulation; -webkit-tap-highlight-color:transparent;
 }
 .btn-white:hover { transform:scale(1.03); }
@@ -148,187 +230,297 @@ body.shaking { animation: bodyShake 0.12s linear 3; }
 
 <script>
 var root = document.getElementById('app');
+var audioCtx = null;
+
+function getCtx() {
+  if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+  if (audioCtx.state === 'suspended') audioCtx.resume();
+  return audioCtx;
+}
+function beep(freq, dur) {
+  try { var ctx=getCtx(),o=ctx.createOscillator(),g=ctx.createGain(); o.type='sine'; o.frequency.value=freq; g.gain.setValueAtTime(0.03,ctx.currentTime); g.gain.exponentialRampToValueAtTime(0.001,ctx.currentTime+dur); o.connect(g);g.connect(ctx.destination); o.start();o.stop(ctx.currentTime+dur); } catch(e) {}
+}
+function beepHigh() { beep(880,0.08); }
+function beepLow() { beep(220,0.15); }
+function beepAlert() { beep(440,0.1); setTimeout(function(){ beep(880,0.12); },100); }
 
 function sleep(ms) { return new Promise(function(r){ setTimeout(r, ms); }); }
 function pick(arr) { return arr[Math.floor(Math.random() * arr.length)]; }
+function rng(min,max) { return Math.floor(Math.random()*(max-min+1))+min; }
 
 var SECRETS = [
-  '浏览器记录：87% 是"拖延症怎么治"',
-  '本周打开外卖App 41次，下单0次',
-  '手机日均亮屏 11.7 小时，击败全国 98% 的人',
-  '过去一年共撤回消息 341 条，其中 340 条是打错字',
-  '自拍数量：2,847 张。角度完全相同的占 94%',
-  '闹钟平均响 4.7 次才起床，比预期晚 48 分钟',
-  '周末平均起床时间：11:47',
-  '深夜0-3点活跃度极高，第二天状态极差',
-  '说"好的"的频率异常高（其实并不好）',
-  '微信占手机内存 58%，远超其他App',
-  '购物车待付款：47件。超半年未付：36件',
-  '密码含"123"概率极高，安全评级 F',
-  '运动App步数：本周 7 步（不含上厕所）',
-  'B站弹幕中"哈哈哈"占 67%（其实并不好笑）'
+  '浏览器记录：87% 是"拖延症怎么治"（搜索了347次，一次没看）',
+  '本周打开外卖App 41次，实际下单0次——你是靠闻菜单活下来的？',
+  '手机日均亮屏 11.7 小时，击败全国 98% 的资本',
+  '过去一年共撤回微信消息 341 条，其中 340 条是打错字',
+  '自拍数量：2,847 张。角度完全相同的占 94%，换个角度吧求你了',
+  '闹钟平均响 4.7 次才起床。实际起床时间比预设晚 48 分钟——数据不会撒谎',
+  '周末平均起床时间：11:47。早餐？那是午餐',
+  '深夜0-3点活跃度极高，次日精神状态极差——两者相关性 99.8%',
+  '说"好的"的频率异常高（但内心活动：不好）',
+  '微信占手机内存 58%，其中聊天记录80%是"好的""收到""哈哈哈"',
+  '购物车待付款：47件。超半年未付：36件——商家已经放弃你了',
+  '密码中含"123"概率极高。安全评级：F——黑客狂喜',
+  '运动App本周步数：7 步（不含上厕所）——接近植物人水平',
+  'B站弹幕中"哈哈哈哈"占 67%（实际上一条都没笑出来）',
+  '收藏夹里"稍后再看"的视频：289个。实际看了：3个',
+  '手机相册截图数量：1,245张。其中 89% 截完就忘，再也没打开过'
 ];
 
 var LIES = [
-  'DNA 回溯：你的基因中有 0.003% 土豆血统 🥔',
-  '前世追溯：唐朝御膳房一只偷吃的猫',
-  'WiFi 记录：蹭过 17 个陌生人的网络',
-  '输入法已经可以完美模拟你的聊天风格',
-  '淘宝标签：只逛不买，高风险用户',
-  '深夜歌曲排行：《大悲咒》x 347 遍（为了助眠）'
+  'DNA 回溯：你的基因中有 0.003% 来自远古土豆，这解释了为什么你爱躺平 🥔',
+  '前世追溯：唐朝御膳房一只偷吃的猫——与现世行为高度吻合',
+  'WiFi 记录：你蹭过 17 个陌生人的网络，其中 3 个密码是 12345678',
+  '你的输入法已经可以完美模拟你的聊天风格，甚至比你本人回复更快',
+  '淘宝标签：「只逛不买」——已被系统标记为高风险白嫖用户',
+  '深夜歌曲排行：《大悲咒》x 347 遍（只是助眠，没有出家计划）',
+  '根据点赞数据推算：你的审美标准为——只要是猫就点赞',
+  '美团数据显示你最喜欢的食物是：随便。其次是：都行'
 ];
 
 var FAKE_FILES = [
-  '简历_最终版_v3_final_真的不改了.doc',
-  '计划表（从来没执行过）.xlsx',
-  '表情包收藏（重要文件）.zip',
-  '待处理（永远不会处理）.txt'
+  '简历_最终版_v3_final_真的不改了_FINAL.doc',
+  '健身计划（从来没打开过）.xlsx',
+  '表情包收藏（人生最重要文件）.zip',
+  '待办事项（永远不会做）.txt',
+  '自拍合集（同一个角度 x 500）.jpg'
 ];
 
-function flashRed() {
-  var f = document.createElement('div'); f.className = 'red-flash';
-  document.body.appendChild(f); setTimeout(function(){ f.remove(); }, 900);
-}
+var NATIVE_DIALOGS = [
+  { title:'允许"系统服务"访问您的数据？', body:'此操作将允许远程节点读取您的设备信息、文件列表和使用数据。此权限无法撤回。', ok:'允许', cancel:'拒绝' },
+  { title:'检测到安全漏洞', body:'您的设备存在严重安全漏洞，建议立即修复。是否继续？', ok:'立即修复', cancel:'忽略风险' },
+  { title:'是否信任此连接？', body:'远程节点声称来自"合法机构"。验证失败：证书已过期 847 天。是否继续信任？', ok:'盲目信任', cancel:'谨慎拒绝' },
+];
+
+function flashRed() { var f=document.createElement('div');f.className='red-flash';document.body.appendChild(f);setTimeout(function(){f.remove();},800); }
+function shakeBody() { document.body.classList.add('shaking');setTimeout(function(){document.body.classList.remove('shaking');},500); }
+function glitchBody() { document.body.classList.add('glitching');setTimeout(function(){document.body.classList.remove('glitching');},600); }
 function showToast(msg) {
-  var t = document.createElement('div'); t.className = 'toast'; t.textContent = msg;
-  document.body.appendChild(t);
-  setTimeout(function(){ t.style.transform='translateY(-100%)';t.style.transition='transform 0.3s';setTimeout(function(){t.remove();},300); }, 2000);
+  var t=document.createElement('div');t.className='toast';t.textContent=msg;document.body.appendChild(t);
+  setTimeout(function(){t.style.transform='translateY(-100%)';t.style.transition='transform 0.3s';setTimeout(function(){t.remove();},300);},2000);
 }
-function shakeBody() {
-  document.body.classList.add('shaking');
-  setTimeout(function(){ document.body.classList.remove('shaking'); }, 500);
+function vibrate(p) { if(navigator.vibrate) navigator.vibrate(p); }
+
+// Fake native iOS-style dialog
+function showDialog(dialog) {
+  return new Promise(function(resolve){
+    var overlay = document.createElement('div'); overlay.className = 'native-dialog';
+    overlay.innerHTML = '<div class="nd-box">'
+      + '<div class="nd-header"><span style="font-size:40px;">'+dialog.icon+'</span></div>'
+      + '<div class="nd-body" style="padding-top:12px;"><div class="nd-title">'+dialog.title+'</div>'+dialog.body+'</div>'
+      + '<div class="nd-btns"><button class="nd-btn" id="ndCancel">'+dialog.cancel+'</button><button class="nd-btn" id="ndOk" style="font-weight:600;">'+dialog.ok+'</button></div>'
+      + '</div>';
+    document.body.appendChild(overlay);
+    document.getElementById('ndOk').onclick = function(){ overlay.remove(); resolve(true); };
+    document.getElementById('ndCancel').onclick = function(){ overlay.remove(); resolve(false); };
+  });
 }
 
 // ============================================================
-// SCENE 1: Lock Screen
+// SCENE 0: Biometric scan
 // ============================================================
-function renderScene1() {
+async function sceneBio() {
+  root.innerHTML = '<div class="bio-scan">'
+    + '<div class="bio-ring"><span class="bio-face">😐</span><div class="bio-progress"></div></div>'
+    + '<div class="bio-title">正在验证身份...</div>'
+    + '<div class="bio-sub">请保持面部在扫描区域内</div></div>';
+
+  for (var i = 0; i < 3; i++) {
+    await sleep(700);
+    beepHigh();
+    document.querySelector('.bio-ring').style.borderColor = 'rgba(255,255,255,0.4)';
+    document.querySelector('.bio-face').textContent = ['😐','🙂','😗'][i];
+    await sleep(200);
+    document.querySelector('.bio-ring').style.borderColor = 'rgba(255,255,255,0.1)';
+  }
+  await sleep(400);
+  beepAlert();
+  document.querySelector('.bio-face').textContent = '✅';
+  document.querySelector('.bio-title').textContent = '身份验证通过';
+  document.querySelector('.bio-sub').textContent = '但这不是你的设备...正在追踪来源';
+  await sleep(1500);
+}
+
+// ============================================================
+// SCENE 1: Connection log
+// ============================================================
+async function sceneConnect() {
   var now = new Date();
-  var hh = now.getHours().toString().padStart(2,'0');
-  var mm = now.getMinutes().toString().padStart(2,'0');
+  var hh = now.getHours().toString().padStart(2,'0'), mm = now.getMinutes().toString().padStart(2,'0');
   var weekdays = ['日','一','二','三','四','五','六'];
   var dateStr = now.getFullYear()+'年'+(now.getMonth()+1)+'月'+now.getDate()+'日 星期'+weekdays[now.getDay()];
 
-  root.innerHTML = '<div class="lockscreen">'
-    + '<div class="ls-time">'+hh+':'+mm+'</div>'
-    + '<div class="ls-date">'+dateStr+'</div>'
-    + '<div class="ls-icon">📡</div>'
-    + '<div class="ls-title">正在建立安全连接...</div>'
-    + '<div class="ls-subtitle">检测到未知节点请求接入<br>正在验证身份...</div>'
-    + '<div class="ls-bar-wrap"><div class="ls-bar" id="lsBar"></div></div>'
-    + '</div>';
+  root.innerHTML = '<div class="connect-screen">'
+    + '<div class="cs-time">'+hh+':'+mm+'</div>'
+    + '<div class="cs-date">'+dateStr+'</div>'
+    + '<div class="cs-icon">📡</div>'
+    + '<div class="cs-title">远程节点已接入</div>'
+    + '<div class="cs-sub">正在枚举设备信息...</div>'
+    + '<div class="cs-log" id="csLog"></div></div>';
 
-  var bar = document.getElementById('lsBar');
-  var pct = 0, t = setInterval(function(){
-    pct += Math.random() * 12; if (pct > 100) pct = 100;
-    bar.style.width = pct + '%';
-    if (pct >= 100) clearInterval(t);
-  }, 100);
-  return sleep(1200);
-}
-
-// ============================================================
-// SCENE 2: Data Extraction
-// ============================================================
-function renderScene2() {
-  var files = FAKE_FILES.slice();
-  var html = '<div class="data-panel">'
-    + '<div class="dp-badge">⚠ 检测到漏洞</div>';
-
-  // File scan card
-  html += '<div class="dp-card" style="animation:panelIn 0.4s ease;">'
-    + '<div class="dp-card-icon">📂</div>'
-    + '<div class="dp-card-title">正在扫描文件系统...</div>'
-    + '<div class="dp-card-val">';
-  files.forEach(function(f){
-    html += 'C:\\\\Users\\\\you\\\\' + f + '<br>';
-  });
-  html += '</div></div>';
-
-  // Data cards
-  var dataTypes = [
-    { icon:'📷', title:'解密相册元数据', val:'检测到 '+pick(['大量','海量','天文数字般的'])+' 自拍。角度相似度：94%' },
-    { icon:'🌐', title:'提取浏览器历史', val:pick(SECRETS.slice(0,6)) },
-    { icon:'💬', title:'分析社交行为', val:pick(SECRETS.slice(6,12)) },
+  var log = document.getElementById('csLog');
+  var lines = [
+    '[OK] 建立加密隧道...',
+    '[OK] 获取设备标识符: '+Math.random().toString(36).substring(2,10).toUpperCase(),
+    '[OK] IP: 192.168.'+rng(1,254)+'.'+rng(1,254),
+    '[OK] 屏幕: '+window.screen.width+'x'+window.screen.height+' @ '+(window.devicePixelRatio||1)+'x',
+    '[OK] 电池: '+rng(5,95)+'% (够用了)',
+    '[OK] 系统版本: PotatoOS 24H2',
   ];
 
-  dataTypes.forEach(function(d, i){
-    html += '<div class="dp-card" style="animation:panelIn 0.4s '+(0.2*i)+'s ease both;">'
-      + '<div class="dp-card-icon">'+d.icon+'</div>'
-      + '<div class="dp-card-title">'+d.title+'</div>'
-      + '<div class="dp-card-val">'+d.val+'</div>'
+  for (var i = 0; i < lines.length; i++) {
+    log.innerHTML += lines[i] + '<br>';
+    beepLow();
+    await sleep(rng(150,350));
+  }
+
+  await sleep(300);
+  flashRed();
+  vibrate([20,50,20]);
+  showToast('⚠ 检测到异常数据包');
+
+  // Fake dialog
+  var dlg = pick(NATIVE_DIALOGS);
+  dlg.icon = '⚠️';
+  await showDialog(dlg);
+  // Regardless of choice, continue
+  showToast('选择无效，系统已自动授权');
+  await sleep(800);
+}
+
+// ============================================================
+// SCENE 2: File scan
+// ============================================================
+async function sceneFiles() {
+  root.innerHTML = '<div class="data-scene">'
+    + '<div class="ds-badge red">⚠ 漏洞已确认</div>';
+
+  var html = '';
+  FAKE_FILES.forEach(function(f, i){
+    html += '<div class="ds-card" style="animation-delay:'+(i*0.12)+'s">'
+      + '<div class="card-icon">📄</div>'
+      + '<div class="card-title">发现文件</div>'
+      + '<div class="card-val">C:\\\\Users\\\\you\\\\'+f+'</div>'
+      + '<div class="card-prog"><div class="card-prog-bar" id="fp'+i+'"></div></div>'
       + '</div>';
   });
-
   html += '</div>';
   root.innerHTML = html;
-  flashRed();
-  return sleep(800);
+
+  for (var i = 0; i < FAKE_FILES.length; i++) {
+    var bar = document.getElementById('fp'+i);
+    if (bar) { bar.style.width = '100%'; beepLow(); }
+    await sleep(250);
+  }
+  await sleep(300);
+  flashRed(); vibrate([30,30,30]);
+  showToast('📂 文件系统已被读取');
 }
 
 // ============================================================
-// SCENE 3: The Reveal
+// SCENE 3: Data extraction
 // ============================================================
-function renderScene3() {
+async function sceneData() {
   var s1 = pick(SECRETS), s2 = pick(SECRETS), s3 = pick(SECRETS);
-  while (s2 === s1) s2 = pick(SECRETS);
-  while (s3 === s1 || s3 === s2) s3 = pick(SECRETS);
+  while (s2===s1) s2=pick(SECRETS);
+  while (s3===s1||s3===s2) s3=pick(SECRETS);
 
-  root.innerHTML = '<div class="data-panel">'
-    + '<div class="dp-badge" style="background:rgba(255,255,255,0.1);color:#fff;">📋 机密档案解密完成</div>'
-    + '<div class="dp-card" style="animation:panelIn 0.3s ease both;">'
-    + '<div class="dp-card-icon">🔍</div><div class="dp-card-title">发现 1</div><div class="dp-card-val">'+s1+'</div></div>'
-    + '<div class="dp-card" style="animation:panelIn 0.3s 0.15s ease both;">'
-    + '<div class="dp-card-icon">🔍</div><div class="dp-card-title">发现 2</div><div class="dp-card-val">'+s2+'</div></div>'
-    + '<div class="dp-card" style="animation:panelIn 0.3s 0.3s ease both;">'
-    + '<div class="dp-card-icon">🔍</div><div class="dp-card-title">发现 3</div><div class="dp-card-val">'+s3+'</div></div>'
-    + '<div class="dp-footer" style="animation:panelIn 0.3s 0.5s ease both;">'
-    + '🤖 AI 综合评估：<br>'+pick(LIES)+'</div>'
-    + '</div>';
+  root.innerHTML = '<div class="data-scene">'
+    + '<div class="ds-badge yellow">🔓 正在解密...</div>';
 
-  flashRed(); shakeBody();
-  showToast('⚠ 数据提取完成');
+  var cards = [
+    { icon:'📷', title:'相册数据分析', val:s1 },
+    { icon:'🌐', title:'浏览器历史', val:s2 },
+    { icon:'💬', title:'社交行为模式', val:s3 },
+    { icon:'🧠', title:'AI综合评估', val:pick(LIES) },
+  ];
 
-  return sleep(1200);
+  cards.forEach(function(c, i){
+    var div = document.createElement('div'); div.className = 'ds-card';
+    div.style.animationDelay = (i*0.2)+'s';
+    div.innerHTML = '<div class="card-icon">'+c.icon+'</div>'
+      + '<div class="card-title">'+c.title+'</div>'
+      + '<div class="card-val">'+c.val+'</div>';
+    root.querySelector('.data-scene').appendChild(div);
+  });
+
+  // Add footer
+  var footer = document.createElement('div'); footer.className = 'ds-footer';
+  footer.style.animationDelay = '0.9s';
+  footer.innerHTML = '数据来源：你<br>真实性：毋庸置疑';
+  root.querySelector('.data-scene').appendChild(footer);
+
+  await sleep(600);
+  flashRed(); glitchBody(); vibrate([10,20,10,20,10]);
+  showToast('🔓 解密完成，数据已打包');
+  await sleep(1200);
 }
 
 // ============================================================
-// SCENE 4: The Twist
+// SCENE 4: Self-destruct fake
 // ============================================================
-function renderFinal() {
-  root.innerHTML = '<div class="twist">'
-    + '<div class="twist-emoji">😏</div>'
-    + '<div class="twist-title">以上数据均为随机生成</div>'
-    + '<div class="twist-sub">你的真实数据比这个还离谱<br>但我们就不曝光了</div>'
-    + '<button class="btn-white" onclick="doRun()">🔄 再来一次</button>'
-    + '</div>';
+async function sceneDestruct() {
+  var overlay = document.createElement('div'); overlay.className = 'countdown-overlay';
+  overlay.innerHTML = '<div class="cd-num" id="cdNum">5</div><div class="cd-label">数据即将上传至公共网络</div>';
+  document.body.appendChild(overlay);
+
+  for (var i = 5; i >= 1; i--) {
+    document.getElementById('cdNum').textContent = i;
+    document.getElementById('cdNum').classList.add('pulse');
+    beep(220 + (5-i)*150, 0.2);
+    vibrate(80);
+    await sleep(400);
+    document.getElementById('cdNum').classList.remove('pulse');
+    await sleep(600);
+  }
+
+  overlay.innerHTML = '<div class="cd-num" style="color:#fff;font-size:48px;">😏</div><div class="cd-label">开玩笑的</div>';
+  await sleep(1500);
+  overlay.remove();
+}
+
+// ============================================================
+// SCENE 5: Final reveal
+// ============================================================
+function sceneFinal() {
+  root.innerHTML = '<div class="final-scene">'
+    + '<div class="fs-emoji">😏</div>'
+    + '<div class="fs-title">以上数据均为随机生成</div>'
+    + '<div class="fs-sub">你的真实数据<br>比这个还离谱<br>但我们就不曝光了</div>'
+    + '<button class="btn-white" onclick="run()">🔄 再被黑一次</button></div>';
 }
 
 // ============================================================
 // RUN
 // ============================================================
-async function doRun() {
+async function run() {
   root.style.display = '';
-  await renderScene1();
-  await renderScene2();
-  await sleep(600);
-  await renderScene3();
-  await sleep(1500);
-  renderFinal();
+  // Wake audio on first user interaction
+  document.addEventListener('click', function initAudio(){ getCtx(); }, {once:true});
+
+  await sceneBio();
+  await sceneConnect();
+  await sceneFiles();
+  await sceneData();
+  await sceneDestruct();
+  sceneFinal();
 }
 
-// Touch anywhere for extra effects
+// Touch anywhere for random glitch
 document.addEventListener('click', function(e){
-  if (e.target.tagName === 'BUTTON') return;
-  if (Math.random() > 0.6) flashRed();
+  if (e.target.tagName==='BUTTON') return;
+  if (Math.random()>0.5) { flashRed(); beep(rng(200,600),0.05); }
 });
+
+// Context menu trap
+document.addEventListener('contextmenu', function(e){ e.preventDefault(); showToast('右键已禁用 🔒'); });
 
 // Exit trap
 document.addEventListener('visibilitychange', function(){
-  if (document.hidden && Math.random() > 0.5) showToast('数据正在上传中，别走！');
+  if (document.hidden && Math.random()>0.4) showToast('别走！你的数据还在上传...');
 });
 
-doRun();
+run();
 </script>
 </body>
 </html>

@@ -368,7 +368,7 @@ async function sceneTarget(){
   var dotTop=rng(20,70), dotLeft=rng(25,65);
   root.innerHTML='<div class="target">'
     +'<div class="tgt-radar"><div class="tgt-sweep"></div><div class="tgt-dot" style="top:'+dotTop+'%;left:'+dotLeft+'%;" id="tdot"></div></div>'
-    +'<div class="tgt-title">正在定位目标设备...</div>'
+    +'<div class="tgt-title" id="tgt-title">正在定位目标设备...</div>'
     +'<div class="tgt-sub" id="tsub">扫描附近信号源...</div></div>';
 
   // Animate the dot blinking

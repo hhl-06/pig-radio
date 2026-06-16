@@ -525,8 +525,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,"Helvetica Neue","PingFang SC"
       <div class="bill-row experience"><span class="br-label">人生经验</span><span class="br-value">+∞（但无法变现）</span></div>
     </div>
     <div class="result-buttons">
-      <button class="result-btn retry" onclick="retryPrank()">🔄 再领一次</button>
-      <button class="result-btn primary" onclick="shareToWechat()">💬 分享给朋友</button>
+      <button class="result-btn primary" onclick="retryPrank()" style="width:100%;max-width:280px">🔄 再领一次</button>
     </div>
   </div>
 </div>
@@ -651,11 +650,13 @@ function startScrollNotice() {
 
 // ===== 按钮 =====
 function startClaim() {
+  sfxClick();
   startTimer();
   showStage('stage-redpacket');
 }
 
 function dontBelieve() {
+  sfxClick();
   forceStep = 0;
   showForceDialog();
 }
@@ -698,6 +699,7 @@ function showStage(id) {
 
 // ===== 红包打开 =====
 function openRedpacket() {
+  sfxOpenPacket();
   // 先播放盖子翻开动画
   document.getElementById('rpFlap').classList.add('open');
   document.getElementById('loadingOverlay').classList.add('show');
@@ -775,7 +777,8 @@ function goToFee() {
       item.innerHTML = '<span class="fi-name">' + fee.name + '</span><span class="fi-amount">-' + fee.amount.toFixed(2) + '</span>';
       listEl.appendChild(item);
 
-      // 音效文字
+      // 音效文字 + 声音
+      sfxFeeDeduct();
       var sfxEl = document.createElement('div');
       sfxEl.className = 'fee-sfx';
       sfxEl.textContent = fee.sfx;
@@ -796,6 +799,7 @@ function goToFee() {
         setTimeout(function() {
           balanceEl.classList.add('shake');
           // 余额爆炸
+          sfxExplosion();
           setTimeout(function() {
             balanceEl.classList.add('explode');
             spawnExplosionParticles(balanceEl);
@@ -971,6 +975,7 @@ function showWxTransfer() {
 }
 
 function confirmTransfer() {
+  sfxTransfer();
   document.getElementById('wxTransfer').classList.remove('show');
   // 转账成功Toast
   var toast = document.getElementById('transferSuccessToast');
@@ -981,6 +986,7 @@ function confirmTransfer() {
 
 // ===== 最终结算 =====
 function showResult() {
+  sfxResult();
   var elapsed = stopTimer();
   document.getElementById('globalTimer').classList.remove('show');
   document.getElementById('resultTime').textContent = elapsed;
@@ -1013,30 +1019,86 @@ function spawnMoneyFall() {
   }
 }
 
-// ===== 分享给朋友 =====
-function shareToWechat() {
-  // 直接用 Web Share API 分享当前页面
-  if (navigator.share) {
-    navigator.share({
-      title: '好友' + FRIEND_NAME + '刚刚领取了' + REDPACKET_AMOUNT + '元红包',
-      text: '快来看看，' + FRIEND_NAME + '刚领了' + REDPACKET_AMOUNT + '元！',
-      url: window.location.href
-    }).catch(function() {});
-  } else {
-    // 降级：提示用户手动复制链接
-    var link = window.location.href;
-    if (navigator.clipboard) {
-      navigator.clipboard.writeText(link).then(function() {
-        alert('链接已复制！\n去微信粘贴发给朋友吧~');
-      }).catch(function() { alert('长按地址栏复制链接，发给朋友吧~'); });
-    } else {
-      alert('长按地址栏复制链接，发给朋友吧~');
-    }
+// ===== 音效系统 =====
+var audioCtx = null;
+function getAudioCtx() {
+  if (!audioCtx) {
+    audioCtx = new (window.AudioContext || window.webkitAudioContext)();
   }
+  return audioCtx;
+}
+
+function playBeep(freq, duration, type, vol, glideTo) {
+  try {
+    var ctx = getAudioCtx();
+    var osc = ctx.createOscillator();
+    var gain = ctx.createGain();
+    osc.type = type || 'sine';
+    osc.frequency.setValueAtTime(freq, ctx.currentTime);
+    if (glideTo) osc.frequency.linearRampToValueAtTime(glideTo, ctx.currentTime + duration);
+    gain.gain.setValueAtTime(vol || 0.15, ctx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + duration);
+    osc.connect(gain);
+    gain.connect(ctx.destination);
+    osc.start(ctx.currentTime);
+    osc.stop(ctx.currentTime + duration);
+  } catch(e) {}
+}
+
+// 拆红包音效
+function sfxOpenPacket() {
+  playBeep(880, 0.1, 'sine', 0.12);
+  setTimeout(function(){ playBeep(1100, 0.1, 'sine', 0.12); }, 100);
+  setTimeout(function(){ playBeep(1320, 0.15, 'sine', 0.15); }, 200);
+  setTimeout(function(){ playBeep(1760, 0.2, 'triangle', 0.18, 2200); }, 300);
+}
+
+// 金额滚动音效
+function sfxCountTick() {
+  playBeep(600 + Math.random() * 400, 0.05, 'sine', 0.04);
+}
+
+// 扣费音效（每次扣一项）
+function sfxFeeDeduct() {
+  playBeep(300, 0.12, 'square', 0.06);
+  setTimeout(function(){ playBeep(200, 0.1, 'square', 0.05); }, 60);
+}
+
+// 余额爆炸音效
+function sfxExplosion() {
+  playBeep(150, 0.3, 'sawtooth', 0.12);
+  setTimeout(function(){ playBeep(100, 0.25, 'sawtooth', 0.1); }, 150);
+  setTimeout(function(){ playBeep(80, 0.2, 'sawtooth', 0.08); }, 280);
+}
+
+// 最终结算音效
+function sfxResult() {
+  playBeep(523, 0.2, 'triangle', 0.12);
+  setTimeout(function(){ playBeep(659, 0.2, 'triangle', 0.12); }, 200);
+  setTimeout(function(){ playBeep(784, 0.2, 'triangle', 0.12); }, 400);
+  setTimeout(function(){ playBeep(1047, 0.4, 'triangle', 0.18); }, 600);
+}
+
+// 按钮点击音效
+function sfxClick() {
+  playBeep(500, 0.06, 'sine', 0.05);
+}
+
+// 弹窗出现音效
+function sfxPopup() {
+  playBeep(660, 0.08, 'sine', 0.06);
+  setTimeout(function(){ playBeep(880, 0.08, 'sine', 0.06); }, 80);
+}
+
+// 转账到账音效
+function sfxTransfer() {
+  playBeep(800, 0.1, 'sine', 0.1);
+  setTimeout(function(){ playBeep(1000, 0.15, 'sine', 0.12); }, 100);
 }
 
 // ===== 再领一次 =====
 function retryPrank() {
+  sfxClick();
   alert('你还没领够？这次可能倒欠更多哦 😏');
   setTimeout(function() { location.reload(); }, 1000);
 }

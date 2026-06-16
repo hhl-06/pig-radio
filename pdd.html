@@ -954,17 +954,7 @@ function checkVisitShame() {
 }
 
 // ===== 微信消息 =====
-var wxMessages = [
-  '我靠，领红包领好了没？等你半天了',
-  '你该不会真信了吧... 算了转你点钱补上',
-  '我就知道你会点进来，钱够不够？',
-  '兄弟，那个页面你也信？转你点钱吧',
-  '看不下去了，给你转点钱把账平了',
-  '你是我见过最执着的人... 拿着吧'
-];
 function showWxMessage() {
-  var msg = wxMessages[Math.floor(Math.random() * wxMessages.length)];
-  document.getElementById('wxToastMsg').textContent = msg;
   document.getElementById('wxToast').classList.add('show');
   setTimeout(function() { hideWxToast(); setTimeout(function() { showWxTransfer(); }, 500); }, 4000);
 }
@@ -974,18 +964,9 @@ function hideWxToast() {
 }
 
 // ===== 微信转账 =====
-var txRemarks = [
-  '下次记得先问问我',
-  '别说我不够意思',
-  '算我赞助你的智商税',
-  '拿了钱别再说我没帮你',
-  '心疼你一秒，然后转钱',
-  '这钱你肯定取不出来，但心意到了'
-];
 function showWxTransfer() {
   var absAmount = ACTUAL_DEBT;
   document.getElementById('transferAmount').innerHTML = '<span>¥</span>' + absAmount.toFixed(2);
-  document.getElementById('txRemark').textContent = txRemarks[Math.floor(Math.random() * txRemarks.length)];
   document.getElementById('wxTransfer').classList.add('show');
 }
 

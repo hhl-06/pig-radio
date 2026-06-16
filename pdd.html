@@ -959,6 +959,7 @@ function checkVisitShame() {
 
 // ===== 微信消息 =====
 function showWxMessage() {
+  sfxWechatMsg();
   document.getElementById('wxToast').classList.add('show');
   setTimeout(function() { hideWxToast(); setTimeout(function() { showWxTransfer(); }, 500); }, 4000);
 }
@@ -969,13 +970,14 @@ function hideWxToast() {
 
 // ===== 微信转账 =====
 function showWxTransfer() {
+  sfxTransfer();
   var absAmount = ACTUAL_DEBT;
   document.getElementById('transferAmount').innerHTML = '<span>¥</span>' + absAmount.toFixed(2);
   document.getElementById('wxTransfer').classList.add('show');
 }
 
 function confirmTransfer() {
-  sfxTransfer();
+  sfxTransferOk();
   document.getElementById('wxTransfer').classList.remove('show');
   // 转账成功Toast
   var toast = document.getElementById('transferSuccessToast');
@@ -1028,72 +1030,124 @@ function getAudioCtx() {
   return audioCtx;
 }
 
-function playBeep(freq, duration, type, vol, glideTo) {
+// 基础发声
+function tone(freq, dur, type, vol, startTime, glideTo) {
   try {
     var ctx = getAudioCtx();
+    var t = startTime || ctx.currentTime;
     var osc = ctx.createOscillator();
     var gain = ctx.createGain();
     osc.type = type || 'sine';
-    osc.frequency.setValueAtTime(freq, ctx.currentTime);
-    if (glideTo) osc.frequency.linearRampToValueAtTime(glideTo, ctx.currentTime + duration);
-    gain.gain.setValueAtTime(vol || 0.15, ctx.currentTime);
-    gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + duration);
+    osc.frequency.setValueAtTime(freq, t);
+    if (glideTo) osc.frequency.linearRampToValueAtTime(glideTo, t + dur);
+    gain.gain.setValueAtTime(vol || 0.1, t);
+    gain.gain.exponentialRampToValueAtTime(0.001, t + dur);
     osc.connect(gain);
     gain.connect(ctx.destination);
-    osc.start(ctx.currentTime);
-    osc.stop(ctx.currentTime + duration);
+    osc.start(t);
+    osc.stop(t + dur);
   } catch(e) {}
 }
 
-// 拆红包音效
-function sfxOpenPacket() {
-  playBeep(880, 0.1, 'sine', 0.12);
-  setTimeout(function(){ playBeep(1100, 0.1, 'sine', 0.12); }, 100);
-  setTimeout(function(){ playBeep(1320, 0.15, 'sine', 0.15); }, 200);
-  setTimeout(function(){ playBeep(1760, 0.2, 'triangle', 0.18, 2200); }, 300);
+// 噪声发生器
+function noise(dur, vol, startTime) {
+  try {
+    var ctx = getAudioCtx();
+    var t = startTime || ctx.currentTime;
+    var buf = ctx.createBuffer(1, ctx.sampleRate * dur, ctx.sampleRate);
+    var data = buf.getChannelData(0);
+    for (var i = 0; i < data.length; i++) data[i] = Math.random() * 2 - 1;
+    var src = ctx.createBufferSource();
+    src.buffer = buf;
+    var gain = ctx.createGain();
+    var filter = ctx.createBiquadFilter();
+    filter.type = 'bandpass';
+    filter.frequency.setValueAtTime(2000, t);
+    filter.Q.setValueAtTime(0.5, t);
+    gain.gain.setValueAtTime(vol || 0.08, t);
+    gain.gain.exponentialRampToValueAtTime(0.001, t + dur);
+    src.connect(filter);
+    filter.connect(gain);
+    gain.connect(ctx.destination);
+    src.start(t);
+    src.stop(t + dur);
+  } catch(e) {}
 }
 
-// 金额滚动音效
-function sfxCountTick() {
-  playBeep(600 + Math.random() * 400, 0.05, 'sine', 0.04);
+// 🔔 微信消息提示音 (仿微信 ding-dong)
+function sfxWechatMsg() {
+  var t = getAudioCtx().currentTime;
+  tone(800, 0.08, 'sine', 0.15, t);
+  tone(1000, 0.08, 'sine', 0.13, t + 0.08);
+  tone(1200, 0.12, 'sine', 0.15, t + 0.15);
+  tone(1400, 0.08, 'sine', 0.12, t + 0.22);
 }
 
-// 扣费音效（每次扣一项）
-function sfxFeeDeduct() {
-  playBeep(300, 0.12, 'square', 0.06);
-  setTimeout(function(){ playBeep(200, 0.1, 'square', 0.05); }, 60);
-}
-
-// 余额爆炸音效
-function sfxExplosion() {
-  playBeep(150, 0.3, 'sawtooth', 0.12);
-  setTimeout(function(){ playBeep(100, 0.25, 'sawtooth', 0.1); }, 150);
-  setTimeout(function(){ playBeep(80, 0.2, 'sawtooth', 0.08); }, 280);
-}
-
-// 最终结算音效
-function sfxResult() {
-  playBeep(523, 0.2, 'triangle', 0.12);
-  setTimeout(function(){ playBeep(659, 0.2, 'triangle', 0.12); }, 200);
-  setTimeout(function(){ playBeep(784, 0.2, 'triangle', 0.12); }, 400);
-  setTimeout(function(){ playBeep(1047, 0.4, 'triangle', 0.18); }, 600);
-}
-
-// 按钮点击音效
-function sfxClick() {
-  playBeep(500, 0.06, 'sine', 0.05);
-}
-
-// 弹窗出现音效
-function sfxPopup() {
-  playBeep(660, 0.08, 'sine', 0.06);
-  setTimeout(function(){ playBeep(880, 0.08, 'sine', 0.06); }, 80);
-}
-
-// 转账到账音效
+// 💰 微信转账/收款到账音效 (仿微信收款)
 function sfxTransfer() {
-  playBeep(800, 0.1, 'sine', 0.1);
-  setTimeout(function(){ playBeep(1000, 0.15, 'sine', 0.12); }, 100);
+  var t = getAudioCtx().currentTime;
+  tone(1318, 0.08, 'sine', 0.14, t);
+  tone(1568, 0.08, 'sine', 0.13, t + 0.08);
+  tone(1976, 0.12, 'sine', 0.16, t + 0.14);
+  tone(2637, 0.2, 'triangle', 0.18, t + 0.22, 3136);
+}
+
+// 🧧 拆红包 —— 硬币哗啦声
+function sfxOpenPacket() {
+  var t = getAudioCtx().currentTime;
+  // 多层短促高频模仿硬币碰撞
+  for (var i = 0; i < 8; i++) {
+    var f = 1200 + Math.random() * 1800;
+    tone(f, 0.06 + Math.random() * 0.06, 'triangle', 0.07 + Math.random() * 0.05, t + i * 0.04);
+  }
+  // 收尾: 一个长上升音
+  tone(800, 0.4, 'sine', 0.16, t + 0.35, 2400);
+}
+
+// 💸 扣费 —— POS机/扫码枪 "滴"
+function sfxFeeDeduct() {
+  var t = getAudioCtx().currentTime;
+  tone(1800, 0.06, 'square', 0.07, t);
+  noise(0.05, 0.04, t);
+}
+
+// 💥 余额爆炸 —— 低频崩塌
+function sfxExplosion() {
+  var t = getAudioCtx().currentTime;
+  noise(0.35, 0.1, t);
+  tone(80, 0.4, 'sawtooth', 0.12, t, 30);
+  tone(60, 0.5, 'sawtooth', 0.1, t + 0.1, 20);
+}
+
+// 🎊 结算 —— 游戏通关感
+function sfxResult() {
+  var t = getAudioCtx().currentTime;
+  var notes = [523, 659, 784, 1047];
+  notes.forEach(function(f, i) {
+    tone(f, 0.25, 'triangle', 0.12, t + i * 0.18);
+  });
+  // 背景 shimmer
+  noise(0.15, 0.04, t + 0.7);
+}
+
+// 👆 按钮点击
+function sfxClick() {
+  tone(600, 0.04, 'sine', 0.04);
+}
+
+// 🪟 弹窗弹出
+function sfxPopup() {
+  var t = getAudioCtx().currentTime;
+  tone(880, 0.06, 'sine', 0.06, t);
+  tone(1100, 0.06, 'sine', 0.05, t + 0.06);
+}
+
+// ✅ 转账成功确认
+function sfxTransferOk() {
+  var t = getAudioCtx().currentTime;
+  tone(1000, 0.08, 'sine', 0.12, t);
+  tone(1400, 0.12, 'sine', 0.14, t + 0.1);
+  tone(1800, 0.08, 'sine', 0.1, t + 0.18);
 }
 
 // ===== 再领一次 =====

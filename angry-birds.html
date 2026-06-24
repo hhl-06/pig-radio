@@ -951,7 +951,9 @@ function getPos(e){
   var sx=W/r.width,sy=H/r.height;
   var cx=e.touches?e.touches[0].clientX:e.clientX;
   var cy=e.touches?e.touches[0].clientY:e.clientY;
-  return{x:(cx-r.left)*sx,y:(cy-r.top)*sy};
+  // viewport coords → world coords (account for camera)
+  var vx=(cx-r.left)*sx, vy=(cy-r.top)*sy;
+  return{x:vx/camera.zoom+camera.x, y:vy/camera.zoom+camera.y};
 }
 function onDown(e){
   e.preventDefault();

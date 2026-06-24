@@ -99,6 +99,7 @@ var camera={x:0,y:0,tx:0,ty:0,zoom:1,tz:1};
 var screenShake=0;
 var settleTimer=0,settleThreshold=90;
 var abilityUsed=false;
+var abilityReadyTime=0;
 var slowMo=1;
 
 // ============================================================
@@ -118,7 +119,7 @@ function buildLevel(lv){
   blocks=[];pigs=[];particles=[];scorePops=[];settledBirds=[];trail=[];
   currentBird=null;dragStart=null;dragPos=null;
   state='aiming';settleTimer=0;abilityUsed=false;screenShake=0;slowMo=1;
-  scoreThisLevel=0;
+  scoreThisLevel=0;abilityReadyTime=0;
 
   // bird queue
   var types=['red','blue','yellow','black'];
@@ -136,8 +137,7 @@ function buildLevel(lv){
 
   updateUI();
   updateBirdQueueUI();
-  camera.x=SLING_X-200;camera.y=GROUND_Y-200;
-  camera.tx=camera.x;camera.ty=camera.y;
+  camera.x=0;camera.y=0;camera.tx=0;camera.ty=0;camera.zoom=1;camera.tz=1;
 }
 
 function addBlock(x,y,w,h,type){
@@ -400,6 +400,7 @@ function spawnFeathers(x,y){
 function activateAbility(){
   if(!currentBird||!currentBird.active||abilityUsed)return;
   if(state!=='flying'&&state!=='settling')return;
+  if(Date.now()<abilityReadyTime)return; // cooldown after launch
   var type=BIRD_TYPES[birdQueue[birdsUsed-1]]||BIRD_TYPES.red;
   abilityUsed=true;
   switch(type.ability){
@@ -501,6 +502,7 @@ function launchBird(){
   dragStart=null;dragPos=null;
   state='flying';
   sfx_launch();spawnFeathers(currentBird.x,currentBird.y);
+  abilityReadyTime=Date.now()+400; // 400ms cooldown before ability
   var st=setTimeout(function(){
     if(state==='flying'){state='settling';settleTimer=settleThreshold}
   },2200);
@@ -616,16 +618,7 @@ function update(){
   }
 
   // camera
-  if(state==='aiming'){
-    camera.tx=SLING_X-200;camera.ty=GROUND_Y-200;camera.tz=1;
-  }else if(currentBird&&currentBird.active){
-    camera.tx=currentBird.x-300;camera.ty=currentBird.y-250;camera.tz=0.95;
-  }else if(state==='settling'){
-    camera.tx=SLING_X-200;camera.ty=GROUND_Y-250;camera.tz=0.9;
-  }
-  camera.x+=(camera.tx-camera.x)*0.08;
-  camera.y+=(camera.ty-camera.y)*0.08;
-  camera.zoom+=(camera.tz-camera.zoom)*0.05;
+  camera.x=0;camera.y=0;camera.tx=0;camera.ty=0;camera.zoom=1;camera.tz=1;
 
   updateUI();
 }
@@ -951,16 +944,14 @@ function getPos(e){
   var sx=W/r.width,sy=H/r.height;
   var cx=e.touches?e.touches[0].clientX:e.clientX;
   var cy=e.touches?e.touches[0].clientY:e.clientY;
-  // viewport coords → world coords (account for camera)
-  var vx=(cx-r.left)*sx, vy=(cy-r.top)*sy;
-  return{x:vx/camera.zoom+camera.x, y:vy/camera.zoom+camera.y};
+  return{x:(cx-r.left)*sx, y:(cy-r.top)*sy};
 }
 function onDown(e){
   e.preventDefault();
   if(state!=='aiming'){activateAbility();return}
   var p=getPos(e);
   var bx=dragPos?dragPos.x:SLING_X,by=dragPos?dragPos.y:SLING_Y-30;
-  if(Math.hypot(p.x-bx,p.y-by)<BIRD_R+15){dragStart=p;dragPos=p}
+  if(Math.hypot(p.x-bx,p.y-by)<BIRD_R+25){dragStart=p;dragPos=p}
 }
 function onMove(e){
   e.preventDefault();
@@ -985,13 +976,7 @@ canvas.addEventListener('mouseup',onUp);
 canvas.addEventListener('mouseleave',onUp);
 canvas.addEventListener('touchstart',onDown,{passive:false});
 canvas.addEventListener('touchmove',onMove,{passive:false});
-canvas.addEventListener('touchend',onUp);
-
-// ability activation on click during flight
-canvas.addEventListener('click',function(e){
-  if(state==='aiming')return;
-  activateAbility();
-});
+canvas.addEventListener('touchend',onUp,{passive:false});
 
 // ============================================================
 // GAME LOOP

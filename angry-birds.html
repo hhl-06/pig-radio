@@ -888,22 +888,27 @@ function render(){
     var dist=Math.sqrt(dx*dx+dy*dy);
     var power=Math.min(dist,MAX_DRAG)*LAUNCH_POWER;
     var vx=dx/(dist||1)*power, vy=dy/(dist||1)*power;
-    // draw parabolic dots
-    for(var t=6;t<100;t+=4){
+    // draw parabolic dots - bright and visible
+    var lastX=dragPos.x, lastY=dragPos.y;
+    for(var t=4;t<120;t+=3){
       var px=dragPos.x+vx*t;
       var py=dragPos.y+vy*t+0.5*GRAVITY*t*t;
       if(px<0||px>W||py>GROUND_Y+50)break;
-      var alpha=0.55*(1-t/100);
-      var r=3.5*(1-t/100);
+      var progress=t/120;
+      var alpha=0.9-progress*0.7;
+      var r=5-progress*3.5;
+      // outer glow
+      ctx.fillStyle='rgba(255,180,50,'+(alpha*0.35)+')';
+      ctx.beginPath();ctx.arc(px,py,Math.max(2,r+3),0,Math.PI*2);ctx.fill();
+      // core dot
       ctx.fillStyle='rgba(255,255,255,'+alpha+')';
-      ctx.beginPath();ctx.arc(px,py,Math.max(1,r),0,Math.PI*2);ctx.fill();
+      ctx.beginPath();ctx.arc(px,py,Math.max(1.5,r),0,Math.PI*2);ctx.fill();
+      // connecting line
+      ctx.strokeStyle='rgba(255,200,100,'+(alpha*0.3)+')';
+      ctx.lineWidth=1.5-progress;
+      ctx.beginPath();ctx.moveTo(lastX,lastY);ctx.lineTo(px,py);ctx.stroke();
+      lastX=px;lastY=py;
     }
-    // draw launch direction line (faint)
-    ctx.setLineDash([3,10]);
-    ctx.strokeStyle='rgba(255,255,255,0.12)';ctx.lineWidth=1;
-    ctx.beginPath();ctx.moveTo(dragPos.x,dragPos.y);
-    ctx.lineTo(dragPos.x+dx*3,dragPos.y+dy*3);ctx.stroke();
-    ctx.setLineDash([]);
   }
   // particles
   for(var i=0;i<particles.length;i++){

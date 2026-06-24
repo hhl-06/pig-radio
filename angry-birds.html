@@ -79,8 +79,8 @@ resize();window.addEventListener('resize',resize);
 // ============================================================
 // CONSTANTS
 // ============================================================
-var GRAVITY=0.45;
-var LAUNCH_POWER=0.16;
+var GRAVITY=0.5;
+var LAUNCH_POWER=0.2;
 var MAX_DRAG=120;
 var GROUND_Y=680;
 var SLING_X=180;
@@ -153,100 +153,110 @@ function addPig(x,y,size){
   pigs.push({x:x,y:y,r:s.r,health:s.health,size:size,vx:0,vy:0});
 }
 
-// Level 1: Tutorial
+// Level 1: Tutorial - simple wooden structure
 function buildLevel1(){
+  addPig(950,GROUND_Y-18,'s');
   addPig(1000,GROUND_Y-18,'m');
-  addPig(1080,GROUND_Y-18,'s');
-  addBlock(980,GROUND_Y-22,60,22,'wood');
-  addBlock(1060,GROUND_Y-22,60,22,'wood');
-  addBlock(990,GROUND_Y-50,18,40,'wood');
-  addBlock(1072,GROUND_Y-50,18,40,'wood');
-  addBlock(980,GROUND_Y-72,110,16,'wood');
+  addPig(1050,GROUND_Y-18,'s');
+  // wooden platform
+  addBlock(920,GROUND_Y-22,160,20,'wood');
+  // pillars
+  addBlock(930,GROUND_Y-50,16,40,'wood');
+  addBlock(990,GROUND_Y-50,16,40,'wood');
+  addBlock(1050,GROUND_Y-50,16,40,'wood');
+  // roof
+  addBlock(920,GROUND_Y-72,160,14,'wood');
+  // small pig on top
+  addPig(1000,GROUND_Y-95,'s');
+  addBlock(980,GROUND_Y-115,40,14,'glass');
 }
-// Level 2: Double tower
+// Level 2: Double tower with glass
 function buildLevel2(){
   addPig(920,GROUND_Y-18,'s');
-  addPig(1020,GROUND_Y-18,'m');
-  addPig(1120,GROUND_Y-18,'s');
+  addPig(1000,GROUND_Y-18,'m');
+  addPig(1080,GROUND_Y-18,'s');
   // tower 1
-  addBlock(900,GROUND_Y-22,60,22,'wood');
+  addBlock(900,GROUND_Y-22,60,20,'wood');
   addBlock(910,GROUND_Y-50,16,40,'wood');
   addBlock(934,GROUND_Y-50,16,40,'wood');
   addBlock(900,GROUND_Y-72,70,14,'glass');
   // tower 2
-  addBlock(1000,GROUND_Y-22,60,22,'wood');
-  addBlock(1010,GROUND_Y-50,16,40,'stone');
-  addBlock(1034,GROUND_Y-50,16,40,'stone');
-  addBlock(1000,GROUND_Y-72,70,14,'wood');
+  addBlock(980,GROUND_Y-22,60,20,'stone');
+  addBlock(990,GROUND_Y-50,16,40,'stone');
+  addBlock(1014,GROUND_Y-50,16,40,'stone');
+  addBlock(980,GROUND_Y-72,70,14,'wood');
   // tower 3
-  addBlock(1100,GROUND_Y-22,60,22,'wood');
-  addBlock(1110,GROUND_Y-50,16,40,'wood');
-  addBlock(1134,GROUND_Y-50,16,40,'wood');
-  addBlock(1100,GROUND_Y-72,70,14,'glass');
+  addBlock(1060,GROUND_Y-22,60,20,'wood');
+  addBlock(1070,GROUND_Y-50,16,40,'glass');
+  addBlock(1094,GROUND_Y-50,16,40,'glass');
+  addBlock(1060,GROUND_Y-72,70,14,'wood');
 }
-// Level 3: Fortress
+// Level 3: Stone fortress
 function buildLevel3(){
   addPig(950,GROUND_Y-18,'m');
   addPig(1020,GROUND_Y-18,'l');
   addPig(1100,GROUND_Y-18,'m');
   addPig(1000,GROUND_Y-100,'s');
   // base
-  addBlock(920,GROUND_Y-22,140,22,'stone');
+  addBlock(920,GROUND_Y-22,150,22,'stone');
   addBlock(1080,GROUND_Y-22,80,22,'stone');
   // pillars
   addBlock(930,GROUND_Y-50,20,45,'stone');
   addBlock(1010,GROUND_Y-50,20,45,'stone');
   addBlock(1090,GROUND_Y-50,20,45,'stone');
-  addBlock(1130,GROUND_Y-50,20,45,'stone');
+  addBlock(1140,GROUND_Y-50,20,45,'stone');
   // roof
-  addBlock(920,GROUND_Y-75,130,14,'wood');
-  addBlock(1080,GROUND_Y-75,90,14,'wood');
-  // top pig platform
+  addBlock(920,GROUND_Y-75,135,14,'wood');
+  addBlock(1080,GROUND_Y-75,85,14,'wood');
+  // upper pig platform
   addBlock(980,GROUND_Y-120,60,16,'glass');
+  addBlock(990,GROUND_Y-145,16,35,'wood');
+  addBlock(1014,GROUND_Y-145,16,35,'wood');
 }
 // Level 4: Castle
 function buildLevel4(){
   addPig(900,GROUND_Y-18,'s');
-  addPig(980,GROUND_Y-18,'m');
-  addPig(1060,GROUND_Y-18,'l');
-  addPig(1140,GROUND_Y-18,'s');
-  addPig(1020,GROUND_Y-120,'m');
+  addPig(970,GROUND_Y-18,'m');
+  addPig(1040,GROUND_Y-18,'l');
+  addPig(1110,GROUND_Y-18,'m');
+  addPig(1180,GROUND_Y-18,'s');
+  addPig(1040,GROUND_Y-120,'m');
   // main wall
-  addBlock(880,GROUND_Y-22,300,22,'stone');
+  addBlock(880,GROUND_Y-22,320,22,'stone');
   // pillars
-  for(var i=0;i<5;i++)addBlock(890+i*70,GROUND_Y-50,18,55,'stone');
+  for(var i=0;i<6;i++)addBlock(890+i*60,GROUND_Y-50,18,55,'stone');
   // roof
-  addBlock(880,GROUND_Y-78,300,16,'wood');
-  // top structure
-  addBlock(980,GROUND_Y-110,80,18,'stone');
-  addBlock(990,GROUND_Y-140,18,40,'wood');
-  addBlock(1032,GROUND_Y-140,18,40,'wood');
-  addBlock(980,GROUND_Y-160,70,12,'glass');
-  // side walls
-  addBlock(870,GROUND_Y-50,20,60,'wood');
-  addBlock(1170,GROUND_Y-50,20,60,'wood');
+  addBlock(880,GROUND_Y-78,320,16,'wood');
+  // upper structure
+  addBlock(980,GROUND_Y-110,120,20,'stone');
+  addBlock(990,GROUND_Y-140,16,45,'stone');
+  addBlock(1034,GROUND_Y-140,16,45,'stone');
+  addBlock(1074,GROUND_Y-140,16,45,'stone');
+  addBlock(980,GROUND_Y-160,110,14,'wood');
+  // top
+  addBlock(1010,GROUND_Y-190,50,14,'glass');
 }
 // Level 5: The Fort
 function buildLevel5(){
-  var pigs=[{x:900,y:GROUND_Y-18,s:'s'},{x:960,y:GROUND_Y-18,s:'m'},{x:1040,y:GROUND_Y-18,s:'l'},{x:1120,y:GROUND_Y-18,s:'m'},{x:1180,y:GROUND_Y-18,s:'s'},{x:1040,y:GROUND_Y-130,s:'m'}];
-  pigs.forEach(function(p){addPig(p.x,p.y,p.s)});
+  var pg=[{x:900,y:GROUND_Y-18,s:'s'},{x:960,y:GROUND_Y-18,s:'m'},{x:1040,y:GROUND_Y-18,s:'l'},{x:1120,y:GROUND_Y-18,s:'m'},{x:1180,y:GROUND_Y-18,s:'s'},{x:960,y:GROUND_Y-130,s:'m'},{x:1120,y:GROUND_Y-130,s:'m'}];
+  pg.forEach(function(p){addPig(p.x,p.y,p.s)});
   // base
-  addBlock(870,GROUND_Y-22,360,22,'stone');
+  addBlock(870,GROUND_Y-22,360,24,'stone');
   // pillars
-  for(var i=0;i<7;i++)addBlock(880+i*60,GROUND_Y-50,16,50,'stone');
+  for(var i=0;i<7;i++)addBlock(880+i*60,GROUND_Y-50,18,55,'stone');
   // roof
-  addBlock(870,GROUND_Y-78,360,16,'wood');
+  addBlock(870,GROUND_Y-80,360,16,'wood');
   // upper structure
-  addBlock(950,GROUND_Y-110,180,18,'stone');
-  addBlock(960,GROUND_Y-140,16,45,'stone');
-  addBlock(1054,GROUND_Y-140,16,45,'stone');
-  addBlock(1104,GROUND_Y-140,16,45,'stone');
-  addBlock(950,GROUND_Y-160,170,14,'wood');
-  // top
-  addBlock(1000,GROUND_Y-190,70,14,'glass');
-  addBlock(1010,GROUND_Y-220,16,40,'wood');
-  addBlock(1044,GROUND_Y-220,16,40,'wood');
-  addBlock(1000,GROUND_Y-240,70,12,'glass');
+  addBlock(950,GROUND_Y-115,180,20,'stone');
+  addBlock(960,GROUND_Y-145,16,45,'stone');
+  addBlock(1054,GROUND_Y-145,16,45,'stone');
+  addBlock(1104,GROUND_Y-145,16,45,'stone');
+  addBlock(950,GROUND_Y-165,170,16,'wood');
+  // towers
+  addBlock(940,GROUND_Y-195,14,45,'stone');
+  addBlock(1010,GROUND_Y-195,14,45,'stone');
+  addBlock(1120,GROUND_Y-195,14,45,'stone');
+  addBlock(930,GROUND_Y-215,160,14,'glass');
 }
 // Random levels
 function buildRandomLevel(lv){
@@ -325,17 +335,19 @@ function resolveBirdBlock(bird,block){
   if(ov>0){bird.x+=c.nx*ov;bird.y+=c.ny*ov}
   var rvx=bird.vx-block.vx,rvy=bird.vy-block.vy;
   var imp=Math.abs(rvx*c.nx+rvy*c.ny);
-  var force=imp*(block.type.mass)*0.7;
+  var force=imp*(block.type.mass)*0.8;
   var tm=1+block.type.mass;
-  bird.vx-=c.nx*imp*0.45;bird.vy-=c.ny*imp*0.45;
-  block.vx+=c.nx*imp*0.45/tm;block.vy+=c.ny*imp*0.45/tm;
+  bird.vx-=c.nx*imp*0.4;bird.vy-=c.ny*imp*0.4;
+  block.vx+=c.nx*imp*0.5/tm;block.vy+=c.ny*imp*0.5/tm-2;
   if(damageBlock(block,force)){
-    spawnParticles(block.x+block.w/2,block.y+block.h/2,25,block.type.color);
+    spawnParticles(block.x+block.w/2,block.y+block.h/2,20,block.type.color,true);
+    spawnParticles(block.x+block.w/2,block.y+block.h/2,15,block.type.color);
+    spawnParticles(block.x+block.w/2,block.y+block.h/2,8,'rgba(200,180,150,0.8)');
     score+=block.type.mass*100;scoreThisLevel+=block.type.mass*100;
     spawnScorePop(block.x+block.w/2,block.y,block.type.mass*100);
-    sfx_destroy();screenShake=Math.max(screenShake,force*0.03);
+    sfx_destroy();screenShake=Math.max(screenShake,force*0.04);
     return'd'
-  }else{sfx_hit();spawnParticles(c.px,c.py,4,block.type.color)}
+  }else{sfx_hit();spawnParticles(c.px,c.py,6,block.type.color);spawnParticles(c.px,c.py,3,'rgba(255,255,255,0.6)')}
   return'h';
 }
 function resolveBirdPig(bird,pig){
@@ -345,18 +357,20 @@ function resolveBirdPig(bird,pig){
   if(ov>0){bird.x-=c.nx*ov*0.5;bird.y-=c.ny*ov*0.5;pig.x+=c.nx*ov*0.5;pig.y+=c.ny*ov*0.5}
   var rvx=bird.vx-pig.vx,rvy=bird.vy-pig.vy;
   var imp=Math.abs(rvx*c.nx+rvy*c.ny);
-  var force=imp*1.2;
-  bird.vx-=c.nx*imp*0.4;bird.vy-=c.ny*imp*0.4;
-  pig.vx+=c.nx*imp*0.25;pig.vy+=c.ny*imp*0.25;
+  var force=imp*1.5;
+  bird.vx-=c.nx*imp*0.35;bird.vy-=c.ny*imp*0.35;
+  pig.vx+=c.nx*imp*0.3;pig.vy+=c.ny*imp*0.3-3;
   if(damagePig(pig,force)){
-    spawnParticles(pig.x,pig.y,30,'#4CAF50');
+    spawnParticles(pig.x,pig.y,20,'#4CAF50',true);
+    spawnParticles(pig.x,pig.y,20,'#4CAF50');
     spawnParticles(pig.x,pig.y,20,'#FFD700');
+    spawnParticles(pig.x,pig.y,10,'#fff');
     score+=1000;scoreThisLevel+=1000;
     spawnScorePop(pig.x,pig.y,1000);
-    sfx_pig();screenShake=Math.max(screenShake,force*0.05);
-    if(pigs.length===0)slowMo=0.3;// slow-mo on last pig
+    sfx_pig();screenShake=Math.max(screenShake,force*0.06);
+    if(pigs.length===0)slowMo=0.25;
     return'd'
-  }else{sfx_hit();spawnParticles(pig.x,pig.y,3,'#4CAF50')}
+  }else{sfx_hit();spawnParticles(pig.x,pig.y,4,'#4CAF50');spawnParticles(pig.x,pig.y,2,'#fff')}
   return'h';
 }
 function resolveBlockBlock(a,b){
@@ -378,10 +392,15 @@ function damagePig(p,f){p.health-=f;return p.health<=0}
 // ============================================================
 // PARTICLES
 // ============================================================
-function spawnParticles(x,y,n,color){
+function spawnParticles(x,y,n,color,debris){
   for(var i=0;i<n;i++){
-    var a=Math.random()*Math.PI*2,s=3+Math.random()*7;
-    particles.push({x:x,y:y,vx:Math.cos(a)*s,vy:Math.sin(a)*s-3,life:1,decay:0.015+Math.random()*0.03,color:color,size:2+Math.random()*5});
+    var a=Math.random()*Math.PI*2,s=debris?2+Math.random()*5:3+Math.random()*7;
+    particles.push({x:x,y:y,vx:Math.cos(a)*s,vy:Math.sin(a)*s-(debris?1:3),life:1,decay:0.012+Math.random()*0.03,color:color,size:debris?3+Math.random()*4:2+Math.random()*5,debris:!!debris});
+  }
+}
+function spawnDust(x,y,n){
+  for(var i=0;i<n;i++){
+    particles.push({x:x+Math.random()*20-10,y:y,vx:Math.random()*2-1,vy:-Math.random()*3-1,life:1,decay:0.02+Math.random()*0.04,color:'rgba(180,160,140,0.6)',size:4+Math.random()*8,dust:true});
   }
 }
 function spawnScorePop(x,y,pts){
@@ -521,8 +540,12 @@ function update(){
   for(var i=particles.length-1;i>=0;i--){
     var p=particles[i];
     p.x+=p.vx*slowMo;p.y+=p.vy*slowMo;
-    if(!p.feather)p.vy+=0.15*slowMo;
-    else p.vy+=0.02*slowMo;
+    if(p.feather)p.vy+=0.02*slowMo;
+    else if(p.dust){p.vy-=0.03*slowMo;p.vx*=0.99;p.size+=0.05;}
+    else if(p.debris){
+      p.vy+=0.2*slowMo;
+      if(p.y>GROUND_Y-2){p.y=GROUND_Y-2;p.vy*=-0.4;p.vx*=0.7;if(Math.abs(p.vy)<1)p.vy=0}
+    }else p.vy+=0.18*slowMo;
     p.life-=p.decay*slowMo;
     if(p.life<=0)particles.splice(i,1);
   }
@@ -577,6 +600,7 @@ function update(){
     if(currentBird.y>GROUND_Y+120||currentBird.x>W+120||currentBird.x<-120){
       if(currentBird._settleTimeout)clearTimeout(currentBird._settleTimeout);
       settledBirds.push({x:currentBird.x,y:Math.min(currentBird.y,GROUND_Y-currentBird.r),r:currentBird.r,color:BIRD_TYPES[birdQueue[birdsUsed-1]]?BIRD_TYPES[birdQueue[birdsUsed-1]].color:'#FF4444'});
+      spawnDust(currentBird.x,GROUND_Y,8);
       currentBird.active=false;
       nextBird();
     }
@@ -584,6 +608,7 @@ function update(){
     if(Math.abs(currentBird.vx)<0.15&&Math.abs(currentBird.vy)<0.15&&currentBird.y>=GROUND_Y-currentBird.r-3){
       if(currentBird._settleTimeout)clearTimeout(currentBird._settleTimeout);
       settledBirds.push({x:currentBird.x,y:currentBird.y,r:currentBird.r,color:BIRD_TYPES[birdQueue[birdsUsed-1]]?BIRD_TYPES[birdQueue[birdsUsed-1]].color:'#FF4444'});
+      spawnDust(currentBird.x,GROUND_Y,6);
       currentBird.active=false;
       nextBird();
     }
@@ -688,30 +713,41 @@ function drawSlingshot(){
 function drawBird(x,y,r,type,active){
   ctx.save();ctx.translate(x,y);
   var t=BIRD_TYPES[type]||BIRD_TYPES.red;
+  // shadow
+  ctx.fillStyle='rgba(0,0,0,0.2)';ctx.beginPath();ctx.ellipse(0,r*1.1,r*0.8,r*0.2,0,0,Math.PI*2);ctx.fill();
   // body
-  ctx.fillStyle=t.color;ctx.beginPath();ctx.arc(0,0,r,0,Math.PI*2);ctx.fill();
+  var grad=ctx.createRadialGradient(-r*0.2,-r*0.2,r*0.1,0,0,r);
+  grad.addColorStop(0,'rgba(255,255,255,0.3)');grad.addColorStop(0.6,t.color);grad.addColorStop(1,t.stroke);
+  ctx.fillStyle=grad;ctx.beginPath();ctx.arc(0,0,r,0,Math.PI*2);ctx.fill();
   ctx.strokeStyle=t.stroke;ctx.lineWidth=2.5;ctx.stroke();
   // belly
-  ctx.fillStyle='rgba(255,255,255,0.25)';
-  ctx.beginPath();ctx.ellipse(0,r*0.2,r*0.55,r*0.45,0,0,Math.PI*2);ctx.fill();
+  ctx.fillStyle='rgba(255,255,255,0.3)';
+  ctx.beginPath();ctx.ellipse(0,r*0.2,r*0.5,r*0.42,0,0,Math.PI*2);ctx.fill();
   // eyes
-  ctx.fillStyle='#fff';
-  ctx.beginPath();ctx.arc(-r*0.3,-r*0.25,r*0.3,0,Math.PI*2);ctx.fill();
-  ctx.beginPath();ctx.arc(r*0.3,-r*0.25,r*0.3,0,Math.PI*2);ctx.fill();
+  ctx.fillStyle='#fff';ctx.strokeStyle='rgba(0,0,0,0.2)';ctx.lineWidth=1;
+  ctx.beginPath();ctx.arc(-r*0.3,-r*0.25,r*0.32,0,Math.PI*2);ctx.fill();ctx.stroke();
+  ctx.beginPath();ctx.arc(r*0.3,-r*0.25,r*0.32,0,Math.PI*2);ctx.fill();ctx.stroke();
   ctx.fillStyle='#111';
   ctx.beginPath();ctx.arc(-r*0.2,-r*0.25,r*0.14,0,Math.PI*2);ctx.fill();
-  ctx.beginPath();ctx.arc(r*0.4,-r*0.25,r*0.14,0,Math.PI*2);ctx.fill();
+  ctx.beginPath();ctx.arc(r*0.38,-r*0.25,r*0.14,0,Math.PI*2);ctx.fill();
+  // eye shine
+  ctx.fillStyle='#fff';ctx.beginPath();ctx.arc(-r*0.25,-r*0.3,r*0.06,0,Math.PI*2);ctx.fill();
+  ctx.beginPath();ctx.arc(r*0.33,-r*0.3,r*0.06,0,Math.PI*2);ctx.fill();
   // beak
-  ctx.fillStyle='#FFA000';
-  ctx.beginPath();ctx.moveTo(r*0.5,r*0.05);ctx.lineTo(r*1.1,r*0.02);ctx.lineTo(r*0.5,-r*0.1);ctx.fill();
+  ctx.fillStyle='#FFA000';ctx.strokeStyle='#E08000';ctx.lineWidth=1;
+  ctx.beginPath();ctx.moveTo(r*0.45,r*0.05);ctx.lineTo(r*1.15,r*0.02);ctx.lineTo(r*0.45,-r*0.12);ctx.closePath();ctx.fill();ctx.stroke();
   // eyebrows
-  ctx.strokeStyle='#111';ctx.lineWidth=2.5;
+  ctx.strokeStyle='#111';ctx.lineWidth=2.5;ctx.lineCap='round';
   ctx.beginPath();ctx.moveTo(-r*0.65,-r*0.5);ctx.lineTo(-r*0.15,-r*0.35);ctx.stroke();
   ctx.beginPath();ctx.moveTo(r*0.65,-r*0.5);ctx.lineTo(r*0.15,-r*0.35);ctx.stroke();
   // tail feathers
-  ctx.fillStyle=t.color;
-  ctx.beginPath();ctx.moveTo(-r*0.7,-r*0.3);ctx.lineTo(-r*1.3,-r*0.8);ctx.lineTo(-r*0.9,-r*0.1);ctx.fill();
-  ctx.beginPath();ctx.moveTo(-r*0.6,-r*0.1);ctx.lineTo(-r*1.4,-r*0.3);ctx.lineTo(-r*0.8,r*0.1);ctx.fill();
+  ctx.fillStyle=t.color;ctx.strokeStyle=t.stroke;ctx.lineWidth=1;
+  ctx.beginPath();ctx.moveTo(-r*0.7,-r*0.3);ctx.lineTo(-r*1.4,-r*0.9);ctx.lineTo(-r*0.9,-r*0.1);ctx.closePath();ctx.fill();ctx.stroke();
+  ctx.beginPath();ctx.moveTo(-r*0.6,-r*0.1);ctx.lineTo(-r*1.5,-r*0.3);ctx.lineTo(-r*0.8,r*0.15);ctx.closePath();ctx.fill();ctx.stroke();
+  // head feather tuft
+  ctx.fillStyle=t.color;ctx.strokeStyle=t.stroke;ctx.lineWidth=1;
+  ctx.beginPath();ctx.moveTo(-r*0.1,-r*0.85);ctx.lineTo(r*0.05,-r*1.3);ctx.lineTo(r*0.2,-r*0.85);ctx.closePath();ctx.fill();ctx.stroke();
+  ctx.beginPath();ctx.moveTo(r*0.05,-r*0.85);ctx.lineTo(r*0.15,-r*1.4);ctx.lineTo(r*0.3,-r*0.85);ctx.closePath();ctx.fill();ctx.stroke();
   ctx.restore();
 }
 
@@ -846,21 +882,28 @@ function render(){
   }
   // slingshot
   drawSlingshot();
-  // aim guide
+  // aim guide - parabolic trajectory prediction
   if(state==='aiming'&&dragPos){
-    ctx.setLineDash([5,8]);
-    ctx.strokeStyle='rgba(255,255,255,0.25)';ctx.lineWidth=1.5;
-    ctx.beginPath();ctx.moveTo(dragPos.x,dragPos.y);
     var dx=SLING_X-dragPos.x,dy=SLING_Y-dragPos.y;
-    ctx.lineTo(dragPos.x+dx*4,dragPos.y+dy*4);ctx.stroke();
-    ctx.setLineDash([]);
-    // power dots
     var dist=Math.sqrt(dx*dx+dy*dy);
-    for(var i=0;i<Math.floor(dist/15);i++){
-      var t=i/Math.floor(dist/15);
-      ctx.fillStyle='rgba(255,255,255,'+(0.15+t*0.2)+')';
-      ctx.beginPath();ctx.arc(dragPos.x+dx*t*4,dragPos.y+dy*t*4,3-t*1.5,0,Math.PI*2);ctx.fill();
+    var power=Math.min(dist,MAX_DRAG)*LAUNCH_POWER;
+    var vx=dx/(dist||1)*power, vy=dy/(dist||1)*power;
+    // draw parabolic dots
+    for(var t=6;t<100;t+=4){
+      var px=dragPos.x+vx*t;
+      var py=dragPos.y+vy*t+0.5*GRAVITY*t*t;
+      if(px<0||px>W||py>GROUND_Y+50)break;
+      var alpha=0.55*(1-t/100);
+      var r=3.5*(1-t/100);
+      ctx.fillStyle='rgba(255,255,255,'+alpha+')';
+      ctx.beginPath();ctx.arc(px,py,Math.max(1,r),0,Math.PI*2);ctx.fill();
     }
+    // draw launch direction line (faint)
+    ctx.setLineDash([3,10]);
+    ctx.strokeStyle='rgba(255,255,255,0.12)';ctx.lineWidth=1;
+    ctx.beginPath();ctx.moveTo(dragPos.x,dragPos.y);
+    ctx.lineTo(dragPos.x+dx*3,dragPos.y+dy*3);ctx.stroke();
+    ctx.setLineDash([]);
   }
   // particles
   for(var i=0;i<particles.length;i++){
@@ -869,6 +912,8 @@ function render(){
     ctx.fillStyle=p.color;
     if(p.feather){
       ctx.fillRect(p.x-2,p.y-4,4,8);
+    }else if(p.dust){
+      ctx.beginPath();ctx.arc(p.x,p.y,p.size,0,Math.PI*2);ctx.fill();
     }else{
       ctx.fillRect(p.x-p.size/2,p.y-p.size/2,p.size,p.size);
     }
